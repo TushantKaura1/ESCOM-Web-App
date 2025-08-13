@@ -1,0 +1,277 @@
+{
+  "accounts": {
+    "admin": {
+      "telegramId": 123456789,
+      "username": "esco_admin",
+      "firstName": "ESCOM",
+      "lastName": "Administrator",
+      "role": "admin",
+      "isAdmin": true,
+      "profile": {
+        "name": "ESCOM Administrator",
+        "village": "Headquarters",
+        "team": "admin",
+        "parameters": "all",
+        "since": "2024-01-01",
+        "experience": "advanced"
+      },
+      "stats": {
+        "totalReadings": 0,
+        "streak": 0,
+        "accuracy": 100,
+        "lastReading": null
+      },
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "lastActive": "2024-01-01T00:00:00.000Z"
+    },
+    "citizens": [
+      {
+        "telegramId": 111111111,
+        "username": "maria_coastal",
+        "firstName": "Maria",
+        "lastName": "Santos",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Maria Santos",
+          "village": "Vila do Mar",
+          "team": "team1",
+          "parameters": "water-quality",
+          "since": "2024-01-15",
+          "experience": "intermediate"
+        },
+        "stats": {
+          "totalReadings": 45,
+          "streak": 12,
+          "accuracy": 92,
+          "lastReading": "2024-01-20T14:30:00.000Z"
+        },
+        "createdAt": "2024-01-15T10:00:00.000Z",
+        "lastActive": "2024-01-20T14:30:00.000Z"
+      },
+      {
+        "telegramId": 222222222,
+        "username": "joao_monitor",
+        "firstName": "João",
+        "lastName": "Pereira",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "João Pereira",
+          "village": "Praia Azul",
+          "team": "team2",
+          "parameters": "temperature",
+          "since": "2024-01-10",
+          "experience": "advanced"
+        },
+        "stats": {
+          "totalReadings": 78,
+          "streak": 25,
+          "accuracy": 95,
+          "lastReading": "2024-01-20T16:45:00.000Z"
+        },
+        "createdAt": "2024-01-10T08:30:00.000Z",
+        "lastActive": "2024-01-20T16:45:00.000Z"
+      },
+      {
+        "telegramId": 333333333,
+        "username": "ana_scientist",
+        "firstName": "Ana",
+        "lastName": "Costa",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Ana Costa",
+          "village": "Porto Seguro",
+          "team": "team1",
+          "parameters": "salinity",
+          "since": "2024-01-20",
+          "experience": "beginner"
+        },
+        "stats": {
+          "totalReadings": 23,
+          "streak": 8,
+          "accuracy": 88,
+          "lastReading": "2024-01-20T12:15:00.000Z"
+        },
+        "createdAt": "2024-01-20T09:00:00.000Z",
+        "lastActive": "2024-01-20T12:15:00.000Z"
+      },
+      {
+        "telegramId": 444444444,
+        "username": "carlos_researcher",
+        "firstName": "Carlos",
+        "lastName": "Silva",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Carlos Silva",
+          "village": "Cabo Verde",
+          "team": "team3",
+          "parameters": "ph",
+          "since": "2024-01-05",
+          "experience": "intermediate"
+        },
+        "stats": {
+          "totalReadings": 56,
+          "streak": 18,
+          "accuracy": 90,
+          "lastReading": "2024-01-20T15:20:00.000Z"
+        },
+        "createdAt": "2024-01-05T11:15:00.000Z",
+        "lastActive": "2024-01-20T15:20:00.000Z"
+      },
+      {
+        "telegramId": 555555555,
+        "username": "lucia_ocean",
+        "firstName": "Lúcia",
+        "lastName": "Fernandes",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Lúcia Fernandes",
+          "village": "Ilha do Sol",
+          "team": "team2",
+          "parameters": "water-quality",
+          "since": "2024-01-12",
+          "experience": "advanced"
+        },
+        "stats": {
+          "totalReadings": 89,
+          "streak": 30,
+          "accuracy": 96,
+          "lastReading": "2024-01-20T17:30:00.000Z"
+        },
+        "createdAt": "2024-01-12T14:20:00.000Z",
+        "lastActive": "2024-01-20T17:30:00.000Z"
+      },
+      {
+        "telegramId": 666666666,
+        "username": "pedro_monitor",
+        "firstName": "Pedro",
+        "lastName": "Oliveira",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Pedro Oliveira",
+          "village": "Baía dos Ventos",
+          "team": "team1",
+          "parameters": "temperature",
+          "since": "2024-01-18",
+          "experience": "beginner"
+        },
+        "stats": {
+          "totalReadings": 15,
+          "streak": 5,
+          "accuracy": 85,
+          "lastReading": "2024-01-20T13:45:00.000Z"
+        },
+        "createdAt": "2024-01-18T16:00:00.000Z",
+        "lastActive": "2024-01-20T13:45:00.000Z"
+      },
+      {
+        "telegramId": 777777777,
+        "username": "sofia_coastal",
+        "firstName": "Sofia",
+        "lastName": "Martins",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Sofia Martins",
+          "village": "Ponta do Mar",
+          "team": "team3",
+          "parameters": "salinity",
+          "since": "2024-01-08",
+          "experience": "intermediate"
+        },
+        "stats": {
+          "totalReadings": 67,
+          "streak": 22,
+          "accuracy": 93,
+          "lastReading": "2024-01-20T18:15:00.000Z"
+        },
+        "createdAt": "2024-01-08T12:30:00.000Z",
+        "lastActive": "2024-01-20T18:15:00.000Z"
+      },
+      {
+        "telegramId": 888888888,
+        "username": "miguel_scientist",
+        "firstName": "Miguel",
+        "lastName": "Ribeiro",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Miguel Ribeiro",
+          "village": "Costa Dourada",
+          "team": "team2",
+          "parameters": "ph",
+          "since": "2024-01-14",
+          "experience": "advanced"
+        },
+        "stats": {
+          "totalReadings": 92,
+          "streak": 28,
+          "accuracy": 97,
+          "lastReading": "2024-01-20T19:00:00.000Z"
+        },
+        "createdAt": "2024-01-14T10:45:00.000Z",
+        "lastActive": "2024-01-20T19:00:00.000Z"
+      },
+      {
+        "telegramId": 999999999,
+        "username": "isabela_monitor",
+        "firstName": "Isabela",
+        "lastName": "Gomes",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Isabela Gomes",
+          "village": "Praia Serena",
+          "team": "team1",
+          "parameters": "water-quality",
+          "since": "2024-01-16",
+          "experience": "beginner"
+        },
+        "stats": {
+          "totalReadings": 34,
+          "streak": 10,
+          "accuracy": 87,
+          "lastReading": "2024-01-20T11:30:00.000Z"
+        },
+        "createdAt": "2024-01-16T15:15:00.000Z",
+        "lastActive": "2024-01-20T11:30:00.000Z"
+      },
+      {
+        "telegramId": 101010101,
+        "username": "tiago_researcher",
+        "firstName": "Tiago",
+        "lastName": "Lopes",
+        "role": "citizen",
+        "isAdmin": false,
+        "profile": {
+          "name": "Tiago Lopes",
+          "village": "Cabo das Ondas",
+          "team": "team3",
+          "parameters": "temperature",
+          "since": "2024-01-11",
+          "experience": "intermediate"
+        },
+        "stats": {
+          "totalReadings": 73,
+          "streak": 20,
+          "accuracy": 91,
+          "lastReading": "2024-01-20T20:15:00.000Z"
+        },
+        "createdAt": "2024-01-11T13:00:00.000Z",
+        "lastActive": "2024-01-20T20:15:00.000Z"
+      }
+    ]
+  },
+  "metadata": {
+    "totalAccounts": 11,
+    "adminCount": 1,
+    "citizenCount": 10,
+    "createdAt": "2024-01-20T00:00:00.000Z",
+    "description": "Demo accounts for ESCOM Citizen Scientist Assistant"
+  }
+} 

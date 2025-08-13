@@ -1,0 +1,111 @@
+{
+  "faqCategories": {
+    "ESCOM organization": {
+      "description": "Learn about ESCOM structure and participation",
+      "questions": {
+        "Getting involved": {
+          "question": "How can I get involved with ESCOM?",
+          "answer": "You can join ESCOM by participating in our coastal monitoring programs. Contact your local team coordinator or visit our website to register as a citizen scientist."
+        },
+        "Benefits of participation": {
+          "question": "What are the benefits of participating in ESCOM?",
+          "answer": "Benefits include contributing to environmental research, learning about coastal ecosystems, connecting with other scientists, and helping protect marine environments."
+        },
+        "Organizational structure": {
+          "question": "How is ESCOM organized?",
+          "answer": "ESCOM is organized into regional teams, each focusing on specific coastal areas. We have team coordinators, data analysts, and citizen scientists working together."
+        }
+      }
+    },
+    "Monitoring": {
+      "description": "Learn about monitoring protocols and instruments",
+      "questions": {
+        "Parameters": {
+          "question": "What parameters do we monitor?",
+          "answer": "We monitor water quality, temperature, salinity, pH levels, and other environmental parameters that affect coastal ecosystems."
+        },
+        "Field protocols": {
+          "question": "What are the field monitoring protocols?",
+          "answer": "Field protocols include standardized sampling methods, safety procedures, and data recording guidelines to ensure consistent and reliable data collection."
+        },
+        "Instruments": {
+          "question": "What instruments do we use for monitoring?",
+          "answer": "We use various instruments including thermometers, pH meters, salinity meters, water quality sensors, and GPS devices for location tracking."
+        }
+      }
+    },
+    "Training": {
+      "description": "Access training materials and resources",
+      "questions": {
+        "Wiki": {
+          "question": "Where can I find the training wiki?",
+          "answer": "Our training wiki is available online and contains comprehensive guides, tutorials, and best practices for coastal monitoring."
+        },
+        "Manuals": {
+          "question": "Are there training manuals available?",
+          "answer": "Yes, we provide detailed training manuals covering all aspects of coastal monitoring, from basic procedures to advanced techniques."
+        },
+        "Podcasts": {
+          "question": "Do you offer training podcasts?",
+          "answer": "Yes, we have a series of training podcasts covering various topics in coastal monitoring and environmental science."
+        },
+        "Videos": {
+          "question": "Are there training videos available?",
+          "answer": "We offer comprehensive video training materials demonstrating proper monitoring techniques and equipment usage."
+        },
+        "External references": {
+          "question": "What external references do you recommend?",
+          "answer": "We recommend various scientific journals, government reports, and educational resources for additional learning."
+        }
+      }
+    },
+    "Data": {
+      "description": "Learn about data entry, visualization, and sharing",
+      "questions": {
+        "Entry": {
+          "question": "How do I enter monitoring data?",
+          "answer": "Data can be entered through our mobile app, web interface, or by submitting paper forms to your team coordinator."
+        },
+        "Download": {
+          "question": "How can I download my data?",
+          "answer": "You can download your data through the dashboard in various formats including CSV, Excel, and PDF reports."
+        },
+        "Visualize": {
+          "question": "How can I visualize my data?",
+          "answer": "Our platform provides various visualization tools including charts, graphs, and maps to help you understand your data."
+        },
+        "Property and sharing": {
+          "question": "Who owns the data I collect?",
+          "answer": "Data collected through ESCOM is shared for scientific research while protecting your privacy. You retain rights to your personal contributions."
+        }
+      }
+    },
+    "Partners": {
+      "description": "Learn about our partners and collaborators",
+      "questions": {
+        "Dalhousie": {
+          "question": "What is our partnership with Dalhousie University?",
+          "answer": "Dalhousie University provides scientific expertise, research support, and academic validation for our monitoring programs."
+        },
+        "ESCOM members": {
+          "question": "Who are the ESCOM members?",
+          "answer": "ESCOM members include citizen scientists, researchers, educators, and community leaders committed to coastal monitoring."
+        },
+        "Funders": {
+          "question": "Who funds ESCOM activities?",
+          "answer": "ESCOM is funded through various sources including government grants, private donations, and research partnerships."
+        },
+        "Allies": {
+          "question": "Who are our allies and collaborators?",
+          "answer": "Our allies include environmental organizations, research institutions, government agencies, and community groups."
+        }
+      }
+    }
+  },
+  "metadata": {
+    "lastUpdated": "2024-01-20T00:00:00.000Z",
+    "version": "1.0",
+    "totalCategories": 5,
+    "totalQuestions": 20
+  }
+} 
