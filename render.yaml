@@ -5,6 +5,9 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: npm start
+    nodeVersion: 18
+    autoDeploy: true
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
