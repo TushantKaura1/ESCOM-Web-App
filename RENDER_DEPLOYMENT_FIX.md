@@ -7,25 +7,25 @@ Your Render deployment is failing with this error:
 error: Script not found "starnpm"
 ```
 
-## 🔍 **Root Cause**
-Render is trying to use **Bun** instead of **Node.js**, and there's a typo in the command execution.
+## 🔍 **Root Cause Analysis**
+1. **Render is defaulting to Bun** instead of Node.js
+2. **Command is corrupted** (`starnpm startt` instead of `npm start`)
+3. **Configuration files** are not being recognized properly
 
 ## ✅ **Solution: Force Node.js Environment**
 
-### **Step 1: Update render.yaml**
-I've already updated your `render.yaml` file to be more explicit about using Node.js.
+### **Step 1: Updated Configuration Files**
+I've updated these files to force Node.js:
+- ✅ `render.yaml` - Explicit Node.js configuration
+- ✅ `.node-version` - Forces Node.js version 18
+- ✅ `package.json` - Added engines field and start:prod script
 
-### **Step 2: Create .node-version file**
-I've added a `.node-version` file with `18` to force Node.js version.
-
-### **Step 3: Redeploy with Correct Configuration**
-
-#### **Option A: Use Updated Files (Recommended)**
+### **Step 2: Redeploy with Updated Files**
 1. **Commit and push** the updated files:
    ```bash
    git add .
-   git commit -m "Fix Render deployment - force Node.js environment"
-   git push
+   git commit -m "Force Node.js environment for Render deployment"
+   git push origin master
    ```
 
 2. **Redeploy on Render**:
@@ -33,16 +33,33 @@ I've added a `.node-version` file with `18` to force Node.js version.
    - Click on your service
    - Click "Manual Deploy" → "Deploy latest commit"
 
-#### **Option B: Manual Configuration on Render**
+## 🚨 **If Still Failing - Alternative Solutions**
+
+### **Option A: Delete and Recreate Service**
+1. **Delete** the current service on Render
+2. **Create new** Web Service
+3. **Use** the updated `render.yaml` file
+4. **Set** environment variables manually
+
+### **Option B: Manual Configuration Override**
 1. **Go to** your service dashboard on Render
-2. **Click** "Environment" tab
-3. **Add/Update** these environment variables:
+2. **Click** "Settings" tab
+3. **Override** these settings:
+   - **Environment**: Must be "Node" (not auto-detected)
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Node Version**: 18
+
+4. **Add** these environment variables:
    ```
    NODE_VERSION=18
    NPM_FLAGS=--legacy-peer-deps
+   FORCE_NODE=true
    ```
 
-4. **Click** "Manual Deploy" → "Deploy latest commit"
+### **Option C: Use package.json Scripts**
+1. **Change** start command to: `npm run start:prod`
+2. **This uses** the explicit production start script
 
 ## 🧪 **Test Your Fix**
 
@@ -67,27 +84,20 @@ curl https://your-backend-name.onrender.com/api/admin/dashboard
 ```
 Should return: `{"error":"No token provided"}`
 
-## 🚨 **If Still Failing**
+## 🚨 **Critical Settings to Check**
 
-### **Check Render Service Settings:**
-1. **Environment**: Must be set to "Node"
+### **Render Service Configuration:**
+1. **Environment**: Must be explicitly set to "Node"
 2. **Build Command**: Must be `npm install`
 3. **Start Command**: Must be `npm start`
 4. **Node Version**: Should be 18 or higher
 
-### **Alternative: Create New Service**
-If the current service keeps having issues:
-1. **Delete** the current service
-2. **Create new** Web Service
-3. **Use** the updated `render.yaml` file
-4. **Set** environment variables manually
-
-## 📋 **Required Environment Variables**
-Make sure these are set in Render:
-
+### **Environment Variables Required:**
 | Key | Value |
 |-----|-------|
-| `MONGODB_URI` | `mongodb+srv://escom_admin:Escom2024!@cluster0.xxxxx.mongodb.net/escom?retryWrites=true&w=majority` |
+| `NODE_VERSION` | `18` |
+| `NPM_FLAGS` | `--legacy-peer-deps` |
+| `MONGODB_URI` | Your MongoDB Atlas connection string |
 | `PORT` | `3002` |
 | `NODE_ENV` | `production` |
 | `JWT_SECRET` | `escom-super-secret-2024` |
@@ -106,6 +116,13 @@ After fixing:
 2. **Update** frontend config with your Render URL
 3. **Redeploy** frontend to Netlify
 4. **Test** complete app functionality
+
+## 🆘 **Emergency Fix**
+If nothing else works:
+1. **Delete** the current Render service
+2. **Create new** service from scratch
+3. **Manually configure** everything
+4. **Don't use** auto-detection
 
 ---
 **Need Help?** The issue is likely resolved with the updated configuration files. Try redeploying! 

@@ -9,10 +9,15 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "node src/mongo-api/admin-api.js",
+    "start:prod": "node src/mongo-api/admin-api.js",
     "server": "node src/mongo-api/server.js",
     "bot": "node src/bot.js",
     "load-demo": "node scripts/load-demo-accounts.js",
     "test-db": "node test-db.js"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "dependencies": {
     "react": "^18.2.0",
