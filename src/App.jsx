@@ -47,19 +47,19 @@ function AuthScreen({ onLogin }) {
       // Try admin login first
       console.log('🔐 Attempting admin login...');
       const adminResponse = await fetch(`${config.API_BASE_URL}/api/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
 
       if (adminResponse.ok) {
         const data = await adminResponse.json();
         console.log('✅ Admin login successful');
-        localStorage.setItem('adminToken', data.token);
-        localStorage.setItem('adminUser', JSON.stringify(data.user));
+            localStorage.setItem('adminToken', data.token);
+            localStorage.setItem('adminUser', JSON.stringify(data.user));
         onLogin(data.user, 'admin');
         return;
-      } else {
+          } else {
         console.log('❌ Admin login failed:', adminResponse.status);
         const errorData = await adminResponse.json().catch(() => ({}));
         console.log('Error details:', errorData);
@@ -68,18 +68,18 @@ function AuthScreen({ onLogin }) {
       // Try regular user login
       console.log('🔐 Attempting user login...');
       const userResponse = await fetch(`${config.API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
       if (userResponse.ok) {
         const data = await userResponse.json();
         console.log('✅ User login successful');
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
         onLogin(data.user, 'citizen');
-      } else {
+        } else {
         const errorData = await userResponse.json().catch(() => ({}));
         console.log('❌ User login failed:', userResponse.status, errorData);
         setError(errorData.error || `Login failed (Status: ${userResponse.status})`);
@@ -103,12 +103,12 @@ function AuthScreen({ onLogin }) {
           <div className="particle"></div>
           <div className="particle"></div>
           <div className="particle"></div>
-        </div>
-        
+      </div>
+      
         <div className="auth-card">
           <div className="auth-header">
-            <div className="logo-icon">🌊</div>
-            <h1>ESCOM Citizen Scientist</h1>
+              <div className="logo-icon">🌊</div>
+              <h1>ESCOM Citizen Scientist</h1>
             <p>Welcome back to the community!</p>
             
             {/* Backend Connection Status */}
@@ -150,7 +150,7 @@ function AuthScreen({ onLogin }) {
             
             <button type="submit" className="login-btn" disabled={loading}>
               {loading ? 'Processing...' : 'Login'}
-            </button>
+              </button>
           </form>
           
           <div className="auth-footer">
@@ -191,21 +191,21 @@ function Dashboard({ user, userMode, onLogout }) {
           `${config.API_BASE_URL}/api/user/dashboard`;
         
         const response = await fetch(endpoint, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (response.ok) {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
           const result = await response.json();
           setData(result.data);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     fetchData();
   }, [userMode]);
@@ -217,7 +217,7 @@ function Dashboard({ user, userMode, onLogout }) {
         <p>Role: {userMode === 'admin' ? '👑 Admin' : '👥 Citizen Scientist'}</p>
         <button onClick={onLogout} className="logout-btn">Logout</button>
       </div>
-      
+
       <div className="dashboard-content">
         {loading ? (
           <div className="loading">Loading dashboard...</div>
@@ -225,7 +225,7 @@ function Dashboard({ user, userMode, onLogout }) {
           <div className="dashboard-data">
             <h2>Dashboard Data</h2>
             <pre>{JSON.stringify(data, null, 2)}</pre>
-          </div>
+              </div>
         )}
       </div>
     </div>

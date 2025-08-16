@@ -1,0 +1,19 @@
+{
+  "name": "ESCOM Citizen Scientist",
+  "short_name": "ESCOM",
+  "description": "Join the coastal monitoring community and contribute to environmental research",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#667eea",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["science", "education", "environment"],
+  "lang": "en"
+}

@@ -1,0 +1,23 @@
+# Netlify Headers Configuration
+# Fix MIME types for proper file serving
+
+/sw.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Ensure proper MIME types for other assets
+/*.js
+  Content-Type: application/javascript
+
+/*.css
+  Content-Type: text/css
+
+/*.json
+  Content-Type: application/json
+
+/*.svg
+  Content-Type: image/svg+xml
