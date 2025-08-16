@@ -1,5 +1,5 @@
 [build]
-  command = "./build-for-netlify.sh"
+  command = "ls -la && echo 'Using pre-built files' && ls -la dist/"
   publish = "dist"
 
 [build.environment]
