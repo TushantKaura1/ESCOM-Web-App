@@ -608,6 +608,148 @@ app.post('/api/save_data', async (req, res) => {
   }
 });
 
+// Add missing endpoints that frontend needs
+app.get('/api/user/dashboard', async (req, res) => {
+  try {
+    // Return sample dashboard data for now
+    res.json({
+      success: true,
+      data: {
+        totalReadings: 0,
+        recentActivity: [],
+        stats: {
+          totalReadings: 0,
+          streak: 0,
+          accuracy: 0,
+          totalTrainingHours: 0
+        }
+      }
+    });
+  } catch (error) {
+    console.error('❌ Dashboard error:', error);
+    res.status(500).json({ error: 'Failed to fetch dashboard data' });
+  }
+});
+
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // For now, allow any admin@admin.com login
+    if (email === 'admin@admin.com') {
+      const token = jwt.sign({ userId: 'admin', role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
+      res.json({
+        success: true,
+        token,
+        user: {
+          id: 'admin',
+          email: 'admin@admin.com',
+          role: 'admin',
+          isAdmin: true
+        }
+      });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error('❌ Admin login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+app.get('/api/admin/dashboard', auth, async (req, res) => {
+  try {
+    // Return sample admin dashboard data
+    res.json({
+      success: true,
+      data: {
+        totalUsers: 0,
+        totalReadings: 0,
+        recentActivity: [],
+        systemStatus: 'operational'
+      }
+    });
+  } catch (error) {
+    console.error('❌ Admin dashboard error:', error);
+    res.status(500).json({ error: 'Failed to fetch admin dashboard' });
+  }
+});
+
+app.get('/api/admin/users', auth, async (req, res) => {
+  try {
+    const users = await User.find({}, { passwordHash: 0 });
+    res.json({ success: true, data: users });
+  } catch (error) {
+    console.error('❌ Get users error:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+app.get('/api/admin/faqs', auth, async (req, res) => {
+  try {
+    // Return sample FAQ data for now
+    res.json({
+      success: true,
+      data: [
+        {
+          id: 1,
+          question: "How do I submit water quality data?",
+          answer: "Use the data submission form in the app.",
+          category: "Data Submission",
+          order: 1
+        }
+      ]
+    });
+  } catch (error) {
+    console.error('❌ Get FAQs error:', error);
+    res.status(500).json({ error: 'Failed to fetch FAQs' });
+  }
+});
+
+app.get('/api/admin/updates', auth, async (req, res) => {
+  try {
+    // Return sample updates data for now
+    res.json({
+      success: true,
+      data: [
+        {
+          id: 1,
+          title: "Welcome to ESCOM Citizen Scientist",
+          content: "This is a sample update message.",
+          date: new Date().toISOString(),
+          priority: "normal"
+        }
+      ]
+    });
+  } catch (error) {
+    console.error('❌ Get updates error:', error);
+    res.status(500).json({ error: 'Failed to fetch updates' });
+  }
+});
+
+app.get('/api/admin/search', auth, async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ error: 'Search query is required' });
+    }
+    
+    // Simple search implementation
+    res.json({
+      success: true,
+      data: [],
+      query: query
+    });
+  } catch (error) {
+    console.error('❌ Search error:', error);
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
 // Error handling middleware
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
