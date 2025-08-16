@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page - ESCOM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a2e 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .test-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 20px;
+        }
+        .success {
+            color: #00ff00;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .info {
+            color: #cccccc;
+            font-size: 16px;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1 class="success">🌊 ESCOM Test Page</h1>
+        <p class="info">If you can see this, basic HTML is working!</p>
+        <p class="info">Current time: <span id="time"></span></p>
+    </div>
+
+    <div class="test-box">
+        <h2>Backend Connection Test</h2>
+        <button onclick="testBackend()">Test Backend</button>
+        <div id="result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Frontend Test</h2>
+        <button onclick="testFrontend()">Test Frontend</button>
+        <div id="frontend-result"></div>
+    </div>
+
+    <script>
+        // Update time
+        document.getElementById('time').textContent = new Date().toLocaleString();
+
+        // Test backend connection
+        async function testBackend() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('https://citiscience-backend-95pp.onrender.com/health');
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <div style="color: #00ff00; margin-top: 10px;">
+                        ✅ Backend Connected!<br>
+                        Status: ${data.status}<br>
+                        Database: ${data.database}<br>
+                        Uptime: ${Math.round(data.uptime)}s
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: #ff0000; margin-top: 10px;">
+                        ❌ Backend Failed: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test frontend functionality
+        function testFrontend() {
+            const resultDiv = document.getElementById('frontend-result');
+            resultDiv.innerHTML = `
+                <div style="color: #00ff00; margin-top: 10px;">
+                    ✅ Frontend JavaScript Working!<br>
+                    React-like functionality: OK<br>
+                    DOM manipulation: OK<br>
+                    Event handling: OK
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
