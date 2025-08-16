@@ -8,6 +8,26 @@ function AuthScreen({ onLogin }) {
   const [password, setPassword] = useState('admin123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [backendStatus, setBackendStatus] = useState('checking');
+
+  // Check backend connection on component mount
+  useEffect(() => {
+    const checkBackendConnection = async () => {
+      try {
+        const response = await fetch(`${config.API_BASE_URL}/health`);
+        if (response.ok) {
+          setBackendStatus('connected');
+        } else {
+          setBackendStatus('error');
+        }
+      } catch (error) {
+        console.error('Backend connection check failed:', error);
+        setBackendStatus('error');
+      }
+    };
+
+    checkBackendConnection();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +35,17 @@ function AuthScreen({ onLogin }) {
     setError('');
 
     try {
+      console.log('🔗 Attempting to connect to:', config.API_BASE_URL);
+      
+      // Test backend connection first
+      const healthResponse = await fetch(`${config.API_BASE_URL}/health`);
+      if (!healthResponse.ok) {
+        throw new Error(`Backend health check failed: ${healthResponse.status}`);
+      }
+      console.log('✅ Backend connection successful');
+
       // Try admin login first
+      console.log('🔐 Attempting admin login...');
       const adminResponse = await fetch(`${config.API_BASE_URL}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -24,13 +54,19 @@ function AuthScreen({ onLogin }) {
 
       if (adminResponse.ok) {
         const data = await adminResponse.json();
+        console.log('✅ Admin login successful');
         localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminUser', JSON.stringify(data.user));
         onLogin(data.user, 'admin');
         return;
+      } else {
+        console.log('❌ Admin login failed:', adminResponse.status);
+        const errorData = await adminResponse.json().catch(() => ({}));
+        console.log('Error details:', errorData);
       }
 
       // Try regular user login
+      console.log('🔐 Attempting user login...');
       const userResponse = await fetch(`${config.API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -39,16 +75,22 @@ function AuthScreen({ onLogin }) {
 
       if (userResponse.ok) {
         const data = await userResponse.json();
+        console.log('✅ User login successful');
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         onLogin(data.user, 'citizen');
       } else {
-        const errorData = await userResponse.json();
-        setError(errorData.error || 'Login failed');
+        const errorData = await userResponse.json().catch(() => ({}));
+        console.log('❌ User login failed:', userResponse.status, errorData);
+        setError(errorData.error || `Login failed (Status: ${userResponse.status})`);
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('Network error. Please try again.');
+      console.error('❌ Login error:', error);
+      if (error.message.includes('Failed to fetch')) {
+        setError('Cannot connect to backend. Please check if the server is running.');
+      } else {
+        setError(`Connection error: ${error.message}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -68,6 +110,19 @@ function AuthScreen({ onLogin }) {
             <div className="logo-icon">🌊</div>
             <h1>ESCOM Citizen Scientist</h1>
             <p>Welcome back to the community!</p>
+            
+            {/* Backend Connection Status */}
+            <div className={`connection-status ${backendStatus}`}>
+              {backendStatus === 'checking' && (
+                <span>🔍 Checking backend connection...</span>
+              )}
+              {backendStatus === 'connected' && (
+                <span>✅ Backend connected</span>
+              )}
+              {backendStatus === 'error' && (
+                <span>❌ Backend connection failed</span>
+              )}
+            </div>
           </div>
           
           <form onSubmit={handleSubmit} className="auth-form">

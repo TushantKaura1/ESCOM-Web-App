@@ -768,6 +768,8 @@ const server = app.listen(PORT, () => {
   console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth/login, /register, /profile`);
   console.log(`❓ FAQs endpoint: http://localhost:${PORT}/api/user/faqs`);
   console.log(`📢 Updates endpoint: http://localhost:${PORT}/api/user/updates`);
+  console.log(`👑 Admin endpoints: http://localhost:${PORT}/api/admin/login, /dashboard, /users, /faqs, /updates, /search`);
+  console.log(`📊 User endpoints: http://localhost:${PORT}/api/user/dashboard`);
 });
 
 // Graceful shutdown
