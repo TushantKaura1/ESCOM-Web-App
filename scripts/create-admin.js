@@ -1,19 +1,20 @@
-// create-admin.js - Create admin user for testing
+// create-admin.js - Create a simple admin user
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/escom';
 
-// User Schema
+// User Schema (matching admin-api.js)
 const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  username: { type: String, required: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'citizen'], default: 'citizen' },
+  email: { type: String, unique: true, required: true },
+  passwordHash: { type: String, required: true },
+  telegramId: { type: Number, unique: true, sparse: true },
+  username: String,
+  firstName: String,
+  lastName: String,
+  role: { type: String, enum: ['admin', 'citizen', 'moderator'], default: 'citizen' },
   isAdmin: { type: Boolean, default: false },
   profile: {
     name: String,
@@ -27,11 +28,14 @@ const UserSchema = new mongoose.Schema({
     totalReadings: { type: Number, default: 0 },
     streak: { type: Number, default: 0 },
     accuracy: { type: Number, default: 0 },
-    lastReading: Date
+    lastReading: Date,
+    totalTrainingHours: { type: Number, default: 0 },
+    certifications: [String]
   },
-  status: { type: String, enum: ['active', 'inactive', 'suspended'], default: 'active' },
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
-  lastActive: { type: Date, default: Date.now }
+  lastActive: { type: Date, default: Date.now },
+  emailVerified: { type: Boolean, default: true }
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -39,49 +43,55 @@ const User = mongoose.model('User', UserSchema);
 async function createAdmin() {
   try {
     // Connect to MongoDB
-    await mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB');
 
     // Check if admin already exists
-    const existingAdmin = await User.findOne({ email: 'admin@escom.com' });
+    const existingAdmin = await User.findOne({ email: 'admin@admin.com' });
     if (existingAdmin) {
-      console.log('⚠️ Admin user already exists');
-      console.log('📧 Email: admin@escom.com');
-      console.log('🔑 Password: admin123');
-      return;
+      console.log('👑 Admin already exists, updating password...');
+      existingAdmin.passwordHash = await bcrypt.hash('admin123', 12);
+      await existingAdmin.save();
+      console.log('✅ Admin password updated');
+    } else {
+      // Create new admin user
+      const adminPassword = 'admin123';
+      const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
+      
+      const adminUser = new User({
+        email: 'admin@admin.com',
+        passwordHash: adminPasswordHash,
+        username: 'admin',
+        firstName: 'Admin',
+        lastName: 'User',
+        role: 'admin',
+        isAdmin: true,
+        profile: {
+          name: 'Administrator',
+          village: 'Headquarters',
+          team: 'admin',
+          parameters: 'all',
+          since: '2024-01-01',
+          experience: 'advanced'
+        },
+        stats: {
+          totalReadings: 0,
+          streak: 0,
+          accuracy: 100,
+          lastReading: null,
+          totalTrainingHours: 0,
+          certifications: []
+        }
+      });
+      
+      await adminUser.save();
+      console.log('✅ Admin user created successfully');
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash('admin123', 10);
-
-    // Create admin user
-    const admin = new User({
-      email: 'admin@escom.com',
-      password: hashedPassword,
-      username: 'esco_admin',
-      firstName: 'ESCOM',
-      lastName: 'Administrator',
-      role: 'admin',
-      isAdmin: true,
-      profile: {
-        name: 'ESCOM Administrator',
-        village: 'Headquarters',
-        team: 'admin',
-        parameters: 'all',
-        since: '2024-01-01',
-        experience: 'advanced'
-      }
-    });
-
-    await admin.save();
-    console.log('✅ Admin user created successfully');
-    console.log('📧 Email: admin@escom.com');
-    console.log('🔑 Password: admin123');
-    console.log('👤 Username: esco_admin');
-    console.log('🔐 Role: admin');
+    console.log('\n🔑 **ADMIN LOGIN CREDENTIALS**');
+    console.log('📧 Email: admin@admin.com');
+    console.log('🔐 Password: admin123');
+    console.log('\n🌐 Use these credentials to login to the admin dashboard');
 
   } catch (error) {
     console.error('❌ Error creating admin:', error);

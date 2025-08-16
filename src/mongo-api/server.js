@@ -1,10 +1,11 @@
-// src/mongo-api/server.js - Enhanced ESCOM API Server
+// src/mongo-api/server.js - Enhanced ESCOM API Server with Authentication
 
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -15,69 +16,51 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:5173',
+    'https://citisci.netlify.app',
+    'https://citiscience.netlify.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Environment variables
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/escom';
-const JWT_SECRET = process.env.JWT_SECRET || 'replace_this_with_a_strong_secret_in_production';
 const PORT = process.env.PORT || 3001;
+const MONGODB_URI = process.env.DB_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/escom';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-here';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 
-// Import enhanced database connection
-const { connectDB, checkConnection } = require('./db');
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
 
-// Initialize database connection
-let db = null;
-
-async function initializeDatabase() {
-  try {
-    db = await connectDB();
-    console.log('✅ Database initialized successfully');
-  } catch (err) {
-    console.error('❌ Database initialization failed:', err);
-    process.exit(1);
-  }
-}
-
-// Initialize database on startup
-initializeDatabase();
-
-// Enhanced User Schema
+// User Schema
 const UserSchema = new mongoose.Schema({
-  email: { 
-    type: String, 
-    unique: true, 
-    required: true,
-    lowercase: true,
-    trim: true
-  },
+  email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
-  telegramId: { type: Number, unique: true, sparse: true },
-  username: String,
-  firstName: String,
-  lastName: String,
+  username: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'citizen', 'moderator'], default: 'citizen' },
+  isAdmin: { type: Boolean, default: false },
   profile: {
-    name: { type: String, required: true },
-    village: { type: String, required: true },
-    team: { 
-      type: String, 
-      enum: ['team1', 'team2', 'team3', ''],
-      default: ''
-    },
-    parameters: { 
-      type: String, 
-      enum: ['water-quality', 'temperature', 'salinity', 'ph', ''],
-      default: ''
-    },
+    name: String,
+    village: String,
+    team: { type: String, enum: ['team1', 'team2', 'team3', 'admin', ''], default: '' },
+    parameters: { type: String, enum: ['water-quality', 'temperature', 'salinity', 'ph', 'all', ''], default: '' },
     since: String,
-    experience: { 
-      type: String, 
-      enum: ['beginner', 'intermediate', 'advanced'], 
-      default: 'beginner' 
-    }
+    experience: { type: String, enum: ['beginner', 'intermediate', 'advanced'], default: 'beginner' }
   },
   stats: {
     totalReadings: { type: Number, default: 0 },
@@ -90,154 +73,93 @@ const UserSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   lastActive: { type: Date, default: Date.now },
-  emailVerified: { type: Boolean, default: false }
-});
-
-// Reading Schema for monitoring data
-const ReadingSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  location: { type: String, required: true },
-  coordinates: {
-    latitude: Number,
-    longitude: Number
-  },
-  parameters: {
-    waterQuality: Number,
-    temperature: Number,
-    salinity: Number,
-    ph: Number
-  },
-  notes: String,
-  weatherConditions: {
-    temperature: Number,
-    humidity: Number,
-    windSpeed: Number,
-    precipitation: String
-  },
-  timestamp: { type: Date, default: Date.now },
-  isVerified: { type: Boolean, default: false },
-  verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-});
-
-// Training Schema
-const TrainingSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  title: { type: String, required: true },
-  type: { 
-    type: String, 
-    enum: ['video', 'document', 'quiz', 'practical'],
-    required: true 
-  },
-  duration: Number, // in minutes
-  completed: { type: Boolean, default: false },
-  completedAt: Date,
-  score: Number, // for quizzes
-  certificate: String // certificate URL
+  emailVerified: { type: Boolean, default: true }
 });
 
 const User = mongoose.model('User', UserSchema);
-const Reading = mongoose.model('Reading', ReadingSchema);
-const Training = mongoose.model('Training', TrainingSchema);
 
-// Enhanced JWT middleware
-const auth = (req, res, next) => {
+// Authentication middleware
+const auth = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization || '';
-    const token = authHeader.replace('Bearer ', '');
-    
+    const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+      return res.status(401).json({ error: 'Access denied. No token provided.' });
     }
     
-    const payload = jwt.verify(token, JWT_SECRET);
-    req.userId = payload.id;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid token.' });
+    }
+    
+    req.user = user;
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
-    res.status(401).json({ error: 'Invalid or expired token' });
+    res.status(401).json({ error: 'Invalid token.' });
   }
 };
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
-
-// Enhanced SIGNUP endpoint
-app.post('/api/signup', async (req, res) => {
+// Authentication endpoints
+app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, profile } = req.body;
-    
-    // Validation
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-    
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
-    }
+    const { email, password, username, firstName, lastName } = req.body;
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+      return res.status(400).json({ error: 'User already exists' });
     }
     
     // Hash password
-    const passwordHash = await bcrypt.hash(password, 12);
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
     
-    // Create user
-    const user = new User({ 
-      email, 
+    // Create new user
+    const user = new User({
+      email,
       passwordHash,
-      profile: profile || {}
+      username,
+      firstName,
+      lastName,
+      role: 'citizen'
     });
     
     await user.save();
     
-    // Generate token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '30d' });
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
     
-    console.log(`✅ New user registered: ${email}`);
-    
-    res.status(201).json({ 
+    res.status(201).json({
+      message: 'User created successfully',
       token,
       user: {
         id: user._id,
         email: user.email,
-        profile: user.profile,
-        stats: user.stats
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
       }
     });
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ error: 'Server error during registration' });
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Failed to create user' });
   }
 });
 
-// Enhanced LOGIN endpoint
-app.post('/api/login', async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-    
-    // Find user
-    const user = await User.findOne({ email, isActive: true });
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    // Verify password
-    const validPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!validPassword) {
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
@@ -245,251 +167,443 @@ app.post('/api/login', async (req, res) => {
     user.lastActive = new Date();
     await user.save();
     
-    // Generate token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '30d' });
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
     
-    console.log(`✅ User logged in: ${email}`);
-    
-    res.json({ 
+    res.json({
+      message: 'Login successful',
       token,
       user: {
         id: user._id,
         email: user.email,
-        profile: user.profile,
-        stats: user.stats
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isAdmin: user.isAdmin
       }
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error during login' });
+    res.status(500).json({ error: 'Failed to login' });
   }
 });
 
-// GET PROFILE endpoint
-app.get('/api/profile', auth, async (req, res) => {
+app.get('/api/auth/profile', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.userId, 'profile stats email createdAt lastActive');
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.json({ 
-      profile: user.profile,
-      stats: user.stats,
-      email: user.email,
-      createdAt: user.createdAt,
-      lastActive: user.lastActive
+    res.json({
+      user: {
+        id: req.user._id,
+        email: req.user.email,
+        username: req.user.username,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        role: req.user.role,
+        isAdmin: req.user.isAdmin,
+        profile: req.user.profile,
+        stats: req.user.stats
+      }
     });
   } catch (error) {
-    console.error('Get profile error:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Failed to fetch profile' });
   }
 });
 
-// UPDATE PROFILE endpoint
-app.put('/api/profile', auth, async (req, res) => {
+// Simple FAQ and Updates endpoints for testing
+app.get('/api/user/faqs', async (req, res) => {
   try {
-    const profile = req.body;
+    // Return sample FAQ data
+    const sampleFAQs = [
+      {
+        _id: '1',
+        category: 'ESCOM organization',
+        subcategory: 'Getting involved',
+        question: 'How can I get involved with ESCOM?',
+        answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection. Contact your local team leader to get started.',
+        tags: ['beginner', 'getting-started', 'community'],
+        importance: 'high',
+        isNew: true,
+        lastUpdated: new Date().toISOString(),
+        order: 1
+      },
+      {
+        _id: '2',
+        category: 'Monitoring',
+        subcategory: 'Water Quality',
+        question: 'What parameters do we monitor?',
+        answer: 'We monitor water temperature, salinity, pH levels, and overall water quality. Each parameter is measured using specialized equipment and recorded in our database.',
+        tags: ['monitoring', 'water-quality', 'parameters'],
+        importance: 'high',
+        isNew: false,
+        lastUpdated: new Date(Date.now() - 86400000).toISOString(),
+        order: 2
+      },
+      {
+        _id: '3',
+        category: 'Training',
+        subcategory: 'Equipment',
+        question: 'How do I calibrate my monitoring equipment?',
+        answer: 'Equipment calibration should be done monthly using the calibration kit provided. Follow the step-by-step guide in your training manual or contact your team leader for assistance.',
+        tags: ['training', 'equipment', 'calibration'],
+        importance: 'medium',
+        isNew: false,
+        lastUpdated: new Date(Date.now() - 172800000).toISOString(),
+        order: 3
+      },
+      {
+        _id: '4',
+        category: 'Data',
+        subcategory: 'Submission',
+        question: 'How often should I submit data?',
+        answer: 'Data should be submitted immediately after each monitoring session, typically monthly. During extreme weather events, additional readings may be required.',
+        tags: ['data', 'submission', 'frequency'],
+        importance: 'medium',
+        isNew: false,
+        lastUpdated: new Date(Date.now() - 259200000).toISOString(),
+        order: 4
+      },
+      {
+        _id: '5',
+        category: 'Partners',
+        subcategory: 'Collaboration',
+        question: 'Who are ESCOM\'s research partners?',
+        answer: 'ESCOM collaborates with universities, government agencies, and environmental organizations to advance coastal research and conservation efforts.',
+        tags: ['partners', 'collaboration', 'research'],
+        importance: 'low',
+        isNew: false,
+        lastUpdated: new Date(Date.now() - 345600000).toISOString(),
+        order: 5
+      }
+    ];
     
-    // Validation
-    if (!profile.name || !profile.village) {
-      return res.status(400).json({ error: 'Name and village are required' });
+    res.json(sampleFAQs);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch FAQs' });
+  }
+});
+
+app.get('/api/user/updates', async (req, res) => {
+  try {
+    // Return sample updates data
+    const sampleUpdates = [
+      {
+        _id: '1',
+        title: 'New Monitoring Equipment Available',
+        content: 'We have received new water quality monitoring equipment for all teams. The new sensors provide more accurate readings and longer battery life. Team leaders will distribute equipment during the next training session.',
+        type: 'announcement',
+        priority: 'high',
+        tags: ['equipment', 'training', 'teams'],
+        createdAt: new Date().toISOString(),
+        isActive: true
+      },
+      {
+        _id: '2',
+        title: 'Monthly Data Review Results',
+        content: 'Great news! Our community achieved 95% data accuracy this month. Special recognition goes to Team Alpha for maintaining 100% accuracy for three consecutive months. Keep up the excellent work!',
+        type: 'news',
+        priority: 'medium',
+        tags: ['data', 'recognition', 'teams'],
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        order: 2
+      },
+      {
+        _id: '3',
+        title: 'Upcoming Training Workshop',
+        content: 'Join us for an advanced monitoring techniques workshop on coastal erosion assessment. This hands-on session will cover new methodologies and equipment usage. Registration opens next week.',
+        type: 'update',
+        priority: 'medium',
+        tags: ['training', 'workshop', 'erosion'],
+        createdAt: new Date(Date.now() - 172800000).toISOString(),
+        order: 3
+      },
+      {
+        _id: '4',
+        title: 'Weather Alert System Update',
+        content: 'We have upgraded our weather alert system to provide real-time notifications for dangerous monitoring conditions. All users will receive alerts via the app and email.',
+        type: 'announcement',
+        priority: 'high',
+        tags: ['safety', 'weather', 'alerts'],
+        createdAt: new Date(Date.now() - 259200000).toISOString(),
+        order: 4
+      },
+      {
+        _id: '5',
+        title: 'Community Survey Results',
+        content: 'Thank you to everyone who participated in our community feedback survey. Your input has helped us identify areas for improvement. We will implement the top suggestions in the next update.',
+        type: 'news',
+        priority: 'low',
+        tags: ['community', 'feedback', 'improvements'],
+        createdAt: new Date(Date.now() - 345600000).toISOString(),
+        order: 5
+      }
+    ];
+    
+    res.json(sampleUpdates);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch updates' });
+  }
+});
+
+// Initialize database connection
+async function initializeDatabase() {
+  try {
+    console.log('🔄 Connecting to MongoDB at:', MONGODB_URI);
+    
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    
+    console.log('✅ Database connected successfully');
+    console.log('📊 Database name:', mongoose.connection.name);
+    console.log('🌐 Connection URL:', MONGODB_URI);
+    
+    // Create a demo admin user if it doesn't exist
+    try {
+      const adminExists = await User.findOne({ email: 'admin@escom.com' });
+      if (!adminExists) {
+        const adminPasswordHash = await bcrypt.hash('admin123', 10);
+        const adminUser = new User({
+          email: 'admin@escom.com',
+          passwordHash: adminPasswordHash,
+          username: 'admin',
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'admin',
+          isAdmin: true
+        });
+        await adminUser.save();
+        console.log('✅ Demo admin user created: admin@escom.com / admin123');
+      }
+    } catch (error) {
+      console.log('⚠️ Could not create demo admin user:', error.message);
     }
     
-    const user = await User.findByIdAndUpdate(
-      req.userId, 
-      { 
-        profile,
-        lastActive: new Date()
-      },
-      { new: true, runValidators: true }
+    // Create a demo citizen user if it doesn't exist
+    try {
+      const citizenExists = await User.findOne({ email: 'citizen@escom.com' });
+      if (!citizenExists) {
+        const citizenPasswordHash = await bcrypt.hash('citizen123', 10);
+        const citizenUser = new User({
+          email: 'citizen@escom.com',
+          passwordHash: citizenPasswordHash,
+          username: 'citizen',
+          firstName: 'Demo',
+          lastName: 'Citizen',
+          role: 'citizen',
+          isAdmin: false
+        });
+        await citizenUser.save();
+        console.log('✅ Demo citizen user created: citizen@escom.com / citizen123');
+      }
+    } catch (error) {
+      console.log('⚠️ Could not create demo citizen user:', error.message);
+    }
+    
+  } catch (err) {
+    console.error('❌ Database initialization failed:', err);
+    console.log('⚠️ Continuing without database connection - using sample data');
+  }
+}
+
+// Initialize database on startup
+initializeDatabase();
+
+// Telegram Webhook Endpoint
+app.post('/webhook', async (req, res) => {
+  try {
+    if (!TELEGRAM_TOKEN) {
+      console.log('⚠️ TELEGRAM_TOKEN not configured');
+      return res.status(500).json({ error: 'Telegram token not configured' });
+    }
+
+    const data = req.body;
+    console.log('📱 Telegram webhook received:', JSON.stringify(data, null, 2));
+
+    if (data.message && data.message.text) {
+      const chatId = data.message.chat.id;
+      const text = data.message.text;
+      const from = data.message.from;
+
+      // Handle different message types
+      if (text === '/start') {
+        await sendTelegramMessage(chatId, 
+          `🌊 Welcome to Citizen Science Assistant!\n\n` +
+          `I'm here to help you with coastal monitoring and data collection.\n\n` +
+          `📱 Open the Mini App to get started:\n` +
+          `https://citiscience.netlify.app\n\n` +
+          `Commands:\n` +
+          `/start - Show this message\n` +
+          `/help - Get help\n` +
+          `/data - View your data\n` +
+          `/status - Check system status`
+        );
+      } else if (text === '/help') {
+        await sendTelegramMessage(chatId,
+          `🔧 How to use the Citizen Science Assistant:\n\n` +
+          `1. 📱 Click the "Open App" button below to launch the Mini App\n` +
+          `2. 🔐 Login with your credentials\n` +
+          `3. 📊 Submit water quality readings\n` +
+          `4. 📚 Complete training modules\n` +
+          `5. 📈 Track your progress\n\n` +
+          `Need help? Contact your team leader.`
+        );
+      } else if (text === '/data') {
+        // Get user data from database
+        try {
+          const user = await User.findOne({ telegramId: from.id });
+          if (user) {
+            await sendTelegramMessage(chatId,
+              `📊 Your Citizen Science Data:\n\n` +
+              `👤 Name: ${user.firstName} ${user.lastName}\n` +
+              `📈 Total Readings: ${user.stats.totalReadings}\n` +
+              `🔥 Streak: ${user.stats.streak} days\n` +
+              `🎯 Accuracy: ${user.stats.accuracy}%\n` +
+              `📚 Training Hours: ${user.stats.totalTrainingHours}h\n` +
+              `🏆 Certifications: ${user.stats.certifications.length}\n\n` +
+              `Open the app to submit new readings!`
+            );
+          } else {
+            await sendTelegramMessage(chatId,
+              `❌ User not found. Please login through the Mini App first.`
+            );
+          }
+        } catch (error) {
+          await sendTelegramMessage(chatId, `❌ Error fetching data: ${error.message}`);
+        }
+      } else if (text === '/status') {
+        await sendTelegramMessage(chatId,
+          `🟢 System Status: Online\n` +
+          `📊 Database: Connected\n` +
+          `🌐 Mini App: Available\n` +
+          `🕐 Last Update: ${new Date().toLocaleString()}\n\n` +
+          `Everything is working normally!`
+        );
+      } else {
+        // Default response with Mini App button
+        await sendTelegramMessage(chatId,
+          `💬 I received your message: "${text}"\n\n` +
+          `To interact with the Citizen Science system, please open the Mini App:`,
+          true // This will add the Mini App button
+        );
+      }
+    }
+
+    res.json({ status: 'ok' });
+  } catch (error) {
+    console.error('❌ Webhook error:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
+});
+
+// Helper function to send Telegram messages
+async function sendTelegramMessage(chatId, text, showMiniAppButton = false) {
+  try {
+    const messageData = {
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'HTML'
+    };
+
+    if (showMiniAppButton) {
+      messageData.reply_markup = {
+        keyboard: [[
+          {
+            text: "🌊 Open Citizen Science App",
+            web_app: { url: "https://citiscience.netlify.app" }
+          }
+        ]],
+        resize_keyboard: true,
+        one_time_keyboard: false
+      };
+    }
+
+    const response = await axios.post(
+      `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
+      messageData
     );
     
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    console.log('✅ Telegram message sent:', response.data);
+  } catch (error) {
+    console.error('❌ Failed to send Telegram message:', error);
+  }
+}
+
+// Data API Endpoints
+app.get('/api/get_data', async (req, res) => {
+  try {
+    const { collection, filter, limit = 100 } = req.query;
+    
+    if (!collection) {
+      return res.status(400).json({ error: 'Collection parameter is required' });
     }
+
+    const db = mongoose.connection.db;
+    let query = {};
     
-    console.log(`✅ Profile updated for user: ${user.email}`);
-    
-    res.json({ 
+    // Parse filter if provided
+    if (filter) {
+      try {
+        query = JSON.parse(filter);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid filter format' });
+      }
+    }
+
+    const data = await db.collection(collection)
+      .find(query)
+      .limit(parseInt(limit))
+      .toArray();
+
+    res.json({
       success: true,
-      profile: user.profile
+      collection,
+      count: data.length,
+      data
     });
   } catch (error) {
-    console.error('Update profile error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error('❌ Get data error:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
   }
 });
 
-// SUBMIT READING endpoint
-app.post('/api/readings', auth, async (req, res) => {
+app.post('/api/save_data', async (req, res) => {
   try {
-    const readingData = req.body;
+    const { collection, data, operation = 'insert' } = req.body;
     
-    // Validation
-    if (!readingData.location) {
-      return res.status(400).json({ error: 'Location is required' });
+    if (!collection || !data) {
+      return res.status(400).json({ error: 'Collection and data are required' });
     }
-    
-    // Create reading
-    const reading = new Reading({
-      userId: req.userId,
-      ...readingData
-    });
-    
-    await reading.save();
-    
-    // Update user stats
-    const user = await User.findById(req.userId);
-    user.stats.totalReadings += 1;
-    user.stats.lastReading = new Date();
-    user.lastActive = new Date();
-    
-    // Calculate streak
-    const now = new Date();
-    const lastReading = user.stats.lastReading;
-    const daysDiff = Math.floor((now - lastReading) / (1000 * 60 * 60 * 24));
-    
-    if (daysDiff <= 1) {
-      user.stats.streak += 1;
+
+    const db = mongoose.connection.db;
+    let result;
+
+    if (operation === 'insert') {
+      result = await db.collection(collection).insertOne(data);
+    } else if (operation === 'update') {
+      const { filter, update } = data;
+      if (!filter || !update) {
+        return res.status(400).json({ error: 'Filter and update are required for update operation' });
+      }
+      result = await db.collection(collection).updateOne(filter, { $set: update });
+    } else if (operation === 'upsert') {
+      const { filter, update } = data;
+      if (!filter || !update) {
+        return res.status(400).json({ error: 'Filter and update are required for upsert operation' });
+      }
+      result = await db.collection(collection).updateOne(filter, { $set: update }, { upsert: true });
     } else {
-      user.stats.streak = 1;
+      return res.status(400).json({ error: 'Invalid operation. Use: insert, update, or upsert' });
     }
-    
-    await user.save();
-    
-    console.log(`📊 Reading submitted by user: ${user.email}`);
-    
-    res.status(201).json({ 
-      success: true,
-      reading: reading._id,
-      stats: user.stats
-    });
-  } catch (error) {
-    console.error('Submit reading error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
-// GET READINGS endpoint
-app.get('/api/readings', auth, async (req, res) => {
-  try {
-    const { page = 1, limit = 10, location } = req.query;
-    
-    const query = { userId: req.userId };
-    if (location) {
-      query.location = new RegExp(location, 'i');
-    }
-    
-    const readings = await Reading.find(query)
-      .sort({ timestamp: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .exec();
-    
-    const total = await Reading.countDocuments(query);
-    
     res.json({
-      readings,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      total
-    });
-  } catch (error) {
-    console.error('Get readings error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// TRAINING endpoints
-app.post('/api/training', auth, async (req, res) => {
-  try {
-    const trainingData = req.body;
-    
-    const training = new Training({
-      userId: req.userId,
-      ...trainingData
-    });
-    
-    await training.save();
-    
-    res.status(201).json({ 
       success: true,
-      training: training._id
+      operation,
+      result
     });
   } catch (error) {
-    console.error('Create training error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-app.put('/api/training/:id/complete', auth, async (req, res) => {
-  try {
-    const training = await Training.findOneAndUpdate(
-      { _id: req.params.id, userId: req.userId },
-      { 
-        completed: true,
-        completedAt: new Date(),
-        score: req.body.score
-      },
-      { new: true }
-    );
-    
-    if (!training) {
-      return res.status(404).json({ error: 'Training not found' });
-    }
-    
-    // Update user stats
-    const user = await User.findById(req.userId);
-    user.stats.totalTrainingHours += training.duration || 0;
-    if (req.body.certificate) {
-      user.stats.certifications.push(req.body.certificate);
-    }
-    await user.save();
-    
-    res.json({ success: true, training });
-  } catch (error) {
-    console.error('Complete training error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// COMMUNITY endpoints
-app.get('/api/community', auth, async (req, res) => {
-  try {
-    const users = await User.find(
-      { isActive: true },
-      'profile stats lastActive'
-    )
-    .sort({ lastActive: -1 })
-    .limit(50);
-    
-    res.json({ users });
-  } catch (error) {
-    console.error('Get community error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// STATISTICS endpoint
-app.get('/api/stats', auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    const totalReadings = await Reading.countDocuments({ userId: req.userId });
-    const totalTraining = await Training.countDocuments({ 
-      userId: req.userId, 
-      completed: true 
-    });
-    
-    res.json({
-      userStats: user.stats,
-      totalReadings,
-      totalTraining,
-      lastActive: user.lastActive
-    });
-  } catch (error) {
-    console.error('Get stats error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error('❌ Save data error:', error);
+    res.status(500).json({ error: 'Failed to save data' });
   }
 });
 
@@ -504,10 +618,13 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server with enhanced error handling
+// Start server
 const server = app.listen(PORT, () => {
   console.log(`🚀 ESCOM API Server running on http://localhost:${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth/login, /register, /profile`);
+  console.log(`❓ FAQs endpoint: http://localhost:${PORT}/api/user/faqs`);
+  console.log(`📢 Updates endpoint: http://localhost:${PORT}/api/user/updates`);
 });
 
 // Graceful shutdown
@@ -515,7 +632,6 @@ process.on('SIGTERM', () => {
   console.log('🛑 SIGTERM received, shutting down gracefully');
   server.close(() => {
     console.log('✅ Process terminated');
-    mongoose.connection.close();
     process.exit(0);
   });
 });
@@ -524,7 +640,6 @@ process.on('SIGINT', () => {
   console.log('🛑 SIGINT received, shutting down gracefully');
   server.close(() => {
     console.log('✅ Process terminated');
-    mongoose.connection.close();
     process.exit(0);
   });
 });

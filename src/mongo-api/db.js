@@ -3,7 +3,7 @@ const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
 // MongoDB connection configuration
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017';
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/escom';
 const DB_NAME = process.env.DB_NAME || 'escom';
 
 // Create MongoDB client with enhanced options

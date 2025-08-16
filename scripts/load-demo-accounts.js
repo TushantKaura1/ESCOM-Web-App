@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 // MongoDB connection
@@ -9,11 +10,13 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/escom'
 
 // User Schema
 const UserSchema = new mongoose.Schema({
-  telegramId: { type: Number, unique: true, required: true },
+  email: { type: String, unique: true, required: true },
+  passwordHash: { type: String, required: true },
+  telegramId: { type: Number, unique: true, sparse: true },
   username: String,
   firstName: String,
   lastName: String,
-  role: { type: String, enum: ['admin', 'citizen'], default: 'citizen' },
+  role: { type: String, enum: ['admin', 'citizen', 'moderator'], default: 'citizen' },
   isAdmin: { type: Boolean, default: false },
   profile: {
     name: String,
@@ -27,10 +30,14 @@ const UserSchema = new mongoose.Schema({
     totalReadings: { type: Number, default: 0 },
     streak: { type: Number, default: 0 },
     accuracy: { type: Number, default: 0 },
-    lastReading: Date
+    lastReading: Date,
+    totalTrainingHours: { type: Number, default: 0 },
+    certifications: [String]
   },
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
-  lastActive: { type: Date, default: Date.now }
+  lastActive: { type: Date, default: Date.now },
+  emailVerified: { type: Boolean, default: true }
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -52,15 +59,31 @@ async function loadDemoAccounts() {
 
     // Load admin account
     const adminData = demoAccountsData.accounts.admin;
-    const adminUser = new User(adminData);
+    const adminEmail = `admin@${adminData.username}.com`;
+    const adminPassword = 'admin123';
+    const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
+    
+    const adminUser = new User({
+      ...adminData,
+      email: adminEmail,
+      passwordHash: adminPasswordHash
+    });
     await adminUser.save();
-    console.log(`👑 Admin account loaded: ${adminData.profile.name}`);
+    console.log(`👑 Admin account loaded: ${adminData.profile.name} (${adminEmail} / ${adminPassword})`);
 
     // Load citizen accounts
     for (const citizenData of demoAccountsData.accounts.citizens) {
-      const citizenUser = new User(citizenData);
+      const citizenEmail = `${citizenData.username}@demo.com`;
+      const citizenPassword = 'demo123';
+      const citizenPasswordHash = await bcrypt.hash(citizenPassword, 12);
+      
+      const citizenUser = new User({
+        ...citizenData,
+        email: citizenEmail,
+        passwordHash: citizenPasswordHash
+      });
       await citizenUser.save();
-      console.log(`👥 Citizen account loaded: ${citizenData.profile.name}`);
+      console.log(`👥 Citizen account loaded: ${citizenData.profile.name} (${citizenEmail} / ${citizenPassword})`);
     }
 
     console.log(`✅ Successfully loaded ${demoAccountsData.metadata.totalAccounts} demo accounts`);

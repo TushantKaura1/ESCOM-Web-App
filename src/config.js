@@ -5,9 +5,13 @@ const config = {
     // Check if we're in development (localhost) or production (Netlify)
     let baseUrl;
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      baseUrl = 'http://localhost:3002';  // Local development
+      baseUrl = 'http://localhost:3001';  // Local development
+    } else if (window.location.hostname === 'citisci.netlify.app') {
+      baseUrl = 'https://citiscience-backend.onrender.com';  // Production backend
+    } else if (window.location.hostname === 'citiscience.netlify.app') {
+      baseUrl = 'https://citiscience-backend.onrender.com';  // Production backend
     } else {
-      baseUrl = 'https://your-backend-url.onrender.com';  // Production - change this!
+      baseUrl = 'https://citiscience-backend.onrender.com';  // Default production
     }
     
     // Debug logging
@@ -28,17 +32,38 @@ const config = {
   // API Endpoints
   ENDPOINTS: {
     AUTH: {
-      LOGIN: '/api/auth/login',
+      LOGIN: '/api/auth/login',  // User login endpoint
       REGISTER: '/api/auth/register',
       PROFILE: '/api/auth/profile'
     },
     ADMIN: {
+      LOGIN: '/api/admin/login',  // Admin-specific login endpoint
       DASHBOARD: '/api/admin/dashboard',
       USERS: '/api/admin/users',
-      ANALYTICS: '/api/admin/analytics',
       FAQS: '/api/admin/faqs',
-      REPORTS: '/api/admin/reports',
-      SETTINGS: '/api/admin/settings'
+      UPDATES: '/api/admin/updates',
+      SEARCH: '/api/admin/search',
+      // Database Monitoring
+      DATABASE_STATUS: '/api/admin/database/status',
+      DATABASE_CHANGES: '/api/admin/database/changes',
+      DATABASE_COLLECTIONS: '/api/admin/database/collections',
+      // Advanced Features
+      CREATE_FAQ: '/api/admin/faqs',
+      UPDATE_FAQ: '/api/admin/faqs',
+      DELETE_FAQ: '/api/admin/faqs',
+      REORDER_FAQS: '/api/admin/faqs/reorder',
+      CREATE_USER: '/api/admin/users',
+      UPDATE_USER_PASSWORD: '/api/admin/users',
+      DELETE_USER: '/api/admin/users',
+      USER_ACTIVITY: '/api/admin/users'
+    },
+    USER: {
+      DASHBOARD: '/api/user/dashboard',
+      FAQS: '/api/user/faqs',
+      UPDATES: '/api/user/updates',
+      PROFILE: '/api/user/profile',
+      ACTIVITY: '/api/user/activity',
+      SEARCH: '/api/user/search'
     }
   }
 };

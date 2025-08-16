@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "🚀 ESCOM Citizen Scientist App - Complete Cloud Deployment"
-echo "=========================================================="
+echo "🚀 Citizen Science Mini App - Complete Deployment"
+echo "=================================================="
 echo ""
 
 # Colors for output
@@ -11,69 +11,118 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}📋 This script will help you deploy your app to the cloud permanently${NC}"
-echo ""
-
 # Check if git is initialized
 if [ ! -d ".git" ]; then
-    echo -e "${YELLOW}📁 Initializing Git repository...${NC}"
+    echo -e "${YELLOW}📁 Initializing git repository...${NC}"
     git init
     git add .
-    git commit -m "Initial commit - ESCOM Citizen Scientist App"
-    echo -e "${GREEN}✅ Git repository initialized${NC}"
-else
-    echo -e "${GREEN}✅ Git repository already exists${NC}"
+    git commit -m "Initial commit - Citizen Science Mini App"
 fi
 
-# Check if remote origin exists
+# Check if remote exists
 if ! git remote get-url origin > /dev/null 2>&1; then
+    echo -e "${RED}❌ No remote origin found!${NC}"
     echo ""
-    echo -e "${YELLOW}🌐 No remote origin found.${NC}"
-    echo -e "${BLUE}💡 Please add your GitHub repository as remote origin:${NC}"
-    echo "   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+    echo "Please add your GitHub repository as remote origin:"
+    echo "git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git"
     echo ""
-    echo -e "${BLUE}📋 Then push your code:${NC}"
-    echo "   git push -u origin main"
-    echo ""
-else
-    echo -e "${GREEN}✅ Remote origin found: $(git remote get-url origin)${NC}"
-    echo -e "${BLUE}📤 Pushing latest changes...${NC}"
-    git add .
-    git commit -m "Ready for cloud deployment - $(date)"
-    git push
-    echo -e "${GREEN}✅ Code pushed to GitHub${NC}"
+    echo "Then run this script again."
+    exit 1
 fi
 
+echo -e "${GREEN}✅ Git repository ready${NC}"
 echo ""
-echo -e "${BLUE}🎯 Complete Deployment Checklist:${NC}"
+
+# Step 1: Deploy Backend
+echo -e "${BLUE}🚀 Step 1: Deploying Backend to Render${NC}"
+echo "================================================"
+
+# Check if backend dependencies are installed
+if [ ! -d "src/mongo-api/node_modules" ]; then
+    echo "📦 Installing backend dependencies..."
+    cd src/mongo-api
+    npm install
+    cd ../..
+fi
+
+# Push backend code
+echo "📤 Pushing backend code to GitHub..."
+git add .
+git commit -m "Deploy backend with Telegram webhook and data APIs"
+git push origin main
+
+echo -e "${GREEN}✅ Backend code pushed to GitHub!${NC}"
+echo ""
+
+# Step 2: Deploy Frontend
+echo -e "${BLUE}🌐 Step 2: Deploying Frontend to Netlify${NC}"
+echo "=================================================="
+
+# Build frontend
+echo "🔨 Building frontend..."
+npm run build
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Frontend build failed!${NC}"
+    exit 1
+fi
+
+# Push frontend
+echo "📤 Pushing frontend to GitHub..."
+git add .
+git commit -m "Build frontend for production"
+git push origin main
+
+echo -e "${GREEN}✅ Frontend code pushed to GitHub!${NC}"
+echo ""
+
+# Step 3: Deployment Instructions
+echo -e "${BLUE}📋 Step 3: Complete the Deployment${NC}"
 echo "=========================================="
 echo ""
-echo -e "${YELLOW}1. 🗄️  MongoDB Atlas Setup${NC}"
-echo "   📧 Email: tushantkaura@gmail.com"
-echo "   📖 Read: MONGODB_ATLAS_SETUP.md"
-echo "   🔗 Go to: https://mongodb.com/atlas"
+
+echo -e "${YELLOW}🔧 Backend Deployment (Render):${NC}"
+echo "1. Go to https://dashboard.render.com"
+echo "2. Create new Web Service"
+echo "3. Connect your GitHub repository"
+echo "4. Configure:"
+echo "   - Name: citiscience-backend"
+echo "   - Build: cd src/mongo-api && npm install"
+echo "   - Start: cd src/mongo-api && node server.js"
+echo "5. Set environment variables:"
+echo "   - DB_URI: mongodb+srv://tushantkaura:Lavanyanavya12#6Ttk@cluster0.we1rghs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+echo "   - JWT_SECRET: (generate strong random string)"
+echo "   - TELEGRAM_TOKEN: (your bot token)"
+echo "   - DB_NAME: citiscience"
+echo "6. Deploy!"
 echo ""
-echo -e "${YELLOW}2. 🚀 Render Backend Deployment${NC}"
-echo "   📖 Read: RENDER_DEPLOYMENT_GUIDE.md"
-echo "   🔗 Go to: https://render.com"
+
+echo -e "${YELLOW}🌐 Frontend Deployment (Netlify):${NC}"
+echo "1. Go to https://app.netlify.com"
+echo "2. New site from Git"
+echo "3. Connect your GitHub repository"
+echo "4. Build settings:"
+echo "   - Build command: npm run build"
+echo "   - Publish directory: dist"
+echo "5. Environment variable:"
+echo "   - BACKEND_URL: https://your-backend-name.onrender.com"
+echo "6. Deploy!"
 echo ""
-echo -e "${YELLOW}3. 🔄 Update Frontend Config${NC}"
-echo "   📝 Edit: src/config.js with your Render URL"
-echo "   🏗️  Build: npm run build"
-echo "   🌐 Deploy: netlify deploy --prod --dir=dist"
+
+echo -e "${YELLOW}🤖 Telegram Bot Setup:${NC}"
+echo "1. Get your bot token from @BotFather"
+echo "2. Set webhook:"
+echo "   https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://your-backend.onrender.com/webhook"
+echo "3. Test with /start command"
 echo ""
-echo -e "${GREEN}✅ Your app will be permanently live at: https://citisci.netlify.app/${NC}"
+
+echo -e "${GREEN}🎉 Your Mini App will be available at:${NC}"
+echo "Frontend: https://citiscience.netlify.app"
+echo "Backend: https://your-backend-name.onrender.com"
 echo ""
-echo -e "${BLUE}📚 Available Guides:${NC}"
-echo "   📖 MONGODB_ATLAS_SETUP.md - Database setup with Gmail"
-echo "   📖 RENDER_DEPLOYMENT_GUIDE.md - Backend deployment"
-echo "   📖 BACKEND_DEPLOYMENT_GUIDE.md - General backend info"
-echo "   📖 NETLIFY_DEPLOYMENT_GUIDE.md - Frontend deployment"
+
+echo -e "${BLUE}📖 For detailed instructions, see: FINAL_DEPLOYMENT_GUIDE.md${NC}"
 echo ""
-echo -e "${YELLOW}🎉 After completing these steps, your app will be:${NC}"
-echo "   🌟 Always online and accessible"
-echo "   🌍 Working from anywhere in the world"
-echo "   🔒 Connected to your Gmail MongoDB account"
-echo "   💰 Completely free hosting"
-echo ""
-echo -e "${BLUE}Need help? Check the guide files above for detailed instructions!${NC}" 
+
+echo -e "${GREEN}✅ Deployment scripts completed!${NC}"
+echo "Complete the manual steps above to go live." 

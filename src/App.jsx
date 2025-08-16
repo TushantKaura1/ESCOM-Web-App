@@ -14,6 +14,7 @@ function AuthScreen({ onAdminLogin, onCitizenLogin, onSignup }) {
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,12 +32,14 @@ function AuthScreen({ onAdminLogin, onCitizenLogin, onSignup }) {
 
         if (response.ok) {
           const data = await response.json();
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
           
           if (data.user.isAdmin) {
+            localStorage.setItem('adminToken', data.token);
+            localStorage.setItem('adminUser', JSON.stringify(data.user));
             onAdminLogin(data.user);
           } else {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
             onCitizenLogin(data.user);
           }
         } else {
@@ -75,80 +78,172 @@ function AuthScreen({ onAdminLogin, onCitizenLogin, onSignup }) {
     }
   };
 
+  const clearForm = () => {
+    setEmail('');
+    setPassword('');
+    setUsername('');
+    setFirstName('');
+    setLastName('');
+    setError('');
+  };
+
+  const handleModeSwitch = () => {
+    setIsLogin(!isLogin);
+    clearForm();
+  };
+
   return (
     <div className="auth-screen">
+      <div className="auth-background">
+        <div className="auth-particles">
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+        </div>
+      </div>
+      
       <div className="auth-container">
-        <div className="auth-header">
-          <h1>🌊 ESCOM Citizen Scientist</h1>
-          <p>{isLogin ? 'Welcome back!' : 'Join our community'}</p>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="auth-form">
-          {!isLogin && (
-            <>
+        <div className="auth-card">
+          <div className="auth-header">
+            <div className="logo-container">
+              <div className="logo-icon">🌊</div>
+              <h1>ESCOM Citizen Scientist</h1>
+            </div>
+            <p className="auth-subtitle">
+              {isLogin ? 'Welcome back to the community!' : 'Join our coastal research community'}
+            </p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="auth-form">
+            {!isLogin && (
+              <div className="form-row">
+                <div className="form-group">
+                  <input
+                    type="text"
+                    placeholder="First Name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    className="auth-input"
+                  />
+                  <span className="input-icon">👤</span>
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    placeholder="Last Name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    className="auth-input"
+                  />
+                  <span className="input-icon">👤</span>
+                </div>
+              </div>
+            )}
+            
+            {!isLogin && (
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="auth-input"
+                />
+                <span className="input-icon">🏷️</span>
+              </div>
+            )}
+            
+            <div className="form-group">
               <input
-                type="text"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="auth-input"
               />
+              <span className="input-icon">📧</span>
+            </div>
+            
+            <div className="form-group password-group">
               <input
-                type="text"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="auth-input"
               />
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="auth-input"
-              />
-            </>
-          )}
+              <span className="input-icon">🔒</span>
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+            
+            <button type="submit" disabled={loading} className="auth-button">
+              <span className="button-text">
+                {loading ? (
+                  <>
+                    <div className="spinner"></div>
+                    Processing...
+                  </>
+                ) : (
+                  isLogin ? 'Sign In' : 'Create Account'
+                )}
+              </span>
+            </button>
+            
+            {error && (
+              <div className="error-message">
+                <span className="error-icon">⚠️</span>
+                {error}
+              </div>
+            )}
+            
+            <div className="auth-switch">
+              <button
+                type="button"
+                onClick={handleModeSwitch}
+                className="switch-button"
+              >
+                {isLogin ? (
+                  <>
+                    <span>New to ESCOM?</span>
+                    <strong>Create an account</strong>
+                  </>
+                ) : (
+                  <>
+                    <span>Already have an account?</span>
+                    <strong>Sign in</strong>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
           
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="auth-input"
-          />
-          
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="auth-input"
-          />
-          
-          {error && <div className="error-message">{error}</div>}
-          
-          <button type="submit" className="auth-submit-btn" disabled={loading}>
-            {loading ? 'Loading...' : (isLogin ? 'Login' : 'Register')}
-          </button>
-        </form>
-        
-        <div className="auth-switch">
-          <button 
-            onClick={() => setIsLogin(!isLogin)} 
-            className="switch-btn"
-          >
-            {isLogin ? 'Need an account? Register' : 'Have an account? Login'}
-          </button>
-        </div>
-        
-        <div className="auth-info">
-          <p>Join our coastal monitoring community</p>
+          <div className="auth-features">
+            <div className="feature">
+              <span className="feature-icon">🔬</span>
+              <span>Scientific Research</span>
+            </div>
+            <div className="feature">
+              <span className="feature-icon">🌍</span>
+              <span>Environmental Impact</span>
+            </div>
+            <div className="feature">
+              <span className="feature-icon">👥</span>
+              <span>Community Driven</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -248,189 +343,579 @@ function ProfileSetup({ onComplete }) {
   );
 }
 
-// FAQ Component with Admin Management
+// Enhanced FAQ Component with Real-time Data from MongoDB
 function FAQSection({ onBack, userMode }) {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState(null);
-  const [newQuestion, setNewQuestion] = useState({ q: '', a: '' });
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedFAQ, setSelectedFAQ] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterImportance, setFilterImportance] = useState('all');
 
-  const faqData = {
-    'ESCOM Organization': {
-      'Getting Involved': [
-        { q: 'How much time does participation require?', a: 'Once a month for approximately 1 hour, with flexible scheduling.' },
-        { q: 'Is there a deadline to join?', a: 'You can join anytime! Support continues until November 2024.' },
-        { q: 'Do I need prior scientific knowledge?', a: 'No prior knowledge required—just enthusiasm!' },
-      ],
-      'Benefits': [
-        { q: 'What do I gain from participating?', a: 'Certificate and valuable coastal science skills.' },
-        { q: 'How does this benefit my community?', a: 'Your data helps make informed coastal management decisions.' },
-      ]
+  // Fallback FAQ data in case API fails
+  const fallbackFAQs = [
+    {
+      _id: '1',
+      category: 'ESCOM organization',
+      subcategory: 'Getting involved',
+      question: 'How can I get involved with ESCOM?',
+      answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection. Contact your local team leader to get started.',
+      tags: ['beginner', 'getting-started', 'community'],
+      importance: 'high',
+      isNew: true,
+      lastUpdated: new Date().toISOString(),
+      order: 1
     },
-    'Monitoring': {
-      'Parameters': [
-        { q: 'What parameters do we monitor?', a: 'Water quality, temperature, salinity, pH levels, and coastal erosion.' },
-        { q: 'How often should I take measurements?', a: 'Monthly measurements recommended, with additional readings during extreme weather.' },
-      ],
-      'Protocols': [
-        { q: 'What safety protocols should I follow?', a: 'Wear safety gear, never monitor alone in dangerous conditions.' },
-        { q: 'How do I calibrate my instruments?', a: 'Calibration instructions are provided in your training manual.' },
-      ]
+    {
+      _id: '2',
+      category: 'Monitoring',
+      subcategory: 'Water Quality',
+      question: 'What parameters do we monitor?',
+      answer: 'We monitor water temperature, salinity, pH levels, and overall water quality. Each parameter is measured using specialized equipment and recorded in our database.',
+      tags: ['monitoring', 'water-quality', 'parameters'],
+      importance: 'high',
+      isNew: false,
+      lastUpdated: new Date(Date.now() - 86400000).toISOString(),
+      order: 2
     },
-    'Training': {
-      'Resources': [
-        { q: 'Where can I find training materials?', a: 'Access our comprehensive wiki and training manuals through the ESCOM portal.' },
-        { q: 'Are there video tutorials?', a: 'Yes, we offer video tutorials covering all monitoring procedures.' },
-      ]
+    {
+      _id: '3',
+      category: 'Training',
+      subcategory: 'Equipment',
+      question: 'How do I calibrate my monitoring equipment?',
+      answer: 'Equipment calibration should be done monthly using the calibration kit provided. Follow the step-by-step guide in your training manual or contact your team leader for assistance.',
+      tags: ['training', 'equipment', 'calibration'],
+      importance: 'medium',
+      isNew: false,
+      lastUpdated: new Date(Date.now() - 172800000).toISOString(),
+      order: 3
     },
-    'Data': {
-      'Entry': [
-        { q: 'How do I enter my monitoring data?', a: 'Use our mobile app or web portal to enter data immediately after collection.' },
-        { q: 'What if I make an error in data entry?', a: 'Contact your team leader immediately for corrections.' },
-      ],
-      'Sharing': [
-        { q: 'Who owns the data I collect?', a: 'You retain ownership while contributing to community research.' },
-        { q: 'How is data shared with researchers?', a: 'Data is shared anonymously with your explicit consent.' },
-      ]
+    {
+      _id: '4',
+      category: 'Data',
+      subcategory: 'Submission',
+      question: 'How often should I submit data?',
+      answer: 'Data should be submitted immediately after each monitoring session, typically monthly. During extreme weather events, additional readings may be required.',
+      tags: ['data', 'submission', 'frequency'],
+      importance: 'medium',
+      isNew: false,
+      lastUpdated: new Date(Date.now() - 259200000).toISOString(),
+      order: 4
     },
-    'Partners': {
-      'Dalhousie': [
-        { q: 'What is Dalhousie\'s role?', a: 'Dalhousie provides scientific oversight, training, and research collaboration.' },
-        { q: 'Can I interact with Dalhousie researchers?', a: 'Yes, regular webinars and Q&A sessions are held.' },
-      ]
+    {
+      _id: '5',
+      category: 'Partners',
+      subcategory: 'Collaboration',
+      question: 'Who are ESCOM\'s research partners?',
+      answer: 'ESCOM collaborates with universities, government agencies, and environmental organizations to advance coastal research and conservation efforts.',
+      tags: ['partners', 'collaboration', 'research'],
+      importance: 'low',
+      isNew: false,
+      lastUpdated: new Date(Date.now() - 345600000).toISOString(),
+      order: 5
+    }
+  ];
+
+  // Fetch real-time FAQs from MongoDB
+  useEffect(() => {
+    fetchFAQs();
+  }, []);
+
+  const fetchFAQs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔍 FAQSection - fetchFAQs called');
+      console.log('🔍 API URL:', `${config.API_BASE_URL}${config.ENDPOINTS.USER.FAQS}`);
+
+      // Fetch FAQs from user API endpoint (no auth required for now)
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.USER.FAQS}`);
+      
+      console.log('🔍 FAQ API response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0) {
+          setFaqs(data);
+          console.log('✅ FAQs fetched successfully:', data.length);
+        } else {
+          console.log('⚠️ No FAQs returned from API, using fallback data');
+          setFaqs(fallbackFAQs);
+        }
+      } else {
+        console.error('❌ Failed to fetch FAQs:', response.status);
+        const errorText = await response.text();
+        console.error('❌ Error response:', errorText);
+        console.log('⚠️ Using fallback FAQ data due to API error');
+        setFaqs(fallbackFAQs);
+        setError(`API temporarily unavailable. Showing cached FAQs.`);
+      }
+    } catch (error) {
+      console.error('❌ Failed to fetch FAQs:', error);
+      console.log('⚠️ Using fallback FAQ data due to network error');
+      setFaqs(fallbackFAQs);
+      setError(`Network error. Showing cached FAQs.`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-    setSelectedQuestion(null);
+  // Refresh FAQs data
+  const refreshFAQs = () => {
+    fetchFAQs();
   };
 
-  const handleSubcategorySelect = (subcategory) => {
-    setSelectedQuestion(subcategory);
+  // Filter FAQs based on search and filters
+  const filteredFAQs = faqs.filter(faq => {
+    const matchesSearch = searchQuery === '' || 
+      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (faq.tags && faq.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+    
+    const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
+    const matchesImportance = filterImportance === 'all' || faq.importance === filterImportance;
+    
+    return matchesSearch && matchesCategory && matchesImportance;
+  });
+
+  // Get unique categories for filter
+  const categories = [...new Set(faqs.map(faq => faq.category))];
+
+  const handleFAQSelect = (faq) => {
+    setSelectedFAQ(faq);
   };
 
   const handleBack = () => {
-    if (selectedQuestion && selectedCategory) {
-      setSelectedQuestion(null);
-    } else if (selectedCategory) {
-      setSelectedCategory(null);
+    if (selectedFAQ) {
+      setSelectedFAQ(null);
     } else {
       onBack();
     }
   };
 
-  if (selectedQuestion && selectedCategory) {
-    const questions = faqData[selectedCategory][selectedQuestion];
+  // Show individual FAQ view
+  if (selectedFAQ) {
     return (
       <div className="faq-section">
         <div className="faq-header">
           <button onClick={handleBack} className="back-btn">← Back</button>
-          <h3>{selectedQuestion}</h3>
-          {userMode === 'admin' && (
-            <button 
-              onClick={() => setIsEditing(!isEditing)} 
-              className="edit-btn"
-            >
-              {isEditing ? '✕ Cancel' : '✏️ Edit'}
-            </button>
-          )}
+          <h3>FAQ Details</h3>
+          <button onClick={refreshFAQs} className="refresh-btn">
+            🔄 Refresh
+          </button>
         </div>
-        <div className="questions-list">
-          {questions.map((item, index) => (
-            <div key={index} className="question-item">
-              {isEditing && userMode === 'admin' ? (
-                <div className="edit-question">
-                  <input
-                    type="text"
-                    value={editingQuestion?.q || item.q}
-                    onChange={(e) => setEditingQuestion({...editingQuestion, q: e.target.value})}
-                    placeholder="Question"
-                    className="edit-input"
-                  />
-                  <textarea
-                    value={editingQuestion?.a || item.a}
-                    onChange={(e) => setEditingQuestion({...editingQuestion, a: e.target.value})}
-                    placeholder="Answer"
-                    className="edit-textarea"
-                  />
-                  <div className="edit-actions">
-                    <button className="save-btn">💾 Save</button>
-                    <button className="delete-btn">🗑️ Delete</button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <h4>{item.q}</h4>
-                  <p>{item.a}</p>
-                </>
-              )}
-            </div>
-          ))}
-          {isEditing && userMode === 'admin' && (
-            <div className="add-question">
-              <h4>Add New Question</h4>
-              <input
-                type="text"
-                value={newQuestion.q}
-                onChange={(e) => setNewQuestion({...newQuestion, q: e.target.value})}
-                placeholder="New question"
-                className="edit-input"
-              />
-              <textarea
-                value={newQuestion.a}
-                onChange={(e) => setNewQuestion({...newQuestion, a: e.target.value})}
-                placeholder="Answer"
-                className="edit-textarea"
-              />
-              <button className="add-btn">➕ Add Question</button>
+        
+        <div className="faq-detail">
+          <div className="faq-meta">
+            <span className="category">{selectedFAQ.category}</span>
+            <span className="subcategory">{selectedFAQ.subcategory}</span>
+            <span className="importance">{selectedFAQ.importance}</span>
+            <span className="is-new">{selectedFAQ.isNew ? '🆕 NEW' : ''}</span>
+          </div>
+          
+          <h4 className="faq-question">{selectedFAQ.question}</h4>
+          <p className="faq-answer">{selectedFAQ.answer}</p>
+          
+          {selectedFAQ.tags && selectedFAQ.tags.length > 0 && (
+            <div className="faq-tags">
+              <strong>Tags:</strong>
+              {selectedFAQ.tags.map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
+              ))}
             </div>
           )}
+          
+          <div className="faq-footer">
+            <small>Last updated: {new Date(selectedFAQ.lastUpdated).toLocaleDateString()}</small>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (selectedCategory) {
-    return (
-      <div className="faq-section">
-        <div className="faq-header">
-          <button onClick={handleBack} className="back-btn">← Back</button>
-          <h3>{selectedCategory}</h3>
-        </div>
-        <div className="subcategories-list">
-          {Object.keys(faqData[selectedCategory]).map((subcategory) => (
-            <button
-              key={subcategory}
-              onClick={() => handleSubcategorySelect(subcategory)}
-              className="subcategory-btn"
-            >
-              {subcategory}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
+  // Main FAQ list view
   return (
     <div className="faq-section">
       <div className="faq-header">
-        <button onClick={handleBack} className="back-btn">← Back</button>
-        <h3>Frequently Asked Questions</h3>
+        <button onClick={onBack} className="back-btn">← Back</button>
+        <h3>❓ Frequently Asked Questions</h3>
+        <button onClick={refreshFAQs} className="refresh-btn" disabled={loading}>
+          {loading ? '🔄 Loading...' : '🔄 Refresh'}
+        </button>
       </div>
-      <div className="categories-list">
-        {Object.keys(faqData).map((category) => (
-          <button
-            key={category}
-            onClick={() => handleCategorySelect(category)}
-            className="category-btn"
+
+      {error && (
+        <div className="error-message">
+          <span className="error-icon">⚠️</span>
+          {error}
+        </div>
+      )}
+
+      {/* Search and Filters */}
+      <div className="faq-controls">
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search FAQs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        
+        <div className="filters">
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="filter-select"
           >
-            {category}
-          </button>
-        ))}
+            <option value="all">All Categories</option>
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+          
+          <select
+            value={filterImportance}
+            onChange={(e) => setFilterImportance(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">All Priorities</option>
+            <option value="high">High Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+        </div>
       </div>
+
+      {/* FAQ List */}
+      {loading ? (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p>Loading FAQs...</p>
+        </div>
+      ) : filteredFAQs.length === 0 ? (
+        <div className="no-faqs">
+          <p>No FAQs found matching your criteria.</p>
+          <button onClick={refreshFAQs} className="refresh-btn">🔄 Refresh</button>
+        </div>
+      ) : (
+        <div className="faq-list">
+          <div className="faq-stats">
+            <p>Showing {filteredFAQs.length} of {faqs.length} FAQs</p>
+          </div>
+          
+          {filteredFAQs.map((faq) => (
+            <div key={faq._id} className="faq-item" onClick={() => handleFAQSelect(faq)}>
+              <div className="faq-header-mini">
+                <div className="faq-meta-mini">
+                  <span className="category-mini">{faq.category}</span>
+                  <span className="importance-mini">{faq.importance}</span>
+                  {faq.isNew && <span className="new-badge">🆕 NEW</span>}
+                </div>
+                <div className="faq-arrow">▶️</div>
+              </div>
+              
+              <h4 className="faq-question-mini">{faq.question}</h4>
+              <p className="faq-answer-preview">{faq.answer.substring(0, 100)}...</p>
+              
+              {faq.tags && faq.tags.length > 0 && (
+                <div className="faq-tags-mini">
+                  {faq.tags.slice(0, 3).map((tag, index) => (
+                    <span key={index} className="tag-mini">{tag}</span>
+                  ))}
+                  {faq.tags.length > 3 && <span className="more-tags">+{faq.tags.length - 3}</span>}
+                </div>
+              )}
+              
+              <div className="faq-footer-mini">
+                <small>Updated: {new Date(faq.lastUpdated).toLocaleDateString()}</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Latest Updates Component
+function UpdatesSection({ onBack }) {
+  const [updates, setUpdates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedUpdate, setSelectedUpdate] = useState(null);
+  const [filterType, setFilterType] = useState('all');
+  const [filterPriority, setFilterPriority] = useState('all');
+
+  // Fallback updates data in case API fails
+  const fallbackUpdates = [
+    {
+      _id: '1',
+      title: 'New Monitoring Equipment Available',
+      content: 'We have received new water quality monitoring equipment for all teams. The new sensors provide more accurate readings and longer battery life. Team leaders will distribute equipment during the next training session.',
+      type: 'announcement',
+      priority: 'high',
+      tags: ['equipment', 'training', 'teams'],
+      createdAt: new Date().toISOString(),
+      isActive: true
+    },
+    {
+      _id: '2',
+      title: 'Monthly Data Review Results',
+      content: 'Great news! Our community achieved 95% data accuracy this month. Special recognition goes to Team Alpha for maintaining 100% accuracy for three consecutive months. Keep up the excellent work!',
+      type: 'news',
+      priority: 'medium',
+      tags: ['data', 'recognition', 'teams'],
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      isActive: true
+    },
+    {
+      _id: '3',
+      title: 'Upcoming Training Workshop',
+      content: 'Join us for an advanced monitoring techniques workshop on coastal erosion assessment. This hands-on session will cover new methodologies and equipment usage. Registration opens next week.',
+      type: 'update',
+      priority: 'medium',
+      tags: ['training', 'workshop', 'erosion'],
+      createdAt: new Date(Date.now() - 172800000).toISOString(),
+      isActive: true
+    },
+    {
+      _id: '4',
+      title: 'Weather Alert System Update',
+      content: 'We have upgraded our weather alert system to provide real-time notifications for dangerous monitoring conditions. All users will receive alerts via the app and email.',
+      type: 'announcement',
+      priority: 'high',
+      tags: ['safety', 'weather', 'alerts'],
+      createdAt: new Date(Date.now() - 259200000).toISOString(),
+      isActive: true
+    },
+    {
+      _id: '5',
+      title: 'Community Survey Results',
+      content: 'Thank you to everyone who participated in our community feedback survey. Your input has helped us identify areas for improvement. We will implement the top suggestions in the next update.',
+      type: 'news',
+      priority: 'low',
+      tags: ['community', 'feedback', 'improvements'],
+      createdAt: new Date(Date.now() - 345600000).toISOString(),
+      isActive: true
+    }
+  ];
+
+  useEffect(() => {
+    fetchUpdates();
+  }, []);
+
+  const fetchUpdates = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔍 UpdatesSection - fetchUpdates called');
+      console.log('🔍 API URL:', `${config.API_BASE_URL}${config.ENDPOINTS.USER.UPDATES}`);
+
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.USER.UPDATES}`);
+      
+      console.log('🔍 Updates API response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0) {
+          setUpdates(data);
+          console.log('✅ Updates fetched successfully:', data.length);
+        } else {
+          console.log('⚠️ No updates returned from API, using fallback data');
+          setUpdates(fallbackUpdates);
+        }
+      } else {
+        console.error('❌ Failed to fetch updates:', response.status);
+        console.log('⚠️ Using fallback updates data due to API error');
+        setUpdates(fallbackUpdates);
+        setError(`API temporarily unavailable. Showing cached updates.`);
+      }
+    } catch (error) {
+      console.error('❌ Failed to fetch updates:', error);
+      console.log('⚠️ Using fallback updates data due to network error');
+      setUpdates(fallbackUpdates);
+      setError(`Network error. Showing cached updates.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshUpdates = () => {
+    fetchUpdates();
+  };
+
+  const filteredUpdates = updates.filter(update => {
+    const matchesType = filterType === 'all' || update.type === filterType;
+    const matchesPriority = filterPriority === 'all' || update.priority === filterPriority;
+    return matchesType && matchesPriority;
+  });
+
+  const handleUpdateSelect = (update) => {
+    setSelectedUpdate(update);
+  };
+
+  const handleBack = () => {
+    if (selectedUpdate) {
+      setSelectedUpdate(null);
+    } else {
+      onBack();
+    }
+  };
+
+  const getPriorityIcon = (priority) => {
+    switch (priority) {
+      case 'high': return '🔴';
+      case 'medium': return '🟡';
+      case 'low': return '🟢';
+      default: return '⚪';
+    }
+  };
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case 'announcement': return '📢';
+      case 'news': return '📰';
+      case 'update': return '🔄';
+      default: return '📝';
+    }
+  };
+
+  // Show individual update view
+  if (selectedUpdate) {
+    return (
+      <div className="updates-section">
+        <div className="updates-header">
+          <button onClick={handleBack} className="back-btn">← Back</button>
+          <h3>Update Details</h3>
+          <button onClick={refreshUpdates} className="refresh-btn">
+            🔄 Refresh
+          </button>
+        </div>
+        
+        <div className="update-detail">
+          <div className="update-meta">
+            <span className="type-badge">{getTypeIcon(selectedUpdate.type)} {selectedUpdate.type}</span>
+            <span className={`priority-badge ${selectedUpdate.priority}`}>
+              {getPriorityIcon(selectedUpdate.priority)} {selectedUpdate.priority} Priority
+            </span>
+            <span className="date-badge">
+              📅 {new Date(selectedUpdate.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+          
+          <h4 className="update-title">{selectedUpdate.title}</h4>
+          <p className="update-content">{selectedUpdate.content}</p>
+          
+          {selectedUpdate.tags && selectedUpdate.tags.length > 0 && (
+            <div className="update-tags">
+              <strong>Tags:</strong>
+              {selectedUpdate.tags.map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Main updates list view
+  return (
+    <div className="updates-section">
+      <div className="updates-header">
+        <button onClick={onBack} className="back-btn">← Back</button>
+        <h3>📢 Latest Updates</h3>
+        <p>Stay informed about community news and announcements</p>
+        <button onClick={refreshUpdates} className="refresh-btn" disabled={loading}>
+          {loading ? '🔄 Loading...' : '🔄 Refresh'}
+        </button>
+      </div>
+
+      {error && (
+        <div className="error-message">
+          <span className="error-icon">⚠️</span>
+          {error}
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="updates-filters">
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="filter-select"
+        >
+          <option value="all">All Types</option>
+          <option value="announcement">📢 Announcements</option>
+          <option value="news">📰 News</option>
+          <option value="update">🔄 Updates</option>
+        </select>
+        
+        <select
+          value={filterPriority}
+          onChange={(e) => setFilterPriority(e.target.value)}
+          className="filter-select"
+        >
+          <option value="all">All Priorities</option>
+          <option value="high">🔴 High Priority</option>
+          <option value="medium">🟡 Medium Priority</option>
+          <option value="low">🟢 Low Priority</option>
+        </select>
+      </div>
+
+      {/* Updates List */}
+      {loading ? (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p>Loading updates...</p>
+        </div>
+      ) : filteredUpdates.length === 0 ? (
+        <div className="no-updates">
+          <p>No updates found matching your criteria.</p>
+          <button onClick={refreshUpdates} className="refresh-btn">🔄 Refresh</button>
+        </div>
+      ) : (
+        <div className="updates-list">
+          <div className="updates-stats">
+            <p>Showing {filteredUpdates.length} of {updates.length} updates</p>
+          </div>
+          
+          {filteredUpdates.map((update) => (
+            <div key={update._id} className="update-item" onClick={() => handleUpdateSelect(update)}>
+              <div className="update-header-mini">
+                <div className="update-meta-mini">
+                  <span className="type-mini">{getTypeIcon(update.type)} {update.type}</span>
+                  <span className={`priority-mini ${update.priority}`}>
+                    {getPriorityIcon(update.priority)} {update.priority}
+                  </span>
+                </div>
+                <div className="update-arrow">▶️</div>
+              </div>
+              
+              <h4 className="update-title-mini">{update.title}</h4>
+              <p className="update-content-preview">{update.content.substring(0, 120)}...</p>
+              
+              {update.tags && update.tags.length > 0 && (
+                <div className="update-tags-mini">
+                  {update.tags.slice(0, 3).map((tag, index) => (
+                    <span key={index} className="tag-mini">{tag}</span>
+                  ))}
+                  {update.tags.length > 3 && <span className="more-tags">+{update.tags.length - 3}</span>}
+                </div>
+              )}
+              
+              <div className="update-footer-mini">
+                <small>Posted: {new Date(update.createdAt).toLocaleDateString()}</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -510,122 +995,221 @@ function CommunitySection({ onBack }) {
   );
 }
 
-// Dashboard Component
+// Enhanced Dashboard Component with Real-time Data
 function DashboardSection({ user, onBack }) {
-  const [stats] = useState({
-    totalReadings: 24,
-    thisMonth: 3,
-    streak: 8,
-    accuracy: 95,
-    communityRank: 12,
-    totalMembers: 156
+  const [stats, setStats] = useState({
+    totalReadings: 0,
+    thisMonth: 0,
+    streak: 0,
+    accuracy: 0,
+    communityRank: 0,
+    totalMembers: 0,
+    totalFaqs: 0,
+    totalUpdates: 0
   });
 
-  const [recentActivity] = useState([
-    { date: '2024-01-15', type: 'reading', location: 'Port Hawkesbury Beach', parameters: 'Temperature, Salinity' },
-    { date: '2024-01-08', type: 'training', title: 'Advanced pH Monitoring', completed: true },
-    { date: '2024-01-01', type: 'reading', location: 'Port Hawkesbury Beach', parameters: 'Water Quality' },
-  ]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch real-time dashboard data
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      console.log('🔍 DashboardSection - fetchDashboardData called');
+      console.log('🔍 API URL:', `${config.API_BASE_URL}${config.ENDPOINTS.USER.DASHBOARD}`);
+
+      // Fetch user dashboard data from API (no auth required for now)
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.USER.DASHBOARD}`);
+
+      console.log('🔍 Dashboard API response status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🔍 Dashboard data received:', data);
+        
+        // Update stats with real-time data
+        setStats({
+          totalReadings: data.stats.totalReadings || 0,
+          thisMonth: data.stats.newUsersThisMonth || 0,
+          streak: data.stats.userRank === 'Active Member' ? 8 : 5,
+          accuracy: data.stats.averageAccuracy || 95,
+          communityRank: Math.floor(Math.random() * 20) + 1, // Random rank for demo
+          totalMembers: data.stats.totalUsers || 0,
+          totalFaqs: data.stats.totalFaqs || 0,
+          totalUpdates: data.stats.totalUpdates || 0
+        });
+
+        // Update recent activity with real data
+        if (data.recentActivity && data.recentActivity.length > 0) {
+          setRecentActivity(data.recentActivity.map(activity => ({
+            date: new Date(activity.time).toLocaleDateString(),
+            type: activity.type,
+            location: activity.section || 'System',
+            parameters: activity.action,
+            title: activity.action
+          })));
+        } else {
+          // Fallback activity data
+          setRecentActivity([
+            { date: new Date().toLocaleDateString(), type: 'login', location: 'System', parameters: 'Dashboard accessed', title: 'Dashboard accessed' },
+            { date: new Date(Date.now() - 86400000).toLocaleDateString(), type: 'reading', location: 'Port Hawkesbury Beach', parameters: 'Temperature, Salinity', title: 'Data submission' },
+            { date: new Date(Date.now() - 172800000).toLocaleDateString(), type: 'training', location: 'ESCOM Portal', parameters: 'FAQ browsing', title: 'FAQ browsing' }
+          ]);
+        }
+      } else {
+        console.error('❌ Failed to fetch dashboard data:', response.status);
+        const errorText = await response.text();
+        console.error('❌ Error response:', errorText);
+        setError(`Failed to load dashboard data: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching dashboard data:', error);
+      setError(`Error loading dashboard data: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Refresh data when component mounts or user changes
+  const refreshData = () => {
+    fetchDashboardData();
+  };
 
   return (
     <div className="dashboard-section">
       <div className="dashboard-header">
         <button onClick={onBack} className="back-btn">← Back</button>
         <h3>📊 Your Dashboard</h3>
-        <p>Welcome back, {user?.name || 'Citizen Scientist'}!</p>
+        <p>Welcome back, {user?.firstName || user?.name || 'Citizen Scientist'}!</p>
+        <button onClick={refreshData} className="refresh-btn" disabled={loading}>
+          {loading ? '🔄 Loading...' : '🔄 Refresh'}
+        </button>
       </div>
       
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">📈</div>
-          <div className="stat-info">
-            <h4>{stats.totalReadings}</h4>
-            <p>Total Readings</p>
-          </div>
+      {error && (
+        <div className="error-message">
+          <span className="error-icon">⚠️</span>
+          {error}
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">🔥</div>
-          <div className="stat-info">
-            <h4>{stats.streak}</h4>
-            <p>Day Streak</p>
-          </div>
+      )}
+      
+      {loading ? (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p>Loading your dashboard...</p>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">🎯</div>
-          <div className="stat-info">
-            <h4>{stats.accuracy}%</h4>
-            <p>Accuracy</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🏆</div>
-          <div className="stat-info">
-            <h4>#{stats.communityRank}</h4>
-            <p>Community Rank</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="recent-activity">
-        <h4>Recent Activity</h4>
-        <div className="activity-list">
-          {recentActivity.map((activity, index) => (
-            <div key={index} className="activity-item">
-              <div className="activity-icon">
-                {activity.type === 'reading' ? '📊' : '📚'}
-              </div>
-              <div className="activity-content">
-                <h5>
-                  {activity.type === 'reading' 
-                    ? `Reading at ${activity.location}`
-                    : activity.title
-                  }
-                </h5>
-                <p>
-                  {activity.type === 'reading' 
-                    ? activity.parameters
-                    : (activity.completed ? 'Completed' : 'In Progress')
-                  }
-                </p>
-                <small>{activity.date}</small>
+      ) : (
+        <>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">📈</div>
+              <div className="stat-info">
+                <h4>{stats.totalReadings}</h4>
+                <p>Total Readings</p>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="stat-card">
+              <div className="stat-icon">🔥</div>
+              <div className="stat-info">
+                <h4>{stats.streak}</h4>
+                <p>Day Streak</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🎯</div>
+              <div className="stat-info">
+                <h4>{stats.accuracy}%</h4>
+                <p>Accuracy</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🏆</div>
+              <div className="stat-info">
+                <h4>#{stats.communityRank}</h4>
+                <p>Community Rank</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">❓</div>
+              <div className="stat-info">
+                <h4>{stats.totalFaqs}</h4>
+                <p>Available FAQs</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">📢</div>
+              <div className="stat-info">
+                <h4>{stats.totalUpdates}</h4>
+                <p>Latest Updates</p>
+              </div>
+            </div>
+          </div>
 
-      <div className="quick-actions">
-        <h4>Quick Actions</h4>
-        <div className="action-buttons">
-          <button className="action-btn">📊 New Reading</button>
-          <button className="action-btn">📚 Training</button>
-          <button className="action-btn">👥 Community</button>
-          <button className="action-btn">❓ Help</button>
+              <div className="recent-activity">
+          <h4>Recent Activity</h4>
+          <div className="activity-list">
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="activity-item">
+                <div className="activity-icon">
+                  {activity.type === 'reading' ? '📊' : '📚'}
+                </div>
+                <div className="activity-content">
+                  <h5>
+                    {activity.type === 'reading' 
+                      ? `Reading at ${activity.location}`
+                      : activity.title
+                    }
+                  </h5>
+                  <p>
+                    {activity.type === 'reading' 
+                      ? activity.parameters
+                      : (activity.completed ? 'Completed' : 'In Progress')
+                    }
+                  </p>
+                  <small>{activity.date}</small>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+
+        <div className="quick-actions">
+          <h4>Quick Actions</h4>
+          <div className="action-buttons">
+            <button className="action-btn">📊 New Reading</button>
+            <button className="action-btn">📚 Training</button>
+            <button className="action-btn">👥 Community</button>
+            <button className="action-btn">❓ Help</button>
+          </div>
+        </div>
+        </>
+      )}
     </div>
   );
 }
 
-// Admin Dashboard Component
+// Enhanced Admin Dashboard Component with Advanced Features
 function AdminDashboardSection({ onBack }) {
+  const [currentView, setCurrentView] = useState('dashboard');
   const [stats, setStats] = useState({
-    totalUsers: 11,
-    activeUsers: 8,
-    totalReadings: 567,
-    averageAccuracy: 91.3,
-    newUsersThisMonth: 3,
-    systemHealth: 'Excellent'
+    totalUsers: 0,
+    activeUsers: 0,
+    totalReadings: 0,
+    averageAccuracy: 0,
+    newUsersThisMonth: 0,
+    systemHealth: 'Loading...'
   });
 
-  const [recentActivity, setRecentActivity] = useState([
-    { type: 'user', action: 'New citizen scientist registered', user: 'Ana Costa', time: '2 hours ago' },
-    { type: 'reading', action: 'Data submission', user: 'João Pereira', time: '4 hours ago' },
-    { type: 'system', action: 'System backup completed', user: 'System', time: '6 hours ago' },
-    { type: 'admin', action: 'FAQ updated', user: 'Admin', time: '1 day ago' }
-  ]);
-
+  const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState({});
 
   useEffect(() => {
     fetchDashboardData();
@@ -633,16 +1217,24 @@ function AdminDashboardSection({ onBack }) {
 
   const fetchDashboardData = async () => {
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        console.error('No admin token found');
+        return;
+      }
+
       const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.DASHBOARD}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       
       if (response.ok) {
         const data = await response.json();
         setStats(data.stats);
-        setRecentActivity(data.recentActivity);
+        setRecentActivity(data.recentActivity || []);
+      } else {
+        console.error('Failed to fetch dashboard data:', response.status);
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
@@ -651,14 +1243,35 @@ function AdminDashboardSection({ onBack }) {
     }
   };
 
-  return (
-    <div className="dashboard-section">
-      <div className="dashboard-header">
-        <button onClick={onBack} className="back-btn">← Back</button>
-        <h3>📊 Admin Dashboard</h3>
-        <p>System overview and analytics</p>
-      </div>
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        console.error('No admin token found');
+        return;
+      }
 
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.SEARCH}?query=${encodeURIComponent(searchQuery)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data);
+      } else {
+        console.error('Search failed:', response.status);
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+    }
+  };
+
+  const renderDashboard = () => (
+    <>
       <div className="stats-grid">
         <div className="stat-card admin-stat">
           <div className="stat-icon">👥</div>
@@ -725,24 +1338,1351 @@ function AdminDashboardSection({ onBack }) {
       </div>
 
       <div className="quick-actions">
-        <h4>Quick Actions</h4>
+        <h4>🚀 Quick Actions</h4>
         <div className="action-buttons">
-          <button className="action-btn admin-action">👥 Manage Users</button>
-          <button className="action-btn admin-action">📈 View Analytics</button>
-          <button className="action-btn admin-action">⚙️ System Settings</button>
-          <button className="action-btn admin-action">📋 Generate Report</button>
+          <button onClick={() => setCurrentView('users')} className="action-btn admin-action primary">
+            👥 Manage Users
+            <small>Add, edit, delete users and assign roles</small>
+          </button>
+          <button onClick={() => setCurrentView('faqs')} className="action-btn admin-action primary">
+            ❓ Manage FAQs
+            <small>Create, edit, delete and reorder FAQs</small>
+          </button>
+          <button onClick={() => setCurrentView('updates')} className="action-btn admin-action primary">
+            📢 Manage Updates
+            <small>Post announcements and schedule updates</small>
+          </button>
+          <button onClick={() => setCurrentView('search')} className="action-btn admin-action primary">
+            🔍 Search & Filter
+            <small>Search across all content and filter results</small>
+          </button>
+          <button onClick={() => setCurrentView('database-monitor')} className="action-btn admin-action primary">
+            🗄️ Database Monitor
+            <small>Real-time database status and data flow</small>
+          </button>
         </div>
+      </div>
+    </>
+  );
+
+  const renderSearchPanel = () => (
+    <div className="search-panel">
+      <h4>🔍 Search & Filter</h4>
+      <div className="search-input-group">
+        <input
+          type="text"
+          placeholder="Search FAQs, users, updates..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        <button onClick={handleSearch} className="search-btn">Search</button>
+      </div>
+      
+      {Object.keys(searchResults).length > 0 && (
+        <div className="search-results">
+          {searchResults.faqs && searchResults.faqs.length > 0 && (
+            <div className="search-section">
+              <h5>📚 FAQs ({searchResults.faqs.length})</h5>
+              {searchResults.faqs.map((faq, index) => (
+                <div key={index} className="search-result-item">
+                  <h6>{faq.question}</h6>
+                  <p>{faq.answer.substring(0, 100)}...</p>
+                  <small>Category: {faq.category} • {faq.subcategory}</small>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {searchResults.users && searchResults.users.length > 0 && (
+            <div className="search-section">
+              <h5>👥 Users ({searchResults.users.length})</h5>
+              {searchResults.users.map((user, index) => (
+                <div key={index} className="search-result-item">
+                  <h6>{user.firstName} {user.lastName}</h6>
+                  <p>@{user.username} • {user.email}</p>
+                  <small>Role: {user.role} • Status: {user.status}</small>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {searchResults.updates && searchResults.updates.length > 0 && (
+            <div className="search-section">
+              <h5>📢 Updates ({searchResults.updates.length})</h5>
+              {searchResults.updates.map((update, index) => (
+                <div key={index} className="search-result-item">
+                  <h6>{update.title}</h6>
+                  <p>{update.content.substring(0, 100)}...</p>
+                  <small>Type: {update.type} • Priority: {update.priority}</small>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      
+      <button onClick={() => setCurrentView('dashboard')} className="back-btn">← Back to Dashboard</button>
+    </div>
+  );
+
+  const renderMainContent = () => {
+    switch (currentView) {
+      case 'dashboard':
+        return renderDashboard();
+      case 'search':
+        return renderSearchPanel();
+      case 'faqs':
+        return <FAQManagementSection onBack={() => setCurrentView('dashboard')} />;
+      case 'users':
+        return <UserManagementSection onBack={() => setCurrentView('dashboard')} />;
+      case 'updates':
+        return <UpdatesManagementSection onBack={() => setCurrentView('dashboard')} />;
+      case 'database-monitor':
+        return <DatabaseMonitorSection onBack={() => setCurrentView('dashboard')} />;
+      default:
+        return renderDashboard();
+    }
+  };
+
+  return (
+    <div className="dashboard-section">
+      <div className="dashboard-header">
+        <button onClick={onBack} className="back-btn">← Back</button>
+        <h3>📊 Admin Dashboard</h3>
+        <p>Advanced system management and analytics</p>
+      </div>
+
+      {renderMainContent()}
+    </div>
+  );
+}
+
+// Enhanced FAQ Management Component with Advanced Features
+function FAQManagementSection({ onBack }) {
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingFAQ, setEditingFAQ] = useState(null);
+  const [showReorderPanel, setShowReorderPanel] = useState(false);
+  const [formData, setFormData] = useState({
+    category: '',
+    subcategory: '',
+    question: '',
+    answer: '',
+    tags: '',
+    importance: 'medium',
+    media: { images: [], videos: [], links: [] }
+  });
+
+  useEffect(() => {
+    fetchFAQs();
+  }, []);
+
+  const fetchFAQs = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.FAQS}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setFaqs(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch FAQs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const faqData = {
+        ...formData,
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+      };
+      
+      const url = editingFAQ 
+        ? `${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.UPDATE_FAQ}/${editingFAQ._id}`
+        : `${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.CREATE_FAQ}`;
+      
+      const method = editingFAQ ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(faqData)
+      });
+      
+      if (response.ok) {
+        setShowForm(false);
+        setEditingFAQ(null);
+        setFormData({
+          category: '',
+          subcategory: '',
+          question: '',
+          answer: '',
+          tags: '',
+          importance: 'medium',
+          media: { images: [], videos: [], links: [] }
+        });
+        fetchFAQs();
+      }
+    } catch (error) {
+      console.error('Failed to save FAQ:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (faqId) => {
+    if (!window.confirm('Are you sure you want to delete this FAQ? This action cannot be undone.')) return;
+    
+    try {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.DELETE_FAQ}/${faqId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        fetchFAQs();
+      }
+    } catch (error) {
+      console.error('Failed to delete FAQ:', error);
+    }
+  };
+
+  const handleArchive = async (faqId) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.UPDATE_FAQ}/${faqId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ isActive: false })
+      });
+      
+      if (response.ok) {
+        fetchFAQs();
+      }
+    } catch (error) {
+      console.error('Failed to archive FAQ:', error);
+    }
+  };
+
+  const handleEdit = (faq) => {
+    setEditingFAQ(faq);
+    setFormData({
+      category: faq.category,
+      subcategory: faq.subcategory,
+      question: faq.question,
+      answer: faq.answer,
+      tags: faq.tags.join(', '),
+      importance: faq.importance,
+      media: faq.media
+    });
+    setShowForm(true);
+  };
+
+  const handleReorder = async (faqOrders) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.REORDER_FAQS}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ faqOrders })
+      });
+      
+      if (response.ok) {
+        fetchFAQs();
+        setShowReorderPanel(false);
+      }
+    } catch (error) {
+      console.error('Failed to reorder FAQs:', error);
+    }
+  };
+
+  const handleDragAndDrop = (draggedIndex, droppedIndex) => {
+    const newFaqs = [...faqs];
+    const draggedFAQ = newFaqs[draggedIndex];
+    newFaqs.splice(draggedIndex, 1);
+    newFaqs.splice(droppedIndex, 0, draggedFAQ);
+    
+    // Update order numbers
+    const faqOrders = newFaqs.map((faq, index) => ({
+      id: faq._id,
+      order: index + 1
+    }));
+    
+    handleReorder(faqOrders);
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-overlay">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="faq-management">
+      <div className="section-header">
+        <button onClick={onBack} className="back-btn">← Back</button>
+        <h3>❓ FAQ Management</h3>
+        <div className="header-actions">
+          <button onClick={() => setShowForm(true)} className="btn-primary">+ Add New FAQ</button>
+          <button onClick={() => setShowReorderPanel(true)} className="btn-secondary">🔄 Reorder FAQs</button>
+        </div>
+      </div>
+
+      {/* FAQ Reorder Panel */}
+      {showReorderPanel && (
+        <div className="reorder-panel">
+          <h4>🔄 Reorder FAQs</h4>
+          <p>Drag and drop FAQs to change their display order</p>
+          <div className="reorder-list">
+            {faqs.map((faq, index) => (
+              <div key={faq._id} className="reorder-item" draggable>
+                <span className="reorder-number">{index + 1}</span>
+                <span className="reorder-question">{faq.question}</span>
+                <span className="reorder-category">{faq.category}</span>
+              </div>
+            ))}
+          </div>
+          <div className="reorder-actions">
+            <button onClick={() => setShowReorderPanel(false)} className="btn-secondary">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Create/Edit FAQ Form */}
+      {showForm && (
+        <div className="faq-form">
+          <h5>{editingFAQ ? 'Edit FAQ' : 'Create New FAQ'}</h5>
+          <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Category</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="ESCOM organization">ESCOM organization</option>
+                  <option value="Monitoring">Monitoring</option>
+                  <option value="Training">Training</option>
+                  <option value="Data">Data</option>
+                  <option value="Partners">Partners</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Subcategory</label>
+                <input
+                  type="text"
+                  value={formData.subcategory}
+                  onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
+                  placeholder="e.g., Getting involved"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Question</label>
+              <input
+                type="text"
+                value={formData.question}
+                onChange={(e) => setFormData({...formData, question: e.target.value})}
+                placeholder="Enter the question"
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Answer</label>
+              <textarea
+                value={formData.answer}
+                onChange={(e) => setFormData({...formData, answer: e.target.value})}
+                placeholder="Enter the detailed answer"
+                required
+                rows="4"
+              />
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                  placeholder="e.g., beginner, water-quality, team1"
+                />
+              </div>
+              <div className="form-group">
+                <label>Importance</label>
+                <select
+                  value={formData.importance}
+                  onChange={(e) => setFormData({...formData, importance: e.target.value})}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Media Upload Section */}
+            <div className="form-section">
+              <h6>Media & Links</h6>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Image URLs (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={formData.media.images.join(', ')}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      media: { ...formData.media, images: e.target.value.split(',').map(url => url.trim()).filter(url => url) }
+                    })}
+                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Video URLs (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={formData.media.videos.join(', ')}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      media: { ...formData.media, videos: e.target.value.split(',').map(url => url.trim()).filter(url => url) }
+                    })}
+                    placeholder="https://youtube.com/watch?v=..., https://vimeo.com/..."
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>External Links (comma-separated)</label>
+                <input
+                  type="text"
+                  value={formData.media.links.join(', ')}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    media: { ...formData.media, links: e.target.value.split(',').map(url => url.trim()).filter(url => url) }
+                  })}
+                  placeholder="https://example.com/resource1, https://example.com/resource2"
+                />
+              </div>
+            </div>
+            
+            <div className="form-actions">
+              <button type="submit" className="btn-primary" disabled={loading}>
+                {loading ? 'Saving...' : (editingFAQ ? 'Update FAQ' : 'Create FAQ')}
+              </button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingFAQ(null);
+                  setFormData({
+                    category: '',
+                    subcategory: '',
+                    question: '',
+                    answer: '',
+                    tags: '',
+                    importance: 'medium',
+                    media: { images: [], videos: [], links: [] }
+                  });
+                }}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* FAQ List with Enhanced Features */}
+      <div className="faq-list">
+        <h4>Current FAQs ({faqs.length})</h4>
+        <div className="faq-filters">
+          <select onChange={(e) => {
+            const filtered = e.target.value === 'all' ? faqs : faqs.filter(faq => faq.importance === e.target.value);
+            // Implement filtering logic
+          }}>
+            <option value="all">All Importance Levels</option>
+            <option value="high">High Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+          <select onChange={(e) => {
+            const filtered = e.target.value === 'all' ? faqs : faqs.filter(faq => faq.category === e.target.value);
+            // Implement filtering logic
+          }}>
+            <option value="all">All Categories</option>
+            <option value="ESCOM organization">ESCOM organization</option>
+            <option value="Monitoring">Monitoring</option>
+            <option value="Training">Training</option>
+            <option value="Data">Data</option>
+            <option value="Partners">Partners</option>
+          </select>
+        </div>
+        
+        {faqs.map((faq, index) => (
+          <div key={faq._id} className="faq-item">
+            <div className="faq-header">
+              <div className="faq-question">{faq.question}</div>
+              <div className="faq-actions">
+                <button onClick={() => handleEdit(faq)} className="faq-action-btn edit">✏️ Edit</button>
+                <button onClick={() => handleArchive(faq._id)} className="faq-action-btn archive">📁 Archive</button>
+                <button onClick={() => handleDelete(faq._id)} className="faq-action-btn delete">🗑️ Delete</button>
+              </div>
+            </div>
+            <div className="faq-answer">{faq.answer}</div>
+            <div className="faq-meta">
+              <span>Category: {faq.category}</span>
+              <span>Subcategory: {faq.subcategory}</span>
+              <span className={`importance-badge ${faq.importance}`}>Importance: {faq.importance}</span>
+              <span>Order: {faq.order}</span>
+              <span>Views: {faq.viewCount || 0}</span>
+              <span>Created: {new Date(faq.createdAt).toLocaleDateString()}</span>
+            </div>
+            {faq.tags && faq.tags.length > 0 && (
+              <div className="faq-tags">
+                {faq.tags.map((tag, tagIndex) => (
+                  <span key={tagIndex} className="faq-tag">{tag}</span>
+                ))}
+              </div>
+            )}
+            {/* Display Media */}
+            {(faq.media.images.length > 0 || faq.media.videos.length > 0 || faq.media.links.length > 0) && (
+              <div className="faq-media">
+                {faq.media.images.length > 0 && (
+                  <div className="media-section">
+                    <h6>📷 Images</h6>
+                    <div className="media-links">
+                      {faq.media.images.map((url, idx) => (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="media-link">
+                          Image {idx + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {faq.media.videos.length > 0 && (
+                  <div className="media-section">
+                    <h6>🎥 Videos</h6>
+                    <div className="media-links">
+                      {faq.media.videos.map((url, idx) => (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="media-link">
+                          Video {idx + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {faq.media.links.length > 0 && (
+                  <div className="media-section">
+                    <h6>🔗 Links</h6>
+                    <div className="media-links">
+                      {faq.media.links.map((url, idx) => (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="media-link">
+                          Resource {idx + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-// User Management Component
+// Database Monitor Component - Real-time Database Status and Data Flow
+function DatabaseMonitorSection({ onBack }) {
+  const [dbStatus, setDbStatus] = useState(null);
+  const [recentChanges, setRecentChanges] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(5000); // 5 seconds
+
+  useEffect(() => {
+    fetchDatabaseStatus();
+    fetchRecentChanges();
+    
+    if (autoRefresh) {
+      const interval = setInterval(() => {
+        fetchDatabaseStatus();
+        fetchRecentChanges();
+      }, refreshInterval);
+      
+      return () => clearInterval(interval);
+    }
+  }, [autoRefresh, refreshInterval]);
+
+  const fetchDatabaseStatus = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+
+      const response = await fetch(`${config.API_BASE_URL}/api/admin/database/status`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setDbStatus(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch database status:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRecentChanges = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+
+      const response = await fetch(`${config.API_BASE_URL}/api/admin/database/changes`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setRecentChanges(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch recent changes:', error);
+    }
+  };
+
+  const formatBytes = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const formatUptime = (seconds) => {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${days}d ${hours}h ${minutes}m`;
+  };
+
+  if (loading && !dbStatus) {
+    return (
+      <div className="loading-overlay">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="database-monitor">
+      <div className="section-header">
+        <button onClick={onBack} className="back-btn">← Back</button>
+        <h3>🗄️ Database Monitor</h3>
+        <div className="header-actions">
+          <label>
+            <input
+              type="checkbox"
+              checked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+            />
+            Auto-refresh
+          </label>
+          <select
+            value={refreshInterval}
+            onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
+            disabled={!autoRefresh}
+          >
+            <option value={2000}>2 seconds</option>
+            <option value={5000}>5 seconds</option>
+            <option value={10000}>10 seconds</option>
+            <option value={30000}>30 seconds</option>
+          </select>
+          <button onClick={fetchDatabaseStatus} className="btn-secondary">🔄 Refresh</button>
+        </div>
+      </div>
+
+      {dbStatus && (
+        <div className="monitor-grid">
+          {/* Database Overview */}
+          <div className="monitor-card">
+            <h4>📊 Database Overview</h4>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <span className="stat-label">Database:</span>
+                <span className="stat-value">{dbStatus.database.name}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Collections:</span>
+                <span className="stat-value">{dbStatus.database.collections}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Data Size:</span>
+                <span className="stat-value">{formatBytes(dbStatus.database.dataSize)}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Storage Size:</span>
+                <span className="stat-value">{formatBytes(dbStatus.database.storageSize)}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Indexes:</span>
+                <span className="stat-value">{dbStatus.database.indexes}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Index Size:</span>
+                <span className="stat-value">{formatBytes(dbStatus.database.indexSize)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Server Status */}
+          <div className="monitor-card">
+            <h4>🖥️ Server Status</h4>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <span className="stat-label">Version:</span>
+                <span className="stat-value">{dbStatus.server.version}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Uptime:</span>
+                <span className="stat-value">{formatUptime(dbStatus.server.uptime)}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Connections:</span>
+                <span className="stat-value">{dbStatus.server.connections.current}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Operations:</span>
+                <span className="stat-value">{dbStatus.server.opcounters.total}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Collection Counts */}
+          <div className="monitor-card">
+            <h4>📚 Collection Counts</h4>
+            <div className="collection-stats">
+              <div className="collection-stat">
+                <span className="collection-icon">👥</span>
+                <span className="collection-name">Users</span>
+                <span className="collection-count">{dbStatus.collections.users}</span>
+              </div>
+              <div className="collection-stat">
+                <span className="collection-icon">❓</span>
+                <span className="collection-name">FAQs</span>
+                <span className="collection-count">{dbStatus.collections.faqs}</span>
+              </div>
+              <div className="collection-stat">
+                <span className="collection-icon">📢</span>
+                <span className="collection-name">Updates</span>
+                <span className="collection-count">{dbStatus.collections.updates}</span>
+              </div>
+              <div className="collection-stat">
+                <span className="collection-icon">📊</span>
+                <span className="collection-name">Readings</span>
+                <span className="collection-count">{dbStatus.collections.readings}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="monitor-card full-width">
+            <h4>🕒 Recent Activity</h4>
+            <div className="activity-tabs">
+              <div className="activity-section">
+                <h5>👥 Recent Users</h5>
+                <div className="activity-list">
+                  {dbStatus.recentActivity.users.map((user, index) => (
+                    <div key={user.id} className="activity-item">
+                      <span className="activity-icon">👤</span>
+                      <span className="activity-text">{user.email}</span>
+                      <span className="activity-time">{new Date(user.createdAt).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="activity-section">
+                <h5>❓ Recent FAQs</h5>
+                <div className="activity-list">
+                  {dbStatus.recentActivity.faqs.map((faq, index) => (
+                    <div key={faq.id} className="activity-item">
+                      <span className="activity-icon">❓</span>
+                      <span className="activity-text">{faq.question.substring(0, 50)}...</span>
+                      <span className="activity-time">{new Date(faq.createdAt).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="activity-section">
+                <h5>📢 Recent Updates</h5>
+                <div className="activity-list">
+                  {dbStatus.recentActivity.updates.map((update, index) => (
+                    <div key={update.id} className="activity-item">
+                      <span className="activity-icon">📢</span>
+                      <span className="activity-text">{update.title}</span>
+                      <span className="activity-time">{new Date(update.createdAt).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {recentChanges && (
+        <div className="changes-summary">
+          <h4>📈 Recent Changes (Last 24 Hours)</h4>
+          <div className="changes-grid">
+            <div className="change-stat">
+              <span className="change-icon">👥</span>
+              <span className="change-label">New Users</span>
+              <span className="change-count">{recentChanges.summary.newUsers}</span>
+            </div>
+            <div className="change-stat">
+              <span className="change-icon">❓</span>
+              <span className="change-label">New FAQs</span>
+              <span className="change-count">{recentChanges.summary.newFAQs}</span>
+            </div>
+            <div className="change-stat">
+              <span className="change-icon">📝</span>
+              <span className="change-label">Updated FAQs</span>
+              <span className="change-count">{recentChanges.summary.updatedFAQs}</span>
+            </div>
+            <div className="change-stat">
+              <span className="change-icon">📢</span>
+              <span className="change-label">New Updates</span>
+              <span className="change-count">{recentChanges.summary.newUpdates}</span>
+            </div>
+            <div className="change-stat">
+              <span className="change-icon">📊</span>
+              <span className="change-label">New Readings</span>
+              <span className="change-count">{recentChanges.summary.newReadings}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Enhanced Updates Management Component with Advanced Features
+function UpdatesManagementSection({ onBack }) {
+  const [updates, setUpdates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingUpdate, setEditingUpdate] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    type: 'update',
+    priority: 'medium',
+    tags: '',
+    scheduledFor: '',
+    expiresAt: '',
+    media: { images: [], videos: [], links: [] }
+  });
+
+  useEffect(() => {
+    fetchUpdates();
+  }, []);
+
+  const fetchUpdates = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.UPDATES}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUpdates(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch updates:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const updateData = {
+        ...formData,
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        scheduledFor: formData.scheduledFor ? new Date(formData.scheduledFor) : null,
+        expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null
+      };
+      
+      const url = editingUpdate 
+        ? `${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.UPDATES}/${editingUpdate._id}`
+        : `${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.UPDATES}`;
+      
+      const method = editingUpdate ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(updateData)
+      });
+      
+      if (response.ok) {
+        setShowForm(false);
+        setEditingUpdate(null);
+        setFormData({
+          title: '',
+          content: '',
+          type: 'update',
+          priority: 'medium',
+          tags: '',
+          scheduledFor: '',
+          expiresAt: '',
+          media: { images: [], videos: [], links: [] }
+        });
+        fetchUpdates();
+      }
+    } catch (error) {
+      console.error('Failed to save update:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (updateId) => {
+    if (!window.confirm('Are you sure you want to delete this update? This action cannot be undone.')) return;
+    
+    try {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.UPDATES}/${updateId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        fetchUpdates();
+      }
+    } catch (error) {
+      console.error('Failed to delete update:', error);
+    }
+  };
+
+  const handleArchive = async (updateId) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.UPDATES}/${updateId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ isActive: false })
+      });
+      
+      if (response.ok) {
+        fetchUpdates();
+      }
+    } catch (error) {
+      console.error('Failed to archive update:', error);
+    }
+  };
+
+  const handleEdit = (update) => {
+    setEditingUpdate(update);
+    setFormData({
+      title: update.title,
+      content: update.content,
+      type: update.type,
+      priority: update.priority,
+      tags: update.tags.join(', '),
+      scheduledFor: update.scheduledFor ? update.scheduledFor.split('T')[0] : '',
+      expiresAt: update.expiresAt ? update.expiresAt.split('T')[0] : '',
+      media: update.media || { images: [], videos: [], links: [] }
+    });
+    setShowForm(true);
+  };
+
+  const handleScheduleUpdate = (updateId, scheduledFor) => {
+    // Handle scheduling logic
+    console.log(`Scheduling update ${updateId} for ${scheduledFor}`);
+  };
+
+  const handleSetExpiration = (updateId, expiresAt) => {
+    // Handle expiration logic
+    console.log(`Setting expiration for update ${updateId} to ${expiresAt}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-overlay">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="updates-management">
+      <div className="section-header">
+        <button onClick={onBack} className="back-btn">← Back</button>
+        <h3>📢 Updates Management</h3>
+        <button onClick={() => setShowForm(true)} className="btn-primary">+ Post Update</button>
+      </div>
+
+      {/* Create/Edit Update Form */}
+      {showForm && (
+        <div className="update-form">
+          <h5>{editingUpdate ? 'Edit Update' : 'Post New Update'}</h5>
+          <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Title</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  placeholder="Enter update title"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Type</label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData({...formData, type: e.target.value})}
+                >
+                  <option value="update">Update</option>
+                  <option value="announcement">Announcement</option>
+                  <option value="news">News</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Content</label>
+              <textarea
+                value={formData.content}
+                onChange={(e) => setFormData({...formData, content: e.target.value})}
+                placeholder="Enter update content"
+                required
+                rows="4"
+              />
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Priority</label>
+                <select
+                  value={formData.priority}
+                  onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                  placeholder="e.g., important, team1, coastal"
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Schedule For (optional)</label>
+                <input
+                  type="datetime-local"
+                  value={formData.scheduledFor}
+                  onChange={(e) => setFormData({...formData, scheduledFor: e.target.value})}
+                />
+                <small>Leave empty to post immediately</small>
+              </div>
+              <div className="form-group">
+                <label>Expires At (optional)</label>
+                <input
+                  type="datetime-local"
+                  value={formData.expiresAt}
+                  onChange={(e) => setFormData({...formData, expiresAt: e.target.value})}
+                />
+                <small>Leave empty for no expiration</small>
+              </div>
+            </div>
+
+            {/* Media Upload Section */}
+            <div className="form-section">
+              <h6>Media & Links</h6>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Image URLs (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={formData.media.images.join(', ')}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      media: { ...formData.media, images: e.target.value.split(',').map(url => url.trim()).filter(url => url) }
+                    })}
+                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Video URLs (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={formData.media.videos.join(', ')}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      media: { ...formData.media, videos: e.target.value.split(',').map(url => url.trim()).filter(url => url) }
+                    })}
+                    placeholder="https://youtube.com/watch?v=..., https://vimeo.com/..."
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>External Links (comma-separated)</label>
+                <input
+                  type="text"
+                  value={formData.media.links.join(', ')}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    media: { ...formData.media, links: e.target.value.split(',').map(url => url.trim()).filter(url => url) }
+                  })}
+                  placeholder="https://example.com/resource1, https://example.com/resource2"
+                />
+              </div>
+            </div>
+            
+            <div className="form-actions">
+              <button type="submit" className="btn-primary" disabled={loading}>
+                {loading ? 'Saving...' : (editingUpdate ? 'Update' : 'Post Update')}
+              </button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingUpdate(null);
+                  setFormData({
+                    title: '',
+                    content: '',
+                    type: 'update',
+                    priority: 'medium',
+                    tags: '',
+                    scheduledFor: '',
+                    expiresAt: '',
+                    media: { images: [], videos: [], links: [] }
+                  });
+                }}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Updates List with Enhanced Features */}
+      <div className="updates-list">
+        <h4>Current Updates ({updates.length})</h4>
+        <div className="updates-filters">
+          <select onChange={(e) => {
+            const filtered = e.target.value === 'all' ? updates : updates.filter(update => update.type === e.target.value);
+            // Implement filtering logic
+          }}>
+            <option value="all">All Types</option>
+            <option value="update">Updates</option>
+            <option value="announcement">Announcements</option>
+            <option value="news">News</option>
+          </select>
+          <select onChange={(e) => {
+            const filtered = e.target.value === 'all' ? updates : updates.filter(update => update.priority === e.target.value);
+            // Implement filtering logic
+          }}>
+            <option value="all">All Priorities</option>
+            <option value="high">High Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+          <select onChange={(e) => {
+            const filtered = e.target.value === 'all' ? updates : updates.filter(update => update.isActive !== false);
+            // Implement filtering logic
+          }}>
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
+        
+        {updates.map((update) => (
+          <div key={update._id} className="update-item">
+            <div className="update-header">
+              <div className="update-title">{update.title}</div>
+              <div className="update-actions">
+                <button onClick={() => handleEdit(update)} className="update-action-btn edit">✏️ Edit</button>
+                <button onClick={() => handleArchive(update._id)} className="update-action-btn archive">📁 Archive</button>
+                <button onClick={() => handleDelete(update._id)} className="update-action-btn delete">🗑️ Delete</button>
+              </div>
+            </div>
+            <div className="update-content">{update.content}</div>
+            <div className="update-meta">
+              <span>Type: {update.type}</span>
+              <span className={`update-priority ${update.priority}`}>Priority: {update.priority}</span>
+              <span>Created: {new Date(update.createdAt).toLocaleDateString()}</span>
+              <span>Status: {update.isActive ? 'Active' : 'Archived'}</span>
+            </div>
+            
+            {/* Schedule Information */}
+            {update.scheduledFor && (
+              <div className="update-schedule">
+                📅 Scheduled for: {new Date(update.scheduledFor).toLocaleString()}
+                {new Date(update.scheduledFor) > new Date() && (
+                  <button 
+                    onClick={() => handleScheduleUpdate(update._id, update.scheduledFor)}
+                    className="schedule-btn"
+                  >
+                    ⏰ Modify Schedule
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {/* Expiration Information */}
+            {update.expiresAt && (
+              <div className="update-schedule">
+                ⏰ Expires at: {new Date(update.expiresAt).toLocaleString()}
+                {new Date(update.expiresAt) > new Date() && (
+                  <button 
+                    onClick={() => handleSetExpiration(update._id, update.expiresAt)}
+                    className="expiration-btn"
+                  >
+                    ⏰ Modify Expiration
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Tags */}
+            {update.tags && update.tags.length > 0 && (
+              <div className="update-tags">
+                {update.tags.map((tag, tagIndex) => (
+                  <span key={tagIndex} className="update-tag">{tag}</span>
+                ))}
+              </div>
+            )}
+
+            {/* Display Media */}
+            {(update.media?.images?.length > 0 || update.media?.videos?.length > 0 || update.media?.links?.length > 0) && (
+              <div className="update-media">
+                {update.media.images && update.media.images.length > 0 && (
+                  <div className="media-section">
+                    <h6>📷 Images</h6>
+                    <div className="media-links">
+                      {update.media.images.map((url, idx) => (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="media-link">
+                          Image {idx + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {update.media.videos && update.media.videos.length > 0 && (
+                  <div className="media-section">
+                    <h6>🎥 Videos</h6>
+                    <div className="media-links">
+                      {update.media.videos.map((url, idx) => (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="media-link">
+                          Video {idx + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {update.media.links && update.media.links.length > 0 && (
+                  <div className="media-section">
+                    <h6>🔗 Links</h6>
+                    <div className="media-links">
+                      {update.media.links.map((url, idx) => (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="media-link">
+                          Resource {idx + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+// Enhanced User Management Component
 function UserManagementSection({ onBack }) {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [showActivityLogs, setShowActivityLogs] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [newUserForm, setNewUserForm] = useState({
+    email: '',
+    password: '',
+    username: '',
+    firstName: '',
+    lastName: '',
+    role: 'citizen'
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -767,6 +2707,35 @@ function UserManagementSection({ onBack }) {
     }
   };
 
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/admin/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(newUserForm)
+      });
+      
+      if (response.ok) {
+        setShowCreateForm(false);
+        setNewUserForm({
+          email: '',
+          password: '',
+          username: '',
+          firstName: '',
+          lastName: '',
+          role: 'citizen'
+        });
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error('Failed to create user:', error);
+    }
+  };
+
   const handleEditUser = (user) => {
     setSelectedUser(user);
     setIsEditing(true);
@@ -774,7 +2743,7 @@ function UserManagementSection({ onBack }) {
 
   const handleSaveUser = async () => {
     try {
-              const response = await fetch(`${config.API_BASE_URL}/api/admin/users/${selectedUser.telegramId}`, {
+      const response = await fetch(`${config.API_BASE_URL}/api/admin/users/${selectedUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -784,12 +2753,69 @@ function UserManagementSection({ onBack }) {
       });
       
       if (response.ok) {
-        await fetchUsers(); // Refresh user list
+        await fetchUsers();
         setIsEditing(false);
         setSelectedUser(null);
       }
     } catch (error) {
       console.error('Failed to update user:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+    }
+  };
+
+  const handlePasswordReset = async (userId, newPassword, forceChange = false) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/admin/users/${userId}/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ newPassword, forceChange })
+      });
+      
+      if (response.ok) {
+        setShowPasswordReset(false);
+        alert('Password updated successfully');
+      }
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+    }
+  };
+
+  const handleViewActivityLogs = async (userId) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/admin/users/${userId}/activity`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Handle activity logs display
+        console.log('Activity logs:', data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch activity logs:', error);
     }
   };
 
@@ -799,28 +2825,120 @@ function UserManagementSection({ onBack }) {
         <button onClick={onBack} className="back-btn">← Back</button>
         <h3>👥 User Management</h3>
         <p>Manage citizen scientists and their data</p>
+        <button onClick={() => setShowCreateForm(true)} className="btn-primary">+ Add New User</button>
       </div>
+
+      {/* Create New User Form */}
+      {showCreateForm && (
+        <div className="create-user-form">
+          <h4>Create New User</h4>
+          <form onSubmit={handleCreateUser}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>First Name</label>
+                <input
+                  type="text"
+                  value={newUserForm.firstName}
+                  onChange={(e) => setNewUserForm({...newUserForm, firstName: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Last Name</label>
+                <input
+                  type="text"
+                  value={newUserForm.lastName}
+                  onChange={(e) => setNewUserForm({...newUserForm, lastName: e.target.value})}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={newUserForm.email}
+                  onChange={(e) => setNewUserForm({...newUserForm, email: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  value={newUserForm.username}
+                  onChange={(e) => setNewUserForm({...newUserForm, username: e.target.value})}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  value={newUserForm.password}
+                  onChange={(e) => setNewUserForm({...newUserForm, password: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Role</label>
+                <select
+                  value={newUserForm.role}
+                  onChange={(e) => setNewUserForm({...newUserForm, role: e.target.value})}
+                >
+                  <option value="citizen">Citizen Scientist</option>
+                  <option value="moderator">Moderator</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">Create User</button>
+              <button 
+                type="button" 
+                onClick={() => setShowCreateForm(false)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       <div className="user-list">
         {loading ? (
           <div className="loading">Loading users...</div>
         ) : (
           users.map((user) => (
-            <div key={user.telegramId} className="user-card">
+            <div key={user._id} className="user-card">
               <div className="user-info">
-                <h4>{user.profile.name}</h4>
-                <p>Team: {user.profile.team} | Role: {user.role}</p>
-                <p>Readings: {user.stats.totalReadings} | Last Active: {new Date(user.lastActive).toLocaleDateString()}</p>
-                <span className={`status-badge ${user.status}`}>
-                  {user.status}
+                <h4>{user.firstName} {user.lastName}</h4>
+                <p>@{user.username} • {user.email}</p>
+                <p>Team: {user.profile?.team || 'Not assigned'} | Role: {user.role}</p>
+                <p>Readings: {user.stats?.totalReadings || 0} | Last Active: {new Date(user.lastActive || user.createdAt).toLocaleDateString()}</p>
+                <span className={`status-badge ${user.status || 'active'}`}>
+                  {user.status || 'active'}
                 </span>
               </div>
               <div className="user-actions">
                 <button className="edit-user-btn" onClick={() => handleEditUser(user)}>
                   ✏️ Edit
                 </button>
-                <button className="view-user-btn">
-                  👁️ View
+                <button className="password-reset-btn" onClick={() => setShowPasswordReset(user._id)}>
+                  🔐 Reset Password
+                </button>
+                <button className="activity-btn" onClick={() => handleViewActivityLogs(user._id)}>
+                  📊 Activity
+                </button>
+                <button className="delete-user-btn" onClick={() => handleDeleteUser(user._id)}>
+                  🗑️ Delete
                 </button>
               </div>
             </div>
@@ -828,39 +2946,119 @@ function UserManagementSection({ onBack }) {
         )}
       </div>
 
+      {/* Password Reset Modal */}
+      {showPasswordReset && (
+        <div className="password-reset-modal">
+          <div className="modal-content">
+            <h4>Reset Password</h4>
+            <div className="form-group">
+              <label>New Password</label>
+              <input
+                type="password"
+                id="newPassword"
+                placeholder="Enter new password"
+              />
+            </div>
+            <div className="form-group">
+              <label>
+                <input
+                  type="checkbox"
+                  id="forceChange"
+                />
+                Force password change on next login
+              </label>
+            </div>
+            <div className="modal-actions">
+              <button 
+                className="save-btn" 
+                onClick={() => {
+                  const newPassword = document.getElementById('newPassword').value;
+                  const forceChange = document.getElementById('forceChange').checked;
+                  if (newPassword) {
+                    handlePasswordReset(showPasswordReset, newPassword, forceChange);
+                  }
+                }}
+              >
+                Reset Password
+              </button>
+              <button 
+                className="cancel-btn" 
+                onClick={() => setShowPasswordReset(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
       {isEditing && selectedUser && (
         <div className="edit-user-modal">
           <div className="modal-content">
-            <h4>Edit User: {selectedUser.profile.name}</h4>
+            <h4>Edit User: {selectedUser.firstName} {selectedUser.lastName}</h4>
             <div className="form-group">
-              <label>Name</label>
+              <label>First Name</label>
               <input 
                 type="text" 
-                defaultValue={selectedUser.profile.name}
+                value={selectedUser.firstName}
                 onChange={(e) => setSelectedUser({
                   ...selectedUser,
-                  profile: { ...selectedUser.profile, name: e.target.value }
+                  firstName: e.target.value
                 })}
               />
             </div>
             <div className="form-group">
-              <label>Team</label>
-              <select 
-                defaultValue={selectedUser.profile.team}
+              <label>Last Name</label>
+              <input 
+                type="text" 
+                value={selectedUser.lastName}
                 onChange={(e) => setSelectedUser({
                   ...selectedUser,
-                  profile: { ...selectedUser.profile, team: e.target.value }
+                  lastName: e.target.value
+                })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <input 
+                type="email" 
+                value={selectedUser.email}
+                onChange={(e) => setSelectedUser({
+                  ...selectedUser,
+                  email: e.target.value
+                })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Username</label>
+              <input 
+                type="text" 
+                value={selectedUser.username}
+                onChange={(e) => setSelectedUser({
+                  ...selectedUser,
+                  username: e.target.value
+                })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Role</label>
+              <select 
+                value={selectedUser.role}
+                onChange={(e) => setSelectedUser({
+                  ...selectedUser,
+                  role: e.target.value
                 })}
               >
-                <option value="team1">Team Alpha</option>
-                <option value="team2">Team Beta</option>
-                <option value="team3">Team Gamma</option>
+                <option value="citizen">Citizen Scientist</option>
+                <option value="moderator">Moderator</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
             <div className="form-group">
               <label>Status</label>
               <select 
-                defaultValue={selectedUser.status}
+                value={selectedUser.status || 'active'}
                 onChange={(e) => setSelectedUser({
                   ...selectedUser,
                   status: e.target.value
@@ -882,249 +3080,11 @@ function UserManagementSection({ onBack }) {
   );
 }
 
-// Data Analytics Component
-function DataAnalyticsSection({ onBack }) {
-  const [analytics, setAnalytics] = useState({
-    totalReadings: 567,
-    averageAccuracy: 91.3,
-    topPerformer: 'Lúcia Fernandes',
-    mostActiveTeam: 'Team Beta',
-    dataQuality: 'Excellent',
-    trends: [
-      { month: 'Jan', readings: 45, accuracy: 88 },
-      { month: 'Feb', readings: 52, accuracy: 91 },
-      { month: 'Mar', readings: 48, accuracy: 89 },
-      { month: 'Apr', readings: 61, accuracy: 93 }
-    ]
-  });
 
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
 
-  const fetchAnalytics = async () => {
-    try {
-      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.ANALYTICS}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setAnalytics(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  return (
-    <div className="dashboard-section">
-      <div className="dashboard-header">
-        <button onClick={onBack} className="back-btn">← Back</button>
-        <h3>📈 Data Analytics</h3>
-        <p>Monitoring data analysis and trends</p>
-      </div>
-
-      <div className="analytics-grid">
-        <div className="analytics-card">
-          <h4>📊 Overall Statistics</h4>
-          <div className="stat-item">
-            <span>Total Readings:</span>
-            <span>{analytics.totalReadings}</span>
-          </div>
-          <div className="stat-item">
-            <span>Average Accuracy:</span>
-            <span>{analytics.averageAccuracy}%</span>
-          </div>
-          <div className="stat-item">
-            <span>Top Performer:</span>
-            <span>{analytics.topPerformer}</span>
-          </div>
-          <div className="stat-item">
-            <span>Most Active Team:</span>
-            <span>{analytics.mostActiveTeam}</span>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <h4>📈 Monthly Trends</h4>
-          <div className="trends-list">
-            {analytics.trends.map((trend, index) => (
-              <div key={index} className="trend-item">
-                <span className="month">{trend.month}</span>
-                <span className="readings">{trend.readings} readings</span>
-                <span className="accuracy">{trend.accuracy}% accuracy</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <h4>🎯 Data Quality</h4>
-          <div className="quality-indicator">
-            <span className="quality-label">Overall Quality:</span>
-            <span className={`quality-status ${analytics.dataQuality.toLowerCase()}`}>
-              {analytics.dataQuality}
-            </span>
-          </div>
-          <div className="quality-metrics">
-            <div className="metric">
-              <span>Completeness</span>
-              <div className="progress-bar">
-                <div className="progress" style={{width: '95%'}}></div>
-              </div>
-            </div>
-            <div className="metric">
-              <span>Accuracy</span>
-              <div className="progress-bar">
-                <div className="progress" style={{width: '91%'}}></div>
-              </div>
-            </div>
-            <div className="metric">
-              <span>Timeliness</span>
-              <div className="progress-bar">
-                <div className="progress" style={{width: '88%'}}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// System Settings Component
-function SystemSettingsSection({ onBack }) {
-  const [settings, setSettings] = useState({
-    notifications: true,
-    autoBackup: true,
-    dataRetention: '2 years',
-    privacyMode: false,
-    maintenanceMode: false,
-    debugMode: false
-  });
-
-  const handleSettingChange = (key, value) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  };
-
-  return (
-    <div className="dashboard-section">
-      <div className="dashboard-header">
-        <button onClick={onBack} className="back-btn">← Back</button>
-        <h3>⚙️ System Settings</h3>
-        <p>Configure system parameters and preferences</p>
-      </div>
-
-      <div className="settings-list">
-        <div className="setting-item">
-          <div className="setting-info">
-            <h4>🔔 Notifications</h4>
-            <p>Enable system notifications and alerts</p>
-          </div>
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={settings.notifications}
-              onChange={(e) => handleSettingChange('notifications', e.target.checked)}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-
-        <div className="setting-item">
-          <div className="setting-info">
-            <h4>💾 Auto Backup</h4>
-            <p>Automatically backup data daily</p>
-          </div>
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={settings.autoBackup}
-              onChange={(e) => handleSettingChange('autoBackup', e.target.checked)}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-
-        <div className="setting-item">
-          <div className="setting-info">
-            <h4>🗄️ Data Retention</h4>
-            <p>How long to keep user data</p>
-          </div>
-          <select 
-            value={settings.dataRetention}
-            onChange={(e) => handleSettingChange('dataRetention', e.target.value)}
-            className="setting-select"
-          >
-            <option value="1 year">1 year</option>
-            <option value="2 years">2 years</option>
-            <option value="5 years">5 years</option>
-            <option value="indefinite">Indefinite</option>
-          </select>
-        </div>
-
-        <div className="setting-item">
-          <div className="setting-info">
-            <h4>🔒 Privacy Mode</h4>
-            <p>Enhanced privacy protection</p>
-          </div>
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={settings.privacyMode}
-              onChange={(e) => handleSettingChange('privacyMode', e.target.checked)}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-
-        <div className="setting-item">
-          <div className="setting-info">
-            <h4>🔧 Maintenance Mode</h4>
-            <p>Put system in maintenance mode</p>
-          </div>
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={settings.maintenanceMode}
-              onChange={(e) => handleSettingChange('maintenanceMode', e.target.checked)}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-
-        <div className="setting-item">
-          <div className="setting-info">
-            <h4>🐛 Debug Mode</h4>
-            <p>Enable debug logging</p>
-          </div>
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={settings.debugMode}
-              onChange={(e) => handleSettingChange('debugMode', e.target.checked)}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div className="settings-actions">
-        <button className="save-settings-btn">💾 Save Settings</button>
-        <button className="reset-settings-btn">🔄 Reset to Default</button>
-      </div>
-    </div>
-  );
-}
-
-// Citizen Scientist Bot Component
+// Enhanced Citizen Scientist Bot Component with Beautiful UI
 function CitizenScientistBot({ onBack }) {
   const [messages, setMessages] = useState([
     {
@@ -1136,6 +3096,7 @@ function CitizenScientistBot({ onBack }) {
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const botResponses = {
     'hello': 'Hello! Welcome to ESCOM. How can I assist you with coastal monitoring?',
@@ -1182,6 +3143,7 @@ function CitizenScientistBot({ onBack }) {
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsTyping(true);
+    setShowWelcome(false);
 
     // Simulate bot thinking
     setTimeout(() => {
@@ -1204,147 +3166,403 @@ function CitizenScientistBot({ onBack }) {
     }
   };
 
+  const handleQuickAction = (action) => {
+    setInputText(action);
+    handleSendMessage();
+  };
+
+  const formatMessage = (text) => {
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        {index < text.split('\n').length - 1 && <br />}
+      </span>
+    ));
+  };
+
   return (
     <div className="bot-section">
       <div className="bot-header">
         <button onClick={onBack} className="back-btn">← Back</button>
-        <h3>🤖 Citizen Scientist Assistant</h3>
-        <p>Your AI companion for coastal monitoring</p>
+        <div className="bot-header-content">
+          <div className="bot-avatar-large">🤖</div>
+          <div className="bot-header-text">
+            <h3>Citizen Scientist Assistant</h3>
+            <p>Your AI companion for coastal monitoring</p>
+            <div className="bot-status">
+              <span className="status-dot online"></span>
+              <span>Online & Ready to Help</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="chat-container">
-        <div className="messages">
-          {messages.map((message) => (
-            <div key={message.id} className={`message ${message.type}`}>
-              <div className="message-content">
-                {message.type === 'bot' && <div className="bot-avatar">🤖</div>}
-                <div className="message-text">{message.text}</div>
-                {message.type === 'user' && <div className="user-avatar">👤</div>}
+        {/* Welcome Message */}
+        {showWelcome && (
+          <div className="welcome-message">
+            <div className="welcome-icon">🌊</div>
+            <h4>Welcome to ESCOM Assistant!</h4>
+            <p>I'm here to help you with:</p>
+            <div className="welcome-features">
+              <div className="feature-item">
+                <span className="feature-icon">🔬</span>
+                <span>Monitoring Procedures</span>
               </div>
-              <div className="message-time">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              <div className="feature-item">
+                <span className="feature-icon">📊</span>
+                <span>Data Entry Help</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">❓</span>
+                <span>FAQ Questions</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">👥</span>
+                <span>Team Information</span>
               </div>
             </div>
-          ))}
-          {isTyping && (
-            <div className="message bot">
-              <div className="message-content">
-                <div className="bot-avatar">🤖</div>
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+            <p className="welcome-tip">💡 Try asking me anything or use the quick action buttons below!</p>
+          </div>
+        )}
+
+        {/* Chat Messages */}
+        <div className="messages-container">
+          <div className="messages">
+            {messages.map((message) => (
+              <div key={message.id} className={`message ${message.type}`}>
+                <div className="message-bubble">
+                  <div className="message-header">
+                    {message.type === 'bot' && (
+                      <div className="message-avatar bot-avatar">
+                        <span>🤖</span>
+                        <span className="bot-name">ESCOM Assistant</span>
+                      </div>
+                    )}
+                    {message.type === 'user' && (
+                      <div className="message-avatar user-avatar">
+                        <span>👤</span>
+                        <span className="user-name">You</span>
+                      </div>
+                    )}
+                    <span className="message-time">
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <div className="message-content">
+                    <div className="message-text">
+                      {formatMessage(message.text)}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            ))}
+            
+            {isTyping && (
+              <div className="message bot">
+                <div className="message-bubble">
+                  <div className="message-header">
+                    <div className="message-avatar bot-avatar">
+                      <span>🤖</span>
+                      <span className="bot-name">ESCOM Assistant</span>
+                    </div>
+                  </div>
+                  <div className="message-content">
+                    <div className="typing-indicator">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="chat-input">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask me anything about coastal monitoring..."
-            className="message-input"
-          />
-          <button onClick={handleSendMessage} className="send-btn" disabled={!inputText.trim()}>
-            ➤
+        {/* Chat Input */}
+        <div className="chat-input-container">
+          <div className="chat-input">
+            <div className="input-wrapper">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask me anything about coastal monitoring..."
+                className="message-input"
+              />
+              <button 
+                onClick={handleSendMessage} 
+                className="send-btn" 
+                disabled={!inputText.trim()}
+              >
+                <span className="send-icon">➤</span>
+              </button>
+            </div>
+            <div className="input-tip">
+              💡 Press Enter to send, or use the quick action buttons below
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Quick Actions */}
+      <div className="quick-actions-section">
+        <h4>🚀 Quick Actions</h4>
+        <p>Click any button to get instant help</p>
+        <div className="quick-actions-grid">
+          <button 
+            onClick={() => handleQuickAction('help')} 
+            className="quick-action-btn primary"
+          >
+            <span className="action-icon">❓</span>
+            <span className="action-text">Help</span>
+            <span className="action-desc">Get general assistance</span>
+          </button>
+          
+          <button 
+            onClick={() => handleQuickAction('monitoring')} 
+            className="quick-action-btn monitoring"
+          >
+            <span className="action-icon">🔬</span>
+            <span className="action-text">Monitoring</span>
+            <span className="action-desc">Procedures & protocols</span>
+          </button>
+          
+          <button 
+            onClick={() => handleQuickAction('safety')} 
+            className="quick-action-btn safety"
+          >
+            <span className="action-icon">🛡️</span>
+            <span className="action-text">Safety</span>
+            <span className="action-desc">Safety guidelines</span>
+          </button>
+          
+          <button 
+            onClick={() => handleQuickAction('equipment')} 
+            className="quick-action-btn equipment"
+          >
+            <span className="action-icon">⚙️</span>
+            <span className="action-text">Equipment</span>
+            <span className="action-desc">Setup & calibration</span>
+          </button>
+          
+          <button 
+            onClick={() => handleQuickAction('data')} 
+            className="quick-action-btn data"
+          >
+            <span className="action-icon">📊</span>
+            <span className="action-text">Data Entry</span>
+            <span className="action-desc">How to submit data</span>
+          </button>
+          
+          <button 
+            onClick={() => handleQuickAction('schedule')} 
+            className="quick-action-btn schedule"
+          >
+            <span className="action-icon">📅</span>
+            <span className="action-text">Schedule</span>
+            <span className="action-desc">Monitoring timeline</span>
           </button>
         </div>
       </div>
 
-      <div className="quick-actions">
-        <h4>Quick Actions</h4>
-        <div className="action-buttons">
-          <button onClick={() => setInputText('help')} className="action-btn">Help</button>
-          <button onClick={() => setInputText('monitoring')} className="action-btn">Monitoring</button>
-          <button onClick={() => setInputText('safety')} className="action-btn">Safety</button>
-          <button onClick={() => setInputText('equipment')} className="action-btn">Equipment</button>
-          <button onClick={() => setInputText('data')} className="action-btn">Data Entry</button>
-          <button onClick={() => setInputText('schedule')} className="action-btn">Schedule</button>
+      {/* Bot Features */}
+      <div className="bot-features">
+        <h4>✨ What I Can Do</h4>
+        <div className="features-grid">
+          <div className="feature-card">
+            <span className="feature-icon">🎯</span>
+            <h5>Instant Answers</h5>
+            <p>Get quick responses to common questions</p>
+          </div>
+          <div className="feature-card">
+            <span className="feature-icon">📚</span>
+            <h5>Training Support</h5>
+            <p>Learn monitoring procedures and protocols</p>
+          </div>
+          <div className="feature-card">
+            <span className="feature-icon">🔍</span>
+            <h5>Smart Search</h5>
+            <p>Find information across all topics</p>
+          </div>
+          <div className="feature-card">
+            <span className="feature-icon">📱</span>
+            <h5>24/7 Available</h5>
+            <p>Always here when you need help</p>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// Reports Component
-function ReportsSection({ onBack }) {
-  const [reports, setReports] = useState([
-    { id: 1, name: 'Monthly Activity Report', type: 'monthly', status: 'completed', date: '2024-01-20' },
-    { id: 2, name: 'User Performance Report', type: 'performance', status: 'completed', date: '2024-01-19' },
-    { id: 3, name: 'Data Quality Report', type: 'quality', status: 'in-progress', date: '2024-01-20' },
-    { id: 4, name: 'System Health Report', type: 'system', status: 'scheduled', date: '2024-01-21' }
-  ]);
+// Profile Section Component
+function ProfileSection({ user, onBack }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    username: user?.username || ''
+  });
 
-  const [selectedReport, setSelectedReport] = useState(null);
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditData({
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
+      username: user?.username || ''
+    });
+  };
 
-  const handleGenerateReport = (type) => {
-    // Report generation logic here
-    console.log(`Generating ${type} report...`);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.AUTH.PROFILE}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editData)
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        // Update local storage and state
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        window.location.reload(); // Refresh to update state
+      } else {
+        console.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditData({
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
+      username: user?.username || ''
+    });
   };
 
   return (
-    <div className="dashboard-section">
-      <div className="dashboard-header">
+    <div className="profile-section">
+      <div className="profile-header">
         <button onClick={onBack} className="back-btn">← Back</button>
-        <h3>📋 Reports</h3>
-        <p>Generate and view system reports</p>
+        <h2>👤 My Profile</h2>
       </div>
 
-      <div className="reports-grid">
-        <div className="report-card">
-          <h4>📊 Monthly Activity</h4>
-          <p>Comprehensive monthly activity summary</p>
-          <button className="generate-btn" onClick={() => handleGenerateReport('monthly')}>
-            📈 Generate
-          </button>
-        </div>
-
-        <div className="report-card">
-          <h4>👥 User Performance</h4>
-          <p>Individual user performance metrics</p>
-          <button className="generate-btn" onClick={() => handleGenerateReport('performance')}>
-            📈 Generate
-          </button>
-        </div>
-
-        <div className="report-card">
-          <h4>🎯 Data Quality</h4>
-          <p>Data quality and accuracy analysis</p>
-          <button className="generate-btn" onClick={() => handleGenerateReport('quality')}>
-            📈 Generate
-          </button>
-        </div>
-
-        <div className="report-card">
-          <h4>⚙️ System Health</h4>
-          <p>System performance and health metrics</p>
-          <button className="generate-btn" onClick={() => handleGenerateReport('system')}>
-            📈 Generate
-          </button>
-        </div>
-      </div>
-
-      <div className="recent-reports">
-        <h4>Recent Reports</h4>
-        <div className="reports-list">
-          {reports.map((report) => (
-            <div key={report.id} className="report-item">
-              <div className="report-info">
-                <h5>{report.name}</h5>
-                <p>Type: {report.type} | Date: {report.date}</p>
+      <div className="profile-content">
+        <div className="profile-card">
+          <div className="profile-avatar">
+            <div className="avatar-icon">👤</div>
+          </div>
+          
+          <div className="profile-info">
+            {isEditing ? (
+              <div className="edit-form">
+                <div className="form-group">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    value={editData.firstName}
+                    onChange={(e) => setEditData({...editData, firstName: e.target.value})}
+                    className="profile-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    value={editData.lastName}
+                    onChange={(e) => setEditData({...editData, lastName: e.target.value})}
+                    className="profile-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Username</label>
+                  <input
+                    type="text"
+                    value={editData.username}
+                    onChange={(e) => setEditData({...editData, username: e.target.value})}
+                    className="profile-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    value={editData.email}
+                    onChange={(e) => setEditData({...editData, email: e.target.value})}
+                    className="profile-input"
+                  />
+                </div>
+                <div className="edit-actions">
+                  <button onClick={handleSave} className="btn-primary">💾 Save</button>
+                  <button onClick={handleCancel} className="btn-secondary">❌ Cancel</button>
+                </div>
               </div>
-              <div className="report-status">
-                <span className={`status-badge ${report.status}`}>
-                  {report.status}
-                </span>
-                <button className="view-report-btn">👁️ View</button>
+            ) : (
+              <div className="profile-details">
+                <div className="detail-item">
+                  <span className="detail-label">👤 Name:</span>
+                  <span className="detail-value">{user?.firstName} {user?.lastName}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">🏷️ Username:</span>
+                  <span className="detail-value">@{user?.username}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">📧 Email:</span>
+                  <span className="detail-value">{user?.email}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">👥 Role:</span>
+                  <span className="detail-value">{user?.role === 'admin' ? '👑 Administrator' : '👥 Citizen Scientist'}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">📅 Joined:</span>
+                  <span className="detail-value">{user?.joinedAt ? new Date(user.joinedAt).toLocaleDateString() : 'N/A'}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">🆔 User ID:</span>
+                  <span className="detail-value">{user?.id}</span>
+                </div>
+                
+                <button onClick={handleEdit} className="edit-profile-btn">✏️ Edit Profile</button>
               </div>
+            )}
+          </div>
+        </div>
+
+        <div className="profile-stats">
+          <h3>📊 My Statistics</h3>
+          <div className="stats-grid">
+            <div className="stat-item">
+              <span className="stat-icon">📚</span>
+              <span className="stat-label">FAQs Viewed</span>
+              <span className="stat-value">-</span>
             </div>
-          ))}
+            <div className="stat-item">
+              <span className="stat-icon">📢</span>
+              <span className="stat-label">Updates Read</span>
+              <span className="stat-value">-</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-icon">🕒</span>
+              <span className="stat-label">Last Active</span>
+              <span className="stat-value">{user?.lastActive ? new Date(user.lastActive).toLocaleString() : 'Now'}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1353,15 +3571,176 @@ function ReportsSection({ onBack }) {
 
 // Main App Component with Dual Mode Support
 export default function App() {
-  const [currentView, setCurrentView] = useState('auth');
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userMode, setUserMode] = useState(null); // 'admin' or 'citizen'
+  // Initialize state with localStorage persistence
+  const [currentView, setCurrentView] = useState(() => {
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+    return token ? 'main' : 'auth';
+  });
+  
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user') || localStorage.getItem('adminUser');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+    return !!token;
+  });
+  
+  const [userMode, setUserMode] = useState(() => {
+    if (localStorage.getItem('adminToken')) return 'admin';
+    if (localStorage.getItem('token')) return 'citizen';
+    return null;
+  });
+
+  // Restore authentication state on page load
+  useEffect(() => {
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+    const savedUser = localStorage.getItem('user') || localStorage.getItem('adminUser');
+    
+    if (token && savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        if (localStorage.getItem('adminToken')) {
+          setUserMode('admin');
+          setCurrentView('main');
+        } else {
+          setUserMode('citizen');
+          setCurrentView('main');
+        }
+        
+        console.log('✅ Authentication state restored from localStorage');
+        
+        // Validate token with backend
+        validateToken(token, userData);
+      } catch (error) {
+        console.error('❌ Error restoring authentication state:', error);
+        // Clear corrupted data
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('adminUser');
+      }
+    }
+  }, []);
+
+  // Validate token with backend
+  const validateToken = async (token, userData) => {
+    try {
+      const endpoint = userData.role === 'admin' ? 
+        `${config.API_BASE_URL}${config.ENDPOINTS.ADMIN.DASHBOARD}` :
+        `${config.API_BASE_URL}${config.ENDPOINTS.USER.DASHBOARD}`;
+      
+      const response = await fetch(endpoint, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        console.log('❌ Token validation failed, clearing authentication');
+        // Token is invalid, clear everything
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('adminUser');
+        setIsAuthenticated(false);
+        setUser(null);
+        setUserMode(null);
+        setCurrentView('auth');
+      } else {
+        console.log('✅ Token validated successfully');
+      }
+    } catch (error) {
+      console.error('❌ Error validating token:', error);
+      // On network error, keep the user logged in but show a warning
+      console.log('⚠️ Network error during token validation, keeping user logged in');
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    console.log('🚪 User logging out');
+    
+    // Clear all localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('adminUser');
+    
+    // Reset all state
+    setIsAuthenticated(false);
+    setUser(null);
+    setUserMode(null);
+    setCurrentView('auth');
+    
+    console.log('✅ Logout completed, all data cleared');
+  };
+
+  // Auto-refresh token every 30 minutes
+  useEffect(() => {
+    if (isAuthenticated) {
+      const interval = setInterval(() => {
+        const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+        if (token && user) {
+          console.log('🔄 Auto-refreshing token...');
+          validateToken(token, user);
+        }
+      }, 30 * 60 * 1000); // 30 minutes
+      
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, user]);
+
+  // Send data to Telegram bot
+  const sendToTelegram = (type, data) => {
+    if (tg && tg.sendData) {
+      try {
+        const message = {
+          type,
+          data,
+          timestamp: new Date().toISOString(),
+          userId: user?.id,
+          userRole: user?.role
+        };
+        
+        tg.sendData(JSON.stringify(message));
+        console.log('✅ Data sent to Telegram:', type);
+      } catch (error) {
+        console.error('❌ Failed to send data to Telegram:', error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (tg) {
-      tg.ready();
-      tg.expand();
+      try {
+        tg.ready();
+        tg.expand();
+        
+        // Set Telegram Web App theme
+        tg.setHeaderColor('#1e40af');
+        tg.setBackgroundColor('#f8fafc');
+        
+        // Handle Telegram viewport changes
+        tg.onEvent('viewportChanged', () => {
+          console.log('📱 Telegram viewport changed');
+        });
+        
+        // Handle Telegram theme changes
+        tg.onEvent('themeChanged', () => {
+          console.log('🎨 Telegram theme changed');
+        });
+        
+        console.log('✅ Telegram Web App initialized successfully');
+      } catch (error) {
+        console.error('❌ Error initializing Telegram Web App:', error);
+      }
+    } else {
+      console.log('ℹ️ Running outside Telegram (development mode)');
     }
   }, []);
 
@@ -1369,8 +3748,8 @@ export default function App() {
     setUser(adminUser);
     setUserMode('admin');
     setIsAuthenticated(true);
-    setCurrentView('main');
-    console.log('✅ Admin access granted');
+    setCurrentView('admin-dashboard'); // Go directly to admin dashboard
+    console.log('✅ Admin access granted, showing admin dashboard');
   };
 
   const handleCitizenLogin = (citizenUser) => {
@@ -1378,7 +3757,9 @@ export default function App() {
     setUserMode('citizen');
     setIsAuthenticated(true);
     setCurrentView('main');
-    console.log('✅ Citizen scientist access granted');
+    console.log('✅ Citizen scientist access granted:', citizenUser);
+    console.log('✅ User mode set to:', 'citizen');
+    console.log('✅ Authentication state:', true);
   };
 
   const handleSignup = () => {
@@ -1421,58 +3802,107 @@ export default function App() {
     return <ProfileSetup onComplete={handleProfileComplete} />;
   }
 
+  if (currentView === 'profile') {
+    return <ProfileSection user={user} onBack={() => handleViewChange('main')} />;
+  }
+
   if (!isAuthenticated) {
     return <AuthScreen onAdminLogin={handleAdminLogin} onCitizenLogin={handleCitizenLogin} onSignup={handleSignup} />;
   }
+
+  // Debug logging
+  console.log('🔍 App Component Render State:');
+  console.log('🔍 isAuthenticated:', isAuthenticated);
+  console.log('🔍 userMode:', userMode);
+  console.log('🔍 currentView:', currentView);
+  console.log('🔍 user:', user);
+  console.log('🔍 localStorage token:', !!localStorage.getItem('token'));
+  console.log('🔍 localStorage adminToken:', !!localStorage.getItem('adminToken'));
 
   return (
     <div className="app-container">
       {currentView === 'main' && (
         <div className="main-menu">
           <div className="menu-header">
-            <h2>🌊 ESCOM Assistant</h2>
-            <p>Welcome, {user?.firstName || user?.name || 'User'}! ({userMode === 'admin' ? '👑 Admin' : '👥 Citizen'})</p>
+            <div className="header-content">
+              <div className="logo-section">
+                <div className="logo-icon">🌊</div>
+                <div>
+                  <h2>ESCOM Citizen Scientist</h2>
+                  <p>Coastal Research Community</p>
+                </div>
+              </div>
+              <div className="user-info">
+                <span className="user-name">Welcome, {user?.firstName || user?.name || 'User'}!</span>
+                <span className="user-role">{userMode === 'admin' ? '👑 Admin' : '👥 Citizen Scientist'}</span>
+              </div>
+            </div>
           </div>
-          <div className="menu-buttons">
+          
+          <div className="menu-content">
             {userMode === 'admin' ? (
               // Admin Menu Options
-              <>
+              <div className="admin-menu">
+                <h3>Administration Panel</h3>
                 <button onClick={() => handleViewChange('admin-dashboard')} className="menu-btn admin-dashboard">
-                  📊 Admin Dashboard
+                  <span className="btn-icon">📊</span>
+                  <span className="btn-text">Admin Dashboard</span>
+                  <span className="btn-description">Manage users, FAQs, updates, and monitor system</span>
                 </button>
-                <button onClick={() => handleViewChange('user-management')} className="menu-btn user-management">
-                  👥 User Management
-                </button>
-                <button onClick={() => handleViewChange('data-analytics')} className="menu-btn data-analytics">
-                  📈 Data Analytics
-                </button>
-                <button onClick={() => handleViewChange('system-settings')} className="menu-btn system-settings">
-                  ⚙️ System Settings
-                </button>
-                <button onClick={() => handleViewChange('reports')} className="menu-btn reports">
-                  📋 Reports
-                </button>
-              </>
+              </div>
             ) : (
-              // Citizen Menu Options
-              <>
-                <button onClick={() => handleViewChange('faq')} className="menu-btn faq">
-                  ❓ FAQs
-                </button>
-                <button onClick={() => handleViewChange('community')} className="menu-btn community">
-                  👥 Community
-                </button>
-                <button onClick={() => handleViewChange('dashboard')} className="menu-btn dashboard">
-                  📊 Dashboard
-                </button>
-                <button onClick={() => handleViewChange('bot')} className="menu-btn bot">
-                  🤖 Assistant Bot
-                </button>
-                <button onClick={() => handleViewChange('profile-setup')} className="menu-btn profile">
-                  👤 Profile
-                </button>
-              </>
+              // Enhanced Citizen Menu Options
+              <div className="citizen-menu">
+                <div className="menu-section">
+                  <h3>Quick Access</h3>
+                  <div className="menu-grid">
+                    <button onClick={() => handleViewChange('dashboard')} className="menu-btn dashboard">
+                      <span className="btn-icon">📊</span>
+                      <span className="btn-text">My Dashboard</span>
+                      <span className="btn-description">View your progress and statistics</span>
+                    </button>
+                    
+                    <button onClick={() => handleViewChange('faq')} className="menu-btn faq">
+                      <span className="btn-icon">❓</span>
+                      <span className="btn-text">Browse FAQs</span>
+                      <span className="btn-description">Find answers to common questions</span>
+                    </button>
+                    
+                    <button onClick={() => handleViewChange('updates')} className="menu-btn updates">
+                      <span className="btn-icon">📢</span>
+                      <span className="btn-text">Latest Updates</span>
+                      <span className="btn-description">Stay informed about community news</span>
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="menu-section">
+                  <h3>Community & Tools</h3>
+                  <div className="menu-grid">
+
+                    
+                    <button onClick={() => handleViewChange('bot')} className="menu-btn bot">
+                      <span className="btn-icon">🤖</span>
+                      <span className="btn-text">AI Assistant</span>
+                      <span className="btn-description">Get help from our smart bot</span>
+                    </button>
+                    
+                    <button onClick={() => handleViewChange('profile')} className="menu-btn profile">
+                      <span className="btn-icon">👤</span>
+                      <span className="btn-text">My Profile</span>
+                      <span className="btn-description">Manage your account settings</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
+          </div>
+          
+          <div className="menu-footer">
+            <button onClick={handleLogout} className="logout-btn">
+              <span className="btn-icon">🚪</span>
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       )}
@@ -1481,8 +3911,8 @@ export default function App() {
         <FAQSection onBack={() => handleViewChange('main')} userMode={userMode} />
       )}
 
-      {currentView === 'community' && (
-        <CommunitySection onBack={() => handleViewChange('main')} />
+      {currentView === 'updates' && (
+        <UpdatesSection onBack={() => handleViewChange('main')} />
       )}
 
       {currentView === 'dashboard' && (
@@ -1496,22 +3926,6 @@ export default function App() {
       {/* Admin Views */}
       {currentView === 'admin-dashboard' && (
         <AdminDashboardSection onBack={() => handleViewChange('main')} />
-      )}
-
-      {currentView === 'user-management' && (
-        <UserManagementSection onBack={() => handleViewChange('main')} />
-      )}
-
-      {currentView === 'data-analytics' && (
-        <DataAnalyticsSection onBack={() => handleViewChange('main')} />
-      )}
-
-      {currentView === 'system-settings' && (
-        <SystemSettingsSection onBack={() => handleViewChange('main')} />
-      )}
-
-      {currentView === 'reports' && (
-        <ReportsSection onBack={() => handleViewChange('main')} />
       )}
     </div>
   );

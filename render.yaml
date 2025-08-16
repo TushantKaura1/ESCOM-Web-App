@@ -1,25 +1,22 @@
 services:
   - type: web
-    name: escom-backend
+    name: citiscience-backend
     env: node
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
-    nodeVersion: 18
-    autoDeploy: true
-    healthCheckPath: /health
+    buildCommand: cd src/mongo-api && npm install
+    startCommand: cd src/mongo-api && node server.js
     envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: NPM_FLAGS
-        value: --legacy-peer-deps
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3002
-      - key: MONGODB_URI
-        sync: false  # You'll set this manually
+        value: 3001
+      - key: DB_URI
+        sync: false
       - key: JWT_SECRET
-        generateValue: true
-      - key: CORS_ORIGIN
-        value: https://citisci.netlify.app 
+        sync: false
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: DB_NAME
+        value: citiscience
+    healthCheckPath: /health
+    autoDeploy: true 
