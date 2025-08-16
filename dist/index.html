@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="ESCOM Citizen Scientist Assistant - Join the coastal monitoring community and contribute to environmental research" />
+  <meta name="keywords" content="citizen science, coastal monitoring, ESCOM, environmental research, Telegram Mini App" />
+  <meta name="author" content="ESCOM Team" />
+  <meta name="theme-color" content="#667eea" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ESCOM Citizen Scientist Assistant" />
+  <meta property="og:description" content="Join the coastal monitoring community and contribute to environmental research" />
+  <meta property="og:image" content="/public/vite.svg" />
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:title" content="ESCOM Citizen Scientist Assistant" />
+  <meta property="twitter:description" content="Join the coastal monitoring community and contribute to environmental research" />
+  
+  <title>🌊 ESCOM Citizen Scientist Assistant</title>
+  
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Inter font with more weights -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/assets/vite-DcBtz0py.svg" />
+  
+  <!-- PWA manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- iOS meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="ESCOM Assistant" />
+  
+  <!-- Prevent zoom on input focus -->
+  <style>
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  </style>
+  <script type="module" crossorigin src="/assets/index-BKiSL1zh.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-0U4bnGZZ.css">
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Service Worker Registration for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
