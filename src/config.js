@@ -7,11 +7,11 @@ const config = {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       baseUrl = 'http://localhost:3001';  // Local development
     } else if (window.location.hostname === 'citisci.netlify.app') {
-      baseUrl = 'https://citiscience-backend.onrender.com';  // Production backend
+      baseUrl = 'https://citiscience-backend-95pp.onrender.com';  // Production backend
     } else if (window.location.hostname === 'citiscience.netlify.app') {
-      baseUrl = 'https://citiscience-backend.onrender.com';  // Production backend
+      baseUrl = 'https://citiscience-backend-95pp.onrender.com';  // Production backend
     } else {
-      baseUrl = 'https://citiscience-backend.onrender.com';  // Default production
+      baseUrl = 'https://citiscience-backend-95pp.onrender.com';  // Default production
     }
     
     // Debug logging
