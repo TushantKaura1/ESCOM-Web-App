@@ -21,7 +21,8 @@ app.use(cors({
     'http://localhost:3001',
     'http://localhost:5173',
     'https://citisci.netlify.app',
-    'https://citiscience.netlify.app'
+    'https://citiscience.netlify.app',
+    'https://*.netlify.app'  // Allow all Netlify domains
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
