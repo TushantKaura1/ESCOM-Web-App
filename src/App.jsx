@@ -41,6 +41,7 @@ function App() {
     
     try {
       console.log('📤 Sending login data:', { email: credentials.email, password: '***' });
+      console.log('🔧 Authentication fixes deployed - v1.1'); // Force redeploy
 
       const response = await fetch(`${config.API_BASE_URL}/api/auth/login`, {
         method: 'POST',
