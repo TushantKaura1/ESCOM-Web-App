@@ -40,6 +40,8 @@ function App() {
     setError(null);
     
     try {
+      console.log('📤 Sending login data:', { email: credentials.email, password: '***' });
+
       const response = await fetch(`${config.API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -57,6 +59,7 @@ function App() {
         console.log('✅ Login successful');
       } else {
         setError(data.error || 'Login failed');
+        console.error('❌ Login failed:', data);
       }
     } catch (error) {
       setError('Network error. Please check your connection.');
@@ -71,12 +74,24 @@ function App() {
     setError(null);
     
     try {
+      // Transform frontend data to match backend schema
+      const backendData = {
+        email: userData.email,
+        password: userData.password,
+        username: userData.name, // Map name to username
+        firstName: userData.name.split(' ')[0] || userData.name, // Extract first name
+        lastName: userData.name.split(' ').slice(1).join(' ') || '', // Extract last name
+        role: userData.role === 'user' ? 'citizen' : userData.role // Map user to citizen
+      };
+
+      console.log('📤 Sending signup data:', backendData);
+
       const response = await fetch(`${config.API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(backendData),
       });
 
       const data = await response.json();
@@ -88,6 +103,7 @@ function App() {
         console.log('✅ Signup successful');
       } else {
         setError(data.error || 'Signup failed');
+        console.error('❌ Signup failed:', data);
       }
     } catch (error) {
       setError('Network error. Please check your connection.');
