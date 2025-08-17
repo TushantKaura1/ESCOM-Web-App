@@ -9,6 +9,9 @@ if [ -d "dist" ]; then
     echo "📋 Dist folder contents:"
     ls -la dist/
     
+    echo "📁 Assets folder contents:"
+    ls -la dist/assets/
+    
     echo "🔍 Checking critical files:"
     if [ -f "dist/index.html" ]; then
         echo "✅ index.html exists"
@@ -17,17 +20,29 @@ if [ -d "dist" ]; then
         exit 1
     fi
     
-    if [ -f "dist/assets/index-DxtwNULl.js" ] || [ -f "dist/assets/index-*.js" ]; then
-        echo "✅ Main JavaScript bundle exists"
+    # Check for JavaScript bundle (more flexible pattern)
+    echo "🔍 Looking for JavaScript bundle..."
+    JS_FILES=$(find dist/assets -name "index-*.js" 2>/dev/null | head -1)
+    if [ -n "$JS_FILES" ]; then
+        echo "✅ Main JavaScript bundle exists: $(basename "$JS_FILES")"
+        echo "   Full path: $JS_FILES"
     else
         echo "❌ Main JavaScript bundle missing!"
+        echo "   Available JS files:"
+        find dist/assets -name "*.js" 2>/dev/null || echo "   No JS files found"
         exit 1
     fi
     
-    if [ -f "dist/assets/index-*.css" ]; then
-        echo "✅ CSS bundle exists"
+    # Check for CSS bundle (more flexible pattern)
+    echo "🔍 Looking for CSS bundle..."
+    CSS_FILES=$(find dist/assets -name "index-*.css" 2>/dev/null | head -1)
+    if [ -n "$CSS_FILES" ]; then
+        echo "✅ CSS bundle exists: $(basename "$CSS_FILES")"
+        echo "   Full path: $CSS_FILES"
     else
         echo "❌ CSS bundle missing!"
+        echo "   Available CSS files:"
+        find dist/assets -name "*.css" 2>/dev/null || echo "   No CSS files found"
         exit 1
     fi
     
