@@ -17,6 +17,9 @@ function App() {
 
   // Check backend connection on app start
   useEffect(() => {
+    console.log('🚨 AUTHENTICATION FIXES DEPLOYED - v1.2.0');
+    console.log('🔧 Field mapping fixed: name → username, firstName, lastName');
+    console.log('🔧 Role mapping fixed: user → citizen');
     checkBackendConnection();
   }, []);
 
@@ -137,6 +140,8 @@ function App() {
         
         <div className="app-version">
           <small>v{APP_VERSION} - {new Date(BUILD_TIMESTAMP).toLocaleDateString()}</small>
+          <br />
+          <small style={{color: '#ff6b6b'}}>🚨 AUTHENTICATION FIXES DEPLOYED - v1.2.0</small>
         </div>
         
         <div className="connection-status">

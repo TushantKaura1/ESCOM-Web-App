@@ -76,53 +76,9 @@ const connectDB = async () => {
     console.log('📊 Database name:', mongoose.connection.name);
     console.log('🌐 Connection URL:', MONGODB_URI);
     
-    // Create demo users after successful connection
-    await createDemoUsers();
-    
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
     process.exit(1);
-  }
-};
-
-// Create demo users function
-const createDemoUsers = async () => {
-  try {
-    // Create a demo admin user if it doesn't exist
-    const adminExists = await User.findOne({ email: 'admin@escom.com' });
-    if (!adminExists) {
-      const adminPasswordHash = await bcrypt.hash('admin123', 10);
-      const adminUser = new User({
-        email: 'admin@escom.com',
-        passwordHash: adminPasswordHash,
-        username: 'admin',
-        firstName: 'Admin',
-        lastName: 'User',
-        role: 'admin',
-        isAdmin: true
-      });
-      await adminUser.save();
-      console.log('✅ Demo admin user created: admin@escom.com / admin123');
-    }
-    
-    // Create a demo citizen user if it doesn't exist
-    const citizenExists = await User.findOne({ email: 'citizen@escom.com' });
-    if (!citizenExists) {
-      const citizenPasswordHash = await bcrypt.hash('citizen123', 10);
-      const citizenUser = new User({
-        email: 'citizen@escom.com',
-        passwordHash: citizenPasswordHash,
-        username: 'citizen',
-        firstName: 'Demo',
-        lastName: 'Citizen',
-        role: 'citizen',
-        isAdmin: false
-      });
-      await citizenUser.save();
-      console.log('✅ Demo citizen user created: citizen@escom.com / citizen123');
-    }
-  } catch (error) {
-    console.log('⚠️ Could not create demo users:', error.message);
   }
 };
 
