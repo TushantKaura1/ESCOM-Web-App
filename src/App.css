@@ -84,7 +84,12 @@ body {
 .welcome-content {
   text-align: center;
   max-width: 600px;
-  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .welcome-title {
@@ -108,6 +113,17 @@ body {
   color: #cccccc;
   margin-bottom: 40px;
   line-height: 1.6;
+}
+
+.app-version {
+  margin: 10px 0;
+  opacity: 0.7;
+}
+
+.app-version small {
+  color: #64b5f6;
+  font-size: 12px;
+  font-family: monospace;
 }
 
 /* Connection Status */

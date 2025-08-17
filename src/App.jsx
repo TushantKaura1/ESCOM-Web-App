@@ -10,6 +10,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('checking');
+  
+  // Force Netlify rebuild - Authentication fixes v1.2 - Aug 17, 2025
+  const APP_VERSION = '1.2.0';
+  const BUILD_TIMESTAMP = '2025-08-17T17:50:00Z';
 
   // Check backend connection on app start
   useEffect(() => {
@@ -130,6 +134,10 @@ function App() {
         <p className="welcome-subtitle">
           Join the coastal monitoring community and contribute to environmental research
         </p>
+        
+        <div className="app-version">
+          <small>v{APP_VERSION} - {new Date(BUILD_TIMESTAMP).toLocaleDateString()}</small>
+        </div>
         
         <div className="connection-status">
           <div className={`status-indicator ${connectionStatus}`}>
