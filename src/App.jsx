@@ -3,6 +3,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
+import TestDashboard from './components/TestDashboard';
 import config from './config';
 import './App.css';
 
@@ -49,8 +50,9 @@ function App() {
     setError(null);
     
     try {
+      console.log('🚀 LOGIN ATTEMPT STARTED');
       console.log('📤 Sending login data:', { email: credentials.email, password: '***' });
-      console.log('🔧 Authentication fixes deployed - v1.1'); // Force redeploy
+      console.log('🔧 Authentication fixes deployed - v1.2.0');
 
       const response = await fetch(`${config.API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -60,22 +62,31 @@ function App() {
         body: JSON.stringify(credentials),
       });
 
+      console.log('📥 Login response received:', response.status, response.statusText);
       const data = await response.json();
+      console.log('📥 Login response data:', data);
 
       if (response.ok) {
+        console.log('✅ LOGIN SUCCESSFUL!');
+        console.log('👤 User data received:', data.user);
+        console.log('🔑 Token received:', data.token ? 'YES' : 'NO');
+        
         setUser(data.user);
         localStorage.setItem('token', data.token);
         setCurrentView('dashboard');
-        console.log('✅ Login successful');
+        
+        console.log('🎯 Current view set to: dashboard');
+        console.log('👤 User state updated:', data.user);
       } else {
+        console.error('❌ LOGIN FAILED:', data.error);
         setError(data.error || 'Login failed');
-        console.error('❌ Login failed:', data);
       }
     } catch (error) {
+      console.error('💥 LOGIN ERROR:', error);
       setError('Network error. Please check your connection.');
-      console.error('Login error:', error);
     } finally {
       setLoading(false);
+      console.log('🏁 Login process completed');
     }
   };
 
@@ -195,17 +206,32 @@ function App() {
   );
 
   const renderDashboard = () => {
-    console.log('🔍 Rendering dashboard for user:', user);
+    console.log('🔍 ===== DASHBOARD RENDERING STARTED =====');
+    console.log('🔍 Current view:', currentView);
+    console.log('🔍 User state:', user);
     console.log('🔍 User role:', user?.role);
     console.log('🔍 Is admin:', user?.isAdmin);
+    console.log('🔍 User object keys:', user ? Object.keys(user) : 'NO USER');
     
+    if (!user) {
+      console.error('❌ NO USER DATA - Cannot render dashboard');
+      return <div>No user data available</div>;
+    }
+    
+    // TEMPORARILY USE TEST DASHBOARD FOR DEBUGGING
+    console.log('🧪 RENDERING TEST DASHBOARD FOR DEBUGGING');
+    return <TestDashboard user={user} onBack={handleLogout} />;
+    
+    // ORIGINAL LOGIC (COMMENTED OUT FOR NOW)
+    /*
     if (user?.isAdmin || user?.role === 'admin') {
-      console.log('👑 Rendering Admin Dashboard');
+      console.log('👑 RENDERING ADMIN DASHBOARD');
       return <AdminDashboard onBack={handleLogout} />;
     } else {
-      console.log('🌊 Rendering User Dashboard');
+      console.log('🌊 RENDERING USER DASHBOARD');
       return <UserDashboard user={user} onBack={handleLogout} />;
     }
+    */
   };
 
   if (loading) {
@@ -219,6 +245,8 @@ function App() {
 
   return (
     <div className="app">
+      {console.log('🎭 APP RENDER - Current view:', currentView, 'User:', user)}
+      
       {error && (
         <div className="error-banner">
           <span>{error}</span>
