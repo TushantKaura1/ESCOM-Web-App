@@ -95,11 +95,16 @@ app.get('/health', async (req, res) => {
     const healthData = {
       status: 'ok',
       timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
+      uptime: process.entryUptime || process.uptime(),
       database: dbStatus,
       databaseName: dbName,
       environment: process.env.NODE_ENV || 'development',
-      version: '1.0.0'
+      version: '1.2.0',
+      features: {
+        dualFormatRegistration: true,
+        enhancedLogging: true,
+        mongodbAtlas: true
+      }
     };
     
     // Set CORS headers explicitly for this endpoint
@@ -116,6 +121,20 @@ app.get('/health', async (req, res) => {
       error: error.message
     });
   }
+});
+
+// Test endpoint to verify backend functionality
+app.get('/api/test', (req, res) => {
+  res.json({
+    message: 'Backend is working with dual-format registration support!',
+    timestamp: new Date().toISOString(),
+    version: '1.2.0',
+    features: {
+      dualFormatRegistration: 'Supports both old (name) and new (username, firstName, lastName) formats',
+      enhancedLogging: 'Detailed request/response logging',
+      mongodbAtlas: 'Connected to cloud database'
+    }
+  });
 });
 
 // User Schema
@@ -175,7 +194,49 @@ const auth = async (req, res, next) => {
 // Authentication endpoints
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, username, firstName, lastName } = req.body;
+    console.log('📥 Registration request received:', JSON.stringify(req.body, null, 2));
+    
+    const { email, password, username, firstName, lastName, name, role } = req.body;
+    
+    // Handle both old and new data formats
+    let finalUsername, finalFirstName, finalLastName, finalRole;
+    
+    if (username && firstName && lastName) {
+      // New format: username, firstName, lastName provided
+      finalUsername = username;
+      finalFirstName = firstName;
+      finalLastName = lastName;
+    } else if (name) {
+      // Old format: name provided, split into firstName and lastName
+      const nameParts = name.trim().split(' ');
+      finalUsername = name;
+      finalFirstName = nameParts[0] || name;
+      finalLastName = nameParts.slice(1).join(' ') || '';
+    } else {
+      return res.status(400).json({ 
+        error: 'Missing required fields. Please provide either (username, firstName, lastName) or (name)' 
+      });
+    }
+    
+    // Handle role mapping
+    if (role === 'user') {
+      finalRole = 'citizen';
+    } else {
+      finalRole = role || 'citizen';
+    }
+    
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
+    console.log('🔧 Processed registration data:', {
+      email,
+      username: finalUsername,
+      firstName: finalFirstName,
+      lastName: finalLastName,
+      role: finalRole
+    });
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -191,10 +252,10 @@ app.post('/api/auth/register', async (req, res) => {
     const user = new User({
       email,
       passwordHash,
-      username,
-      firstName,
-      lastName,
-      role: 'citizen'
+      username: finalUsername,
+      firstName: finalFirstName,
+      lastName: finalLastName,
+      role: finalRole
     });
     
     await user.save();
@@ -216,23 +277,32 @@ app.post('/api/auth/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Failed to create user' });
+    res.status(500).json({ error: 'Failed to create user', details: error.message });
   }
 });
 
 app.post('/api/auth/login', async (req, res) => {
   try {
+    console.log('📥 Login request received:', { email: req.body.email, password: '***' });
+    
     const { email, password } = req.body;
+    
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
     
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('❌ Login failed: User not found for email:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
+      console.log('❌ Login failed: Invalid password for email:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
@@ -242,6 +312,8 @@ app.post('/api/auth/login', async (req, res) => {
     
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
+    
+    console.log('✅ Login successful for user:', email);
     
     res.json({
       message: 'Login successful',
@@ -258,7 +330,7 @@ app.post('/api/auth/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Failed to login' });
+    res.status(500).json({ error: 'Failed to login', details: error.message });
   }
 });
 
