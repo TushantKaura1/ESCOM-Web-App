@@ -1,25 +1,7 @@
 // Configuration file for API endpoints
 const config = {
-  // API Base URL - Change this for different environments
-  API_BASE_URL: (() => {
-    // Check if we're in development (localhost) or production (Netlify)
-    let baseUrl;
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      baseUrl = 'http://localhost:3001';  // Local development
-    } else if (window.location.hostname === 'citisci.netlify.app') {
-      baseUrl = 'https://citiscience-backend-95pp.onrender.com';  // Production backend
-    } else if (window.location.hostname === 'citiscience.netlify.app') {
-      baseUrl = 'https://citiscience-backend-95pp.onrender.com';  // Production backend
-    } else {
-      baseUrl = 'https://citiscience-backend-95pp.onrender.com';  // Default production
-    }
-    
-    // Debug logging
-    console.log('🌐 Environment detected:', window.location.hostname);
-    console.log('🔗 API Base URL:', baseUrl);
-    
-    return baseUrl;
-  })(),
+  // API Base URL - Always use Render backend for now
+  API_BASE_URL: 'https://citiscience-backend-95pp.onrender.com',
   
   // App Configuration
   APP_NAME: 'ESCOM Citizen Scientist',
