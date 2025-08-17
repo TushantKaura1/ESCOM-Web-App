@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import AdminDashboard from './components/AdminDashboard';
+import UserDashboard from './components/UserDashboard';
 import config from './config';
 import './App.css';
 
@@ -192,37 +194,13 @@ function App() {
     </div>
   );
 
-  const renderDashboard = () => (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>Welcome, {user?.name || 'Citizen Scientist'}! 👋</h1>
-        <button onClick={handleLogout} className="btn btn-logout">
-          🚪 Logout
-        </button>
-      </div>
-
-      <div className="dashboard-content">
-        <div className="dashboard-card">
-          <h3>📊 Your Dashboard</h3>
-          <p>Email: {user?.email}</p>
-          <p>Role: {user?.role || 'User'}</p>
-          <p>Member since: {new Date(user?.createdAt || Date.now()).toLocaleDateString()}</p>
-        </div>
-
-        <div className="dashboard-card">
-          <h3>🔬 Quick Actions</h3>
-          <button className="btn btn-action">📝 Submit Data</button>
-          <button className="btn btn-action">📊 View Reports</button>
-          <button className="btn btn-action">❓ FAQs</button>
-        </div>
-
-        <div className="dashboard-card">
-          <h3>📈 Recent Activity</h3>
-          <p>No recent activity yet. Start contributing to see your impact!</p>
-        </div>
-      </div>
-    </div>
-  );
+  const renderDashboard = () => {
+    if (user?.isAdmin || user?.role === 'admin') {
+      return <AdminDashboard onBack={handleLogout} />;
+    } else {
+      return <UserDashboard user={user} onBack={handleLogout} />;
+    }
+  };
 
   if (loading) {
     return (
