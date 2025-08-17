@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Test</title>
+</head>
+<body style="background: black; color: white; text-align: center; padding: 50px;">
+    <h1 style="color: green;">✅ SIMPLE TEST PAGE</h1>
+    <p>If you can see this, basic HTML is working!</p>
+    <p>Time: <span id="time"></span></p>
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+        console.log('✅ Simple page loaded successfully!');
+    </script>
+</body>
+</html>
