@@ -195,9 +195,15 @@ function App() {
   );
 
   const renderDashboard = () => {
+    console.log('🔍 Rendering dashboard for user:', user);
+    console.log('🔍 User role:', user?.role);
+    console.log('🔍 Is admin:', user?.isAdmin);
+    
     if (user?.isAdmin || user?.role === 'admin') {
+      console.log('👑 Rendering Admin Dashboard');
       return <AdminDashboard onBack={handleLogout} />;
     } else {
+      console.log('🌊 Rendering User Dashboard');
       return <UserDashboard user={user} onBack={handleLogout} />;
     }
   };

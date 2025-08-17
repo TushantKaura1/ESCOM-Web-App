@@ -13,6 +13,7 @@ function UserDashboard({ user, onBack }) {
   });
 
   useEffect(() => {
+    console.log('🌊 UserDashboard component mounted for user:', user);
     loadUserData();
   }, []);
 
@@ -80,7 +81,7 @@ function UserDashboard({ user, onBack }) {
           <button onClick={() => setActiveTab('updates')} className="action-btn">
             📢 Check Updates
           </button>
-          <button onClick={() => setBotHelper({...botHelper, isOpen: true})} className="action-btn">
+          <button onClick={() => setActiveTab('bot')} className="action-btn">
             🤖 Bot Helper
           </button>
         </div>

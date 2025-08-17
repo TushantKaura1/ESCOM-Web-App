@@ -23,6 +23,7 @@ function AdminDashboard({ onBack }) {
   });
 
   useEffect(() => {
+    console.log('👑 AdminDashboard component mounted');
     loadDashboardData();
   }, []);
 
