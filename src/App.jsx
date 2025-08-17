@@ -1,84 +1,231 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import config from './config';
+import './App.css';
 
 function App() {
-  return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: '#000',
-      color: '#fff',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'Arial, sans-serif',
-      textAlign: 'center',
-      padding: '20px'
-    }}>
-      <h1 style={{ fontSize: '48px', color: '#00ff00', marginBottom: '20px' }}>
-        🌊 ESCOM Citizen Scientist
-      </h1>
-      
-      <div style={{
-        backgroundColor: '#333',
-        padding: '30px',
-        borderRadius: '15px',
-        marginBottom: '20px'
-      }}>
-        <h2 style={{ color: '#00ff00', marginBottom: '15px' }}>
-          ✅ Frontend is Working!
-        </h2>
-        <p style={{ fontSize: '18px', marginBottom: '10px' }}>
-          If you can see this, your React app is rendering successfully!
-        </p>
-        <p style={{ fontSize: '16px', color: '#ccc' }}>
-          Current time: {new Date().toLocaleString()}
-        </p>
-      </div>
+  const [currentView, setCurrentView] = useState('welcome');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('checking');
 
-      <div style={{
-        backgroundColor: '#333',
-        padding: '20px',
-        borderRadius: '15px',
-        marginBottom: '20px'
-      }}>
-        <h3>Backend Test</h3>
-        <button 
-          onClick={async () => {
-            try {
-              const response = await fetch('https://citiscience-backend-95pp.onrender.com/health');
-              const data = await response.json();
-              alert(`✅ Backend Status: ${data.status}\n🌐 Database: ${data.database}`);
-            } catch (error) {
-              alert('❌ Backend connection failed: ' + error.message);
-            }
-          }}
-          style={{
-            backgroundColor: '#00ff00',
-            color: '#000',
-            padding: '15px 30px',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '18px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          Test Backend Connection
+  // Check backend connection on app start
+  useEffect(() => {
+    checkBackendConnection();
+  }, []);
+
+  const checkBackendConnection = async () => {
+    try {
+      setConnectionStatus('checking');
+      const response = await fetch(`${config.API_BASE_URL}/health`);
+      const data = await response.json();
+      
+      if (data.status === 'ok') {
+        setConnectionStatus('connected');
+        console.log('✅ Backend connected successfully');
+      } else {
+        setConnectionStatus('error');
+        console.error('❌ Backend health check failed');
+      }
+    } catch (error) {
+      setConnectionStatus('error');
+      console.error('❌ Backend connection failed:', error);
+    }
+  };
+
+  const handleLogin = async (credentials) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data.user);
+        localStorage.setItem('token', data.token);
+        setCurrentView('dashboard');
+        console.log('✅ Login successful');
+      } else {
+        setError(data.error || 'Login failed');
+      }
+    } catch (error) {
+      setError('Network error. Please check your connection.');
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignup = async (userData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data.user);
+        localStorage.setItem('token', data.token);
+        setCurrentView('dashboard');
+        console.log('✅ Signup successful');
+      } else {
+        setError(data.error || 'Signup failed');
+      }
+    } catch (error) {
+      setError('Network error. Please check your connection.');
+      console.error('Signup error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('token');
+    setCurrentView('welcome');
+    setError(null);
+  };
+
+  const renderWelcome = () => (
+    <div className="welcome-container">
+      <div className="welcome-content">
+        <h1 className="welcome-title">
+          🌊 ESCOM Citizen Scientist
+        </h1>
+        <p className="welcome-subtitle">
+          Join the coastal monitoring community and contribute to environmental research
+        </p>
+        
+        <div className="connection-status">
+          <div className={`status-indicator ${connectionStatus}`}>
+            {connectionStatus === 'checking' && '🔄 Checking connection...'}
+            {connectionStatus === 'connected' && '✅ Backend Connected'}
+            {connectionStatus === 'error' && '❌ Backend Disconnected'}
+          </div>
+          <button 
+            onClick={checkBackendConnection}
+            className="retry-button"
+            disabled={connectionStatus === 'checking'}
+          >
+            🔄 Retry
+          </button>
+        </div>
+
+        <div className="welcome-buttons">
+          <button 
+            onClick={() => setCurrentView('login')}
+            className="btn btn-primary"
+          >
+            🔐 Login
+          </button>
+          <button 
+            onClick={() => setCurrentView('signup')}
+            className="btn btn-secondary"
+          >
+            📝 Sign Up
+          </button>
+        </div>
+
+        <div className="welcome-features">
+          <div className="feature">
+            <span className="feature-icon">🌊</span>
+            <span>Coastal Monitoring</span>
+          </div>
+          <div className="feature">
+            <span className="feature-icon">🔬</span>
+            <span>Scientific Research</span>
+          </div>
+          <div className="feature">
+            <span className="feature-icon">🌍</span>
+            <span>Environmental Impact</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDashboard = () => (
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>Welcome, {user?.name || 'Citizen Scientist'}! 👋</h1>
+        <button onClick={handleLogout} className="btn btn-logout">
+          🚪 Logout
         </button>
       </div>
 
-      <div style={{
-        backgroundColor: '#333',
-        padding: '20px',
-        borderRadius: '15px'
-      }}>
-        <h3>Debug Info</h3>
-        <p>React Version: {React.version}</p>
-        <p>App loaded at: {new Date().toISOString()}</p>
-        <p>User Agent: {navigator.userAgent}</p>
-        <p>Window size: {window.innerWidth} x {window.innerHeight}</p>
+      <div className="dashboard-content">
+        <div className="dashboard-card">
+          <h3>📊 Your Dashboard</h3>
+          <p>Email: {user?.email}</p>
+          <p>Role: {user?.role || 'User'}</p>
+          <p>Member since: {new Date(user?.createdAt || Date.now()).toLocaleDateString()}</p>
+        </div>
+
+        <div className="dashboard-card">
+          <h3>🔬 Quick Actions</h3>
+          <button className="btn btn-action">📝 Submit Data</button>
+          <button className="btn btn-action">📊 View Reports</button>
+          <button className="btn btn-action">❓ FAQs</button>
+        </div>
+
+        <div className="dashboard-card">
+          <h3>📈 Recent Activity</h3>
+          <p>No recent activity yet. Start contributing to see your impact!</p>
+        </div>
       </div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Processing...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app">
+      {error && (
+        <div className="error-banner">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="error-close">×</button>
+        </div>
+      )}
+
+      {currentView === 'welcome' && renderWelcome()}
+      {currentView === 'login' && (
+        <Login 
+          onLogin={handleLogin} 
+          onBack={() => setCurrentView('welcome')}
+        />
+      )}
+      {currentView === 'signup' && (
+        <Signup 
+          onSignup={handleSignup} 
+          onBack={() => setCurrentView('welcome')}
+        />
+      )}
+      {currentView === 'dashboard' && renderDashboard()}
     </div>
   );
 }
