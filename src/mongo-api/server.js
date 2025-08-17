@@ -108,12 +108,13 @@ app.get('/health', async (req, res) => {
       database: dbStatus,
       databaseName: dbName,
       environment: process.env.NODE_ENV || 'development',
-      version: '1.2.0',
+      version: '1.2.1',
       features: {
         dualFormatRegistration: true,
         enhancedLogging: true,
         mongodbAtlas: true,
-        corsFixed: true
+        corsFixed: true,
+        lastNameOptional: true
       },
       cors: {
         allowedOrigins: ['*'],
@@ -144,13 +145,36 @@ app.get('/api/test', (req, res) => {
   res.json({
     message: 'Backend is working with dual-format registration support!',
     timestamp: new Date().toISOString(),
-    version: '1.2.0',
+    version: '1.2.1',
     features: {
       dualFormatRegistration: 'Supports both old (name) and new (username, firstName, lastName) formats',
       enhancedLogging: 'Detailed request/response logging',
-      mongodbAtlas: 'Connected to cloud database'
+      mongodbAtlas: 'Connected to cloud database',
+      lastNameOptional: 'lastName field is now optional with fallback values'
     }
   });
+});
+
+// Test registration endpoint to verify the fix
+app.post('/api/test/register', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    
+    // Test the same logic as the main registration
+    const nameParts = name.trim().split(' ');
+    const username = name;
+    const firstName = nameParts[0] || name;
+    const lastName = nameParts.slice(1).join(' ') || nameParts[0] || name;
+    
+    res.json({
+      message: 'Test registration logic working',
+      input: { name, email, role },
+      processed: { username, firstName, lastName, role: role === 'user' ? 'citizen' : role },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Test failed', details: error.message });
+  }
 });
 
 // Database cleanup endpoint (for development/testing)
@@ -178,7 +202,7 @@ const UserSchema = new mongoose.Schema({
   passwordHash: { type: String, required: true },
   username: { type: String, required: true },
   firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  lastName: { type: String, required: false, default: '' }, // Make lastName optional
   role: { type: String, enum: ['admin', 'citizen', 'moderator'], default: 'citizen' },
   isAdmin: { type: Boolean, default: false },
   profile: {
@@ -246,7 +270,8 @@ app.post('/api/auth/register', async (req, res) => {
       const nameParts = name.trim().split(' ');
       finalUsername = name;
       finalFirstName = nameParts[0] || name;
-      finalLastName = nameParts.slice(1).join(' ') || '';
+      // Ensure lastName is never empty - use firstName if only one name part
+      finalLastName = nameParts.slice(1).join(' ') || nameParts[0] || name;
     } else {
       return res.status(400).json({ 
         error: 'Missing required fields. Please provide either (username, firstName, lastName) or (name)' 
@@ -263,6 +288,12 @@ app.post('/api/auth/register', async (req, res) => {
     // Validate required fields
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
+    // Ensure firstName and lastName are never empty
+    if (!finalFirstName || !finalLastName) {
+      finalFirstName = finalFirstName || finalUsername || 'User';
+      finalLastName = finalLastName || finalUsername || 'User';
     }
     
     console.log('🔧 Processed registration data:', {
@@ -293,7 +324,23 @@ app.post('/api/auth/register', async (req, res) => {
       role: finalRole
     });
     
-    await user.save();
+    try {
+      await user.save();
+      console.log('✅ User created successfully:', {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
+      });
+    } catch (saveError) {
+      console.error('❌ User save failed:', saveError);
+      if (saveError.code === 11000) {
+        return res.status(400).json({ error: 'User with this email already exists' });
+      }
+      return res.status(500).json({ error: 'Failed to create user', details: saveError.message });
+    }
     
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
