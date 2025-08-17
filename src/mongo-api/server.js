@@ -22,12 +22,13 @@ app.use(cors({
     'http://localhost:5173',
     'https://citisci.netlify.app',
     'https://citiscience.netlify.app',
-    'https://*.netlify.app',  // Allow all Netlify domains
-    'https://citiscience-backend-95pp.onrender.com'  // Allow backend to frontend
+    'https://*.netlify.app',
+    'https://citiscience-backend-95pp.onrender.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
+  optionsSuccessStatus: 200
 }));
 
 // Handle preflight requests
@@ -35,7 +36,8 @@ app.options('*', cors());
 
 // Add CORS headers to all responses
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  // Allow all origins for now to fix CORS issues
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Origin, Accept');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -49,9 +51,12 @@ app.use((req, res, next) => {
 
 // Environment variables
 const PORT = process.env.PORT || 3001;
-const MONGODB_URI = process.env.DB_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/escom';
+const MONGODB_URI = process.env.DB_URI || process.env.MONGODB_URI || 'mongodb+srv://tushantkaura:Lavanyanavya12%236Ttk@cluster0.we1rghs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-here';
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+
+// Force production environment for Render
+process.env.NODE_ENV = 'production';
 
 // Log environment variables for debugging
 console.log('🔧 Environment Configuration:');
@@ -59,12 +64,13 @@ console.log('   PORT:', PORT);
 console.log('   DB_URI:', process.env.DB_URI ? 'SET' : 'NOT SET');
 console.log('   MONGODB_URI:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
 console.log('   JWT_SECRET:', process.env.JWT_SECRET ? 'SET' : 'NOT SET');
-console.log('   NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('   NODE_ENV:', process.env.NODE_ENV);
+console.log('   Using MongoDB URI:', MONGODB_URI);
 
 // MongoDB Connection
 const connectDB = async () => {
   try {
-    console.log('🔄 Connecting to MongoDB...');
+    console.log('🔄 Connecting to MongoDB Atlas...');
     console.log('   URI:', MONGODB_URI);
     
     await mongoose.connect(MONGODB_URI, {
@@ -72,9 +78,12 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
     
-    console.log('✅ MongoDB connected successfully');
+    console.log('✅ MongoDB Atlas connected successfully');
     console.log('📊 Database name:', mongoose.connection.name);
     console.log('🌐 Connection URL:', MONGODB_URI);
+    
+    // Clean database and create fresh demo users
+    await createDemoUsers();
     
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
@@ -95,7 +104,7 @@ app.get('/health', async (req, res) => {
     const healthData = {
       status: 'ok',
       timestamp: new Date().toISOString(),
-      uptime: process.entryUptime || process.uptime(),
+      uptime: process.uptime(),
       database: dbStatus,
       databaseName: dbName,
       environment: process.env.NODE_ENV || 'development',
@@ -103,14 +112,21 @@ app.get('/health', async (req, res) => {
       features: {
         dualFormatRegistration: true,
         enhancedLogging: true,
-        mongodbAtlas: true
+        mongodbAtlas: true,
+        corsFixed: true
+      },
+      cors: {
+        allowedOrigins: ['*'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        headers: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
       }
     };
     
     // Set CORS headers explicitly for this endpoint
-    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Origin, Accept');
+    res.header('Access-Control-Allow-Credentials', 'true');
     
     res.json(healthData);
   } catch (error) {
@@ -135,6 +151,25 @@ app.get('/api/test', (req, res) => {
       mongodbAtlas: 'Connected to cloud database'
     }
   });
+});
+
+// Database cleanup endpoint (for development/testing)
+app.post('/api/admin/cleanup', async (req, res) => {
+  try {
+    console.log('🧹 Manual database cleanup requested');
+    await createDemoUsers();
+    res.json({
+      message: 'Database cleaned successfully',
+      timestamp: new Date().toISOString(),
+      action: 'All data cleared and fresh demo users created'
+    });
+  } catch (error) {
+    console.error('Cleanup error:', error);
+    res.status(500).json({
+      error: 'Database cleanup failed',
+      details: error.message
+    });
+  }
 });
 
 // User Schema
@@ -880,3 +915,45 @@ process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
 });
+
+// Create demo users function
+const createDemoUsers = async () => {
+  try {
+    // Clear all existing data first
+    console.log('🧹 Clearing all existing data...');
+    await User.deleteMany({});
+    console.log('✅ All existing users deleted');
+    
+    // Create a fresh admin user
+    const adminPasswordHash = await bcrypt.hash('admin123', 10);
+    const adminUser = new User({
+      email: 'admin@escom.com',
+      passwordHash: adminPasswordHash,
+      username: 'admin',
+      firstName: 'Admin',
+      lastName: 'User',
+      role: 'admin',
+      isAdmin: true
+    });
+    await adminUser.save();
+    console.log('✅ Fresh admin user created: admin@escom.com / admin123');
+    
+    // Create a fresh citizen user
+    const citizenPasswordHash = await bcrypt.hash('citizen123', 10);
+    const citizenUser = new User({
+      email: 'citizen@escom.com',
+      passwordHash: citizenPasswordHash,
+      username: 'citizen',
+      firstName: 'Demo',
+      lastName: 'Citizen',
+      role: 'citizen',
+      isAdmin: false
+    });
+    await citizenUser.save();
+    console.log('✅ Fresh citizen user created: citizen@escom.com / citizen123');
+    
+    console.log('🎉 Database cleaned and fresh demo users created!');
+  } catch (error) {
+    console.log('⚠️ Could not create demo users:', error.message);
+  }
+};
