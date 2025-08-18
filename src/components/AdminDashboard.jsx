@@ -58,6 +58,42 @@ function AdminDashboard({ onBack }) {
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState('grid'); // grid or list
 
+  const [settings, setSettings] = useState({
+    notifications: true,
+    autoBackup: true,
+    dataRetention: '2 years',
+    privacyMode: false,
+    maintenanceMode: false,
+    debugMode: false
+  });
+
+  const [reports, setReports] = useState([
+    { id: 1, name: 'Monthly Activity Report', status: 'Completed', date: '2024-01-20', type: 'Monthly Activity' },
+    { id: 2, name: 'User Performance Report', status: 'Completed', date: '2024-01-19', type: 'User Performance' },
+    { id: 3, name: 'Data Quality Report', status: 'In Progress', date: '2024-01-20', type: 'Data Quality' },
+    { id: 4, name: 'System Health Report', status: 'Scheduled', date: '2024-01-21', type: 'System Health' }
+  ]);
+
+  const [dataAnalytics, setDataAnalytics] = useState({
+    totalReadings: 567,
+    averageAccuracy: 91.3,
+    topPerformer: 'Lúcia Fernandes',
+    topPerformerReadings: 89,
+    mostActiveTeam: 'Team Beta',
+    monthlyTrends: [
+      { month: 'January', readings: 45, accuracy: 88 },
+      { month: 'February', readings: 52, accuracy: 91 },
+      { month: 'March', readings: 48, accuracy: 89 },
+      { month: 'April', readings: 61, accuracy: 93 }
+    ],
+    dataQuality: {
+      completeness: 95,
+      accuracy: 91,
+      timeliness: 88,
+      overall: 'Excellent'
+    }
+  });
+
   useEffect(() => {
     console.log('👑 AdminDashboard component mounted');
     console.log('📊 Loading dashboard data...');
@@ -486,8 +522,9 @@ function AdminDashboard({ onBack }) {
   };
 
   const handleSettingsSave = () => {
-    console.log('Settings saved:', settings);
+    console.log('💾 Settings saved:', settings);
     // Here you would typically save to backend
+    alert('Settings saved successfully!');
   };
 
   const handleSettingsReset = () => {
@@ -499,6 +536,7 @@ function AdminDashboard({ onBack }) {
       maintenanceMode: false,
       debugMode: false
     });
+    console.log('🔄 Settings reset to default');
   };
 
   const generateReport = (type) => {
@@ -521,6 +559,26 @@ function AdminDashboard({ onBack }) {
         )
       );
     }, 3000);
+    
+    console.log('📋 Report generation started:', type);
+  };
+
+  const downloadReport = (reportId) => {
+    const report = reports.find(r => r.id === reportId);
+    if (report) {
+      console.log('📥 Downloading report:', report.name);
+      // Here you would generate and download the actual report
+      alert(`Downloading ${report.name}...`);
+    }
+  };
+
+  const viewReport = (reportId) => {
+    const report = reports.find(r => r.id === reportId);
+    if (report) {
+      console.log('👁️ Viewing report:', report.name);
+      // Here you would show the report details
+      alert(`Viewing ${report.name}...`);
+    }
   };
 
   // Search and filter functions
@@ -670,15 +728,41 @@ function AdminDashboard({ onBack }) {
   const renderUserManagement = () => (
     <div className="user-management">
       <h3>👥 User Management</h3>
+      
+      <div className="user-actions-header">
+        <button onClick={() => setShowAddUser(true)} className="add-btn">➕ Add New User</button>
+        <div className="user-filters">
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="sort-select"
+          >
+            <option value="name">Sort by Name</option>
+            <option value="team">Sort by Team</option>
+            <option value="activity">Sort by Activity</option>
+            <option value="contributions">Sort by Contributions</option>
+          </select>
+        </div>
+      </div>
+
       <div className="user-list">
-        {users.map(user => (
+        {sortedUsers.map(user => (
           <div key={user.id} className="user-card">
             <div className="user-info">
               <h4>{user.name}</h4>
-              <p>{user.email}</p>
+              <p className="user-email">{user.email}</p>
+              <p className="user-username">@{user.username}</p>
               <div className="user-meta">
                 <span className={`status ${user.status.toLowerCase()}`}>{user.status}</span>
                 <span className="team">{user.team}</span>
+                <span className={`role ${user.role}`}>{user.role}</span>
               </div>
             </div>
             <div className="user-stats">
@@ -691,6 +775,14 @@ function AdminDashboard({ onBack }) {
                 <span className="value">{user.accuracy}%</span>
               </div>
               <div className="stat">
+                <span className="label">Contributions:</span>
+                <span className="value">{user.totalContributions}</span>
+              </div>
+              <div className="stat">
+                <span className="label">Joined:</span>
+                <span className="value">{new Date(user.joinDate).toLocaleDateString()}</span>
+              </div>
+              <div className="stat">
                 <span className="label">Last Active:</span>
                 <span className="value">{user.lastActivity}</span>
               </div>
@@ -698,10 +790,107 @@ function AdminDashboard({ onBack }) {
             <div className="user-actions">
               <button className="edit-btn" onClick={() => handleUserEdit(user)}>✏️ Edit</button>
               <button className="view-btn">👁️ View</button>
+              <button className="password-btn" onClick={() => handlePasswordReset(user.id)}>🔑 Reset Password</button>
+              <button className="role-btn" onClick={() => handleRoleChange(user.id, user.role === 'admin' ? 'citizen' : 'admin')}>
+                {user.role === 'admin' ? '👤 Make Citizen' : '👑 Make Admin'}
+              </button>
+              <button className="status-btn" onClick={() => handleStatusChange(user.id, user.status === 'active' ? 'inactive' : 'active')}>
+                {user.status === 'active' ? '⏸️ Deactivate' : '▶️ Activate'}
+              </button>
+              <button className="delete-btn" onClick={() => handleUserDelete(user.id)}>🗑️ Delete</button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Add User Modal */}
+      {showAddUser && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Add New User</h3>
+            <div className="form-group">
+              <label>Full Name:</label>
+              <input 
+                type="text" 
+                value={newUser.name}
+                onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                className="form-input"
+                placeholder="Enter full name..."
+              />
+            </div>
+            <div className="form-group">
+              <label>Email:</label>
+              <input 
+                type="email" 
+                value={newUser.email}
+                onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                className="form-input"
+                placeholder="Enter email address..."
+              />
+            </div>
+            <div className="form-group">
+              <label>Username:</label>
+              <input 
+                type="text" 
+                value={newUser.username}
+                onChange={(e) => setNewUser({...newUser, username: e.target.value})}
+                className="form-input"
+                placeholder="Enter username..."
+              />
+            </div>
+            <div className="form-group">
+              <label>Password:</label>
+              <input 
+                type="password" 
+                value={newUser.password}
+                onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                className="form-input"
+                placeholder="Enter password..."
+              />
+            </div>
+            <div className="form-group">
+              <label>Role:</label>
+              <select 
+                value={newUser.role}
+                onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                className="form-input"
+              >
+                <option value="citizen">Citizen Scientist</option>
+                <option value="moderator">Moderator</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Team:</label>
+              <select 
+                value={newUser.team}
+                onChange={(e) => setNewUser({...newUser, team: e.target.value})}
+                className="form-input"
+              >
+                <option value="Team Alpha">Team Alpha</option>
+                <option value="Team Beta">Team Beta</option>
+                <option value="Team Gamma">Team Gamma</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Status:</label>
+              <select 
+                value={newUser.status}
+                onChange={(e) => setNewUser({...newUser, status: e.target.value})}
+                className="form-input"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+            <div className="modal-actions">
+              <button onClick={handleAddUser} className="save-btn">💾 Add User</button>
+              <button onClick={() => setShowAddUser(false)} className="cancel-btn">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit User Modal */}
       {editingUser && (
@@ -718,6 +907,24 @@ function AdminDashboard({ onBack }) {
               />
             </div>
             <div className="form-group">
+              <label>Email:</label>
+              <input 
+                type="email" 
+                value={editingUser.email}
+                onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Username:</label>
+              <input 
+                type="text" 
+                value={editingUser.username}
+                onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
               <label>Team:</label>
               <select 
                 value={editingUser.team}
@@ -727,6 +934,18 @@ function AdminDashboard({ onBack }) {
                 <option>Team Alpha</option>
                 <option>Team Beta</option>
                 <option>Team Gamma</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Role:</label>
+              <select 
+                value={editingUser.role}
+                onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
+                className="form-input"
+              >
+                <option value="citizen">Citizen Scientist</option>
+                <option value="moderator">Moderator</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
             <div className="form-group">
@@ -742,7 +961,7 @@ function AdminDashboard({ onBack }) {
               </select>
             </div>
             <div className="modal-actions">
-              <button onClick={handleUserSave} className="save-btn">💾 Save</button>
+              <button onClick={handleUserSave} className="save-btn">💾 Save Changes</button>
               <button onClick={() => setEditingUser(null)} className="cancel-btn">❌ Cancel</button>
             </div>
           </div>
@@ -756,91 +975,94 @@ function AdminDashboard({ onBack }) {
       <h3>📈 Data Analytics</h3>
       
       <div className="analytics-overview">
-        <div className="overview-card">
-          <h4>Overall Statistics</h4>
-          <div className="overview-stats">
-            <div className="overview-stat">
-              <span className="label">Total Readings:</span>
-              <span className="value">567</span>
-            </div>
-            <div className="overview-stat">
-              <span className="label">Average Accuracy:</span>
-              <span className="value">91.3%</span>
-            </div>
-            <div className="overview-stat">
-              <span className="label">Top Performer:</span>
-              <span className="value">Lúcia Fernandes (89 readings)</span>
-            </div>
-            <div className="overview-stat">
-              <span className="label">Most Active Team:</span>
-              <span className="value">Team Beta</span>
-            </div>
+        <h4>Overall Statistics</h4>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h5>Total Readings</h5>
+            <div className="stat-value">{dataAnalytics.totalReadings}</div>
+            <div className="stat-label">Monitoring entries</div>
+          </div>
+          <div className="stat-card">
+            <h5>Average Accuracy</h5>
+            <div className="stat-value">{dataAnalytics.averageAccuracy}%</div>
+            <div className="stat-label">Data quality</div>
+          </div>
+          <div className="stat-card">
+            <h5>Top Performer</h5>
+            <div className="stat-value">{dataAnalytics.topPerformer}</div>
+            <div className="stat-label">{dataAnalytics.topPerformerReadings} readings</div>
+          </div>
+          <div className="stat-card">
+            <h5>Most Active Team</h5>
+            <div className="stat-value">{dataAnalytics.mostActiveTeam}</div>
+            <div className="stat-label">Highest participation</div>
           </div>
         </div>
       </div>
 
       <div className="monthly-trends">
         <h4>Monthly Trends</h4>
-        <div className="trends-grid">
-          <div className="trend-month">
-            <h5>January</h5>
-            <div className="trend-data">
-              <span>45 readings</span>
-              <span>88% accuracy</span>
+        <div className="trends-chart">
+          {dataAnalytics.monthlyTrends.map((trend, index) => (
+            <div key={index} className="trend-item">
+              <div className="trend-month">{trend.month}</div>
+              <div className="trend-bar">
+                <div 
+                  className="trend-fill" 
+                  style={{ 
+                    width: `${(trend.readings / 70) * 100}%`,
+                    backgroundColor: `hsl(${120 + (trend.accuracy - 80) * 2}, 70%, 50%)`
+                  }}
+                ></div>
+              </div>
+              <div className="trend-stats">
+                <span className="readings">{trend.readings} readings</span>
+                <span className="accuracy">{trend.accuracy}% accuracy</span>
+              </div>
             </div>
-          </div>
-          <div className="trend-month">
-            <h5>February</h5>
-            <div className="trend-data">
-              <span>52 readings</span>
-              <span>91% accuracy</span>
-            </div>
-          </div>
-          <div className="trend-month">
-            <h5>March</h5>
-            <div className="trend-data">
-              <span>48 readings</span>
-              <span>89% accuracy</span>
-            </div>
-          </div>
-          <div className="trend-month">
-            <h5>April</h5>
-            <div className="trend-data">
-              <span>61 readings</span>
-              <span>93% accuracy</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      <div className="quality-metrics">
+      <div className="data-quality">
         <h4>Data Quality Metrics</h4>
-        <div className="metrics-grid">
-          <div className="metric">
-            <span className="metric-label">Completeness</span>
-            <div className="progress-bar">
-              <div className="progress" style={{width: '95%'}}></div>
+        <div className="quality-metrics">
+          <div className="quality-item">
+            <span className="quality-label">Completeness</span>
+            <div className="quality-bar">
+              <div 
+                className="quality-fill" 
+                style={{ width: `${dataAnalytics.dataQuality.completeness}%` }}
+              ></div>
             </div>
-            <span className="metric-value">95%</span>
+            <span className="quality-value">{dataAnalytics.dataQuality.completeness}%</span>
           </div>
-          <div className="metric">
-            <span className="metric-label">Accuracy</span>
-            <div className="progress-bar">
-              <div className="progress" style={{width: '91%'}}></div>
+          <div className="quality-item">
+            <span className="quality-label">Accuracy</span>
+            <div className="quality-bar">
+              <div 
+                className="quality-fill" 
+                style={{ width: `${dataAnalytics.dataQuality.accuracy}%` }}
+              ></div>
             </div>
-            <span className="metric-value">91%</span>
+            <span className="quality-value">{dataAnalytics.dataQuality.accuracy}%</span>
           </div>
-          <div className="metric">
-            <span className="metric-label">Timeliness</span>
-            <div className="progress-bar">
-              <div className="progress" style={{width: '88%'}}></div>
+          <div className="quality-item">
+            <span className="quality-label">Timeliness</span>
+            <div className="quality-bar">
+              <div 
+                className="quality-fill" 
+                style={{ width: `${dataAnalytics.dataQuality.timeliness}%` }}
+              ></div>
             </div>
-            <span className="metric-value">88%</span>
+            <span className="quality-value">{dataAnalytics.dataQuality.timeliness}%</span>
           </div>
         </div>
         <div className="overall-quality">
           <span className="quality-label">Overall Quality:</span>
-          <span className="quality-value excellent">Excellent</span>
+          <span className={`quality-badge ${dataAnalytics.dataQuality.overall.toLowerCase()}`}>
+            {dataAnalytics.dataQuality.overall}
+          </span>
         </div>
       </div>
     </div>
@@ -963,11 +1185,23 @@ function AdminDashboard({ onBack }) {
         <h4>Recent Reports</h4>
         <div className="report-list">
           {reports.map(report => (
-            <div key={report.id} className={`report-item ${report.status.toLowerCase().replace(' ', '-')}`}>
-              <span className="report-name">{report.name}</span>
-              <span className={`report-status ${report.status.toLowerCase().replace(' ', '-')}`}>{report.status}</span>
-              <span className="report-date">{report.date}</span>
-              <button className="view-btn">View</button>
+            <div key={report.id} className="report-item">
+              <div className="report-info">
+                <h5>{report.name}</h5>
+                <p>Type: {report.type}</p>
+                <p>Date: {report.date}</p>
+              </div>
+              <div className="report-status">
+                <span className={`status-badge ${report.status.toLowerCase()}`}>
+                  {report.status}
+                </span>
+              </div>
+              <div className="report-actions">
+                <button onClick={() => viewReport(report.id)} className="view-btn">👁️ View</button>
+                {report.status === 'Completed' && (
+                  <button onClick={() => downloadReport(report.id)} className="download-btn">📥 Download</button>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -1106,6 +1340,257 @@ function AdminDashboard({ onBack }) {
     </div>
   );
 
+  const renderUpdatesManagement = () => (
+    <div className="updates-management">
+      <h3>📢 Update Management</h3>
+      
+      <div className="update-actions-header">
+        <button onClick={() => setShowAddUpdate(true)} className="add-btn">➕ Add New Update</button>
+        <div className="update-filters">
+          <input
+            type="text"
+            placeholder="Search updates..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="sort-select"
+          >
+            <option value="date">Sort by Date</option>
+            <option value="priority">Sort by Priority</option>
+            <option value="views">Sort by Views</option>
+            <option value="type">Sort by Type</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="update-list">
+        {sortedUpdates.map(update => (
+          <div key={update.id} className="update-item">
+            <div className="update-header">
+              <h5>{update.title}</h5>
+              <div className="update-meta">
+                <span className="update-type">{update.type}</span>
+                <span className={`update-priority ${update.priority}`}>{update.priority}</span>
+                <span className={`update-status ${update.status}`}>{update.status}</span>
+              </div>
+            </div>
+            <div className="update-content">
+              <p>{update.content}</p>
+              {update.media && update.media.length > 0 && (
+                <div className="update-media">
+                  <h6>Media:</h6>
+                  <ul>
+                    {update.media.map((url, index) => (
+                      <li key={index}>
+                        <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div className="update-tags">
+                {update.tags.map((tag, index) => (
+                  <span key={index} className="tag">{tag}</span>
+                ))}
+              </div>
+            </div>
+            <div className="update-stats">
+              <span className="views">👁️ {update.viewCount} views</span>
+              <span className="date">📅 {new Date(update.createdAt).toLocaleDateString()}</span>
+              {update.scheduledDate && (
+                <span className="scheduled">⏰ Scheduled: {new Date(update.scheduledDate).toLocaleDateString()}</span>
+              )}
+            </div>
+            <div className="update-actions">
+              <button onClick={() => handleUpdateEdit(update)} className="edit-btn">✏️ Edit</button>
+              <button onClick={() => handleUpdateDelete(update.id)} className="delete-btn">🗑️ Delete</button>
+              {update.status === 'scheduled' && (
+                <button onClick={() => handlePublishUpdate(update.id)} className="publish-btn">📢 Publish Now</button>
+              )}
+              {update.status === 'published' && (
+                <button onClick={() => handleScheduleUpdate(update.id, update.scheduledDate)} className="schedule-btn">📅 Reschedule</button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Add Update Modal */}
+      {showAddUpdate && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Add New Update</h3>
+            <div className="form-group">
+              <label>Title:</label>
+              <input 
+                type="text" 
+                value={newUpdate.title}
+                onChange={(e) => setNewUpdate({...newUpdate, title: e.target.value})}
+                className="form-input"
+                placeholder="Enter update title..."
+              />
+            </div>
+            <div className="form-group">
+              <label>Content:</label>
+              <textarea 
+                value={newUpdate.content}
+                onChange={(e) => setNewUpdate({...newUpdate, content: e.target.value})}
+                className="form-input"
+                placeholder="Enter update content..."
+                rows="4"
+              />
+            </div>
+            <div className="form-group">
+              <label>Type:</label>
+              <select 
+                value={newUpdate.type}
+                onChange={(e) => setNewUpdate({...newUpdate, type: e.target.value})}
+                className="form-input"
+              >
+                <option>Announcement</option>
+                <option>News</option>
+                <option>Alert</option>
+                <option>Information</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Priority:</label>
+              <select 
+                value={newUpdate.priority}
+                onChange={(e) => setNewUpdate({...newUpdate, priority: e.target.value})}
+                className="form-input"
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+                <option>Critical</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Scheduled Date:</label>
+              <input 
+                type="date" 
+                value={newUpdate.scheduledDate}
+                onChange={(e) => setNewUpdate({...newUpdate, scheduledDate: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Expiration Date:</label>
+              <input 
+                type="date" 
+                value={newUpdate.expirationDate}
+                onChange={(e) => setNewUpdate({...newUpdate, expirationDate: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Auto-expire:</label>
+              <input 
+                type="checkbox" 
+                checked={newUpdate.autoExpire}
+                onChange={(e) => setNewUpdate({...newUpdate, autoExpire: e.target.checked})}
+                className="form-checkbox"
+              />
+            </div>
+            <div className="modal-actions">
+              <button onClick={handleAddUpdate} className="save-btn">💾 Add Update</button>
+              <button onClick={() => setShowAddUpdate(false)} className="cancel-btn">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Update Modal */}
+      {editingUpdate && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Edit Update: {editingUpdate.title}</h3>
+            <div className="form-group">
+              <label>Title:</label>
+              <input 
+                type="text" 
+                value={editingUpdate.title}
+                onChange={(e) => setEditingUpdate({...editingUpdate, title: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Content:</label>
+              <textarea 
+                value={editingUpdate.content}
+                onChange={(e) => setEditingUpdate({...editingUpdate, content: e.target.value})}
+                className="form-input"
+                rows="4"
+              />
+            </div>
+            <div className="form-group">
+              <label>Type:</label>
+              <select 
+                value={editingUpdate.type}
+                onChange={(e) => setEditingUpdate({...editingUpdate, type: e.target.value})}
+                className="form-input"
+              >
+                <option>Announcement</option>
+                <option>News</option>
+                <option>Alert</option>
+                <option>Information</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Priority:</label>
+              <select 
+                value={editingUpdate.priority}
+                onChange={(e) => setEditingUpdate({...editingUpdate, priority: e.target.value})}
+                className="form-input"
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+                <option>Critical</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Scheduled Date:</label>
+              <input 
+                type="date" 
+                value={editingUpdate.scheduledDate}
+                onChange={(e) => setEditingUpdate({...editingUpdate, scheduledDate: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Expiration Date:</label>
+              <input 
+                type="date" 
+                value={editingUpdate.expirationDate}
+                onChange={(e) => setEditingUpdate({...editingUpdate, expirationDate: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Auto-expire:</label>
+              <input 
+                type="checkbox" 
+                checked={editingUpdate.autoExpire}
+                onChange={(e) => setEditingUpdate({...editingUpdate, autoExpire: e.target.checked})}
+                className="form-checkbox"
+              />
+            </div>
+            <div className="modal-actions">
+              <button onClick={handleUpdateSave} className="save-btn">💾 Save Changes</button>
+              <button onClick={() => setEditingUpdate(null)} className="cancel-btn">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const renderMainContent = () => {
     console.log('🔍 Rendering main content for tab:', activeTab);
     
@@ -1128,6 +1613,9 @@ function AdminDashboard({ onBack }) {
       case 'faqs':
         console.log('❓ Rendering FAQs tab');
         return renderFAQManagement();
+      case 'updates':
+        console.log('📢 Rendering updates tab');
+        return renderUpdatesManagement();
       default:
         console.log('📊 Defaulting to dashboard tab');
         return renderDashboard();
@@ -1175,6 +1663,12 @@ function AdminDashboard({ onBack }) {
             onClick={() => setActiveTab('faqs')}
           >
             ❓ FAQs
+          </button>
+          <button 
+            className={`nav-btn ${activeTab === 'updates' ? 'active' : ''}`}
+            onClick={() => setActiveTab('updates')}
+          >
+            📢 Updates
           </button>
         </div>
       </div>
