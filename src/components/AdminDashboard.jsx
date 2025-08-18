@@ -12,6 +12,8 @@ function AdminDashboard({ onBack }) {
   const [showAddFaq, setShowAddFaq] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
   const [showAddUpdate, setShowAddUpdate] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [newFaq, setNewFaq] = useState({ 
     category: 'ESCOM Organization', 
     subcategory: 'General',
@@ -101,135 +103,157 @@ function AdminDashboard({ onBack }) {
   }, []);
 
   const loadDashboardData = async () => {
-    console.log('🔄 Loading demo data...');
-    
-    // Enhanced demo data
-    setUsers([
-      { 
-        id: 1, 
-        name: 'Lúcia Fernandes', 
-        email: 'lucia@example.com', 
-        username: 'lucia.fernandes',
-        team: 'Team Beta', 
-        status: 'active', 
-        role: 'citizen',
-        readings: 89, 
-        accuracy: 94, 
-        lastActivity: '2 hours ago',
-        joinDate: '2024-01-15',
-        totalContributions: 156
-      },
-      { 
-        id: 2, 
-        name: 'Carlos Silva', 
-        email: 'carlos@example.com', 
-        username: 'carlos.silva',
-        team: 'Team Alpha', 
-        status: 'active', 
-        role: 'moderator',
-        readings: 67, 
-        accuracy: 91, 
-        lastActivity: '1 day ago',
-        joinDate: '2024-01-10',
-        totalContributions: 98
-      },
-      { 
-        id: 3, 
-        name: 'Maria Santos', 
-        email: 'maria@example.com', 
-        username: 'maria.santos',
-        team: 'Team Gamma', 
-        status: 'active', 
-        role: 'citizen',
-        readings: 78, 
-        accuracy: 89, 
-        lastActivity: '3 hours ago',
-        joinDate: '2024-01-20',
-        totalContributions: 134
-      }
-    ]);
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🔄 Loading demo data...');
+      
+      // Enhanced demo data
+      const demoUsers = [
+        { 
+          id: 1, 
+          name: 'Lúcia Fernandes', 
+          email: 'lucia@example.com', 
+          username: 'lucia.fernandes',
+          team: 'Team Beta', 
+          status: 'active', 
+          role: 'citizen',
+          readings: 89, 
+          accuracy: 94, 
+          lastActivity: '2 hours ago',
+          joinDate: '2024-01-15',
+          totalContributions: 156
+        },
+        { 
+          id: 2, 
+          name: 'Carlos Silva', 
+          email: 'carlos@example.com', 
+          username: 'carlos.silva',
+          team: 'Team Alpha', 
+          status: 'active', 
+          role: 'moderator',
+          readings: 67, 
+          accuracy: 91, 
+          lastActivity: '1 day ago',
+          joinDate: '2024-01-10',
+          totalContributions: 98
+        },
+        { 
+          id: 3, 
+          name: 'Maria Santos', 
+          email: 'maria@example.com', 
+          username: 'maria.santos',
+          team: 'Team Gamma', 
+          status: 'active', 
+          role: 'citizen',
+          readings: 78, 
+          accuracy: 89, 
+          lastActivity: '3 hours ago',
+          joinDate: '2024-01-20',
+          totalContributions: 134
+        }
+      ];
 
-    setFaqs([
-      { 
-        id: 1, 
-        category: 'ESCOM Organization', 
-        subcategory: 'Getting Involved',
-        question: 'How can I get involved with ESCOM?', 
-        answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.',
-        priority: 'high',
-        tags: ['getting-started', 'volunteer', 'training'],
-        media: ['https://example.com/image1.jpg'],
-        importance: 'critical',
-        viewCount: 156,
-        createdAt: '2024-01-15',
-        updatedAt: '2024-01-18'
-      },
-      { 
-        id: 2, 
-        category: 'Monitoring', 
-        subcategory: 'Equipment',
-        question: 'What parameters do we monitor?', 
-        answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.',
-        priority: 'medium',
-        tags: ['monitoring', 'equipment', 'parameters'],
-        media: [],
-        importance: 'normal',
-        viewCount: 89,
-        createdAt: '2024-01-10',
-        updatedAt: '2024-01-10'
-      }
-    ]);
+      const demoFaqs = [
+        { 
+          id: 1, 
+          category: 'ESCOM Organization', 
+          subcategory: 'Getting Involved',
+          question: 'How can I get involved with ESCOM?', 
+          answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.',
+          priority: 'high',
+          tags: ['getting-started', 'volunteer', 'training'],
+          media: ['https://example.com/image1.jpg'],
+          importance: 'critical',
+          viewCount: 156,
+          createdAt: '2024-01-15',
+          updatedAt: '2024-01-18'
+        },
+        { 
+          id: 2, 
+          category: 'Monitoring', 
+          subcategory: 'Equipment',
+          question: 'What parameters do we monitor?', 
+          answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.',
+          priority: 'medium',
+          tags: ['monitoring', 'equipment', 'parameters'],
+          media: [],
+          importance: 'normal',
+          viewCount: 89,
+          createdAt: '2024-01-10',
+          updatedAt: '2024-01-10'
+        }
+      ];
 
-    setUpdates([
-      {
-        id: 1,
-        title: 'New Monitoring Equipment Available',
-        content: 'We have received new water quality monitoring equipment. Training sessions will be scheduled next week.',
-        type: 'announcement',
-        priority: 'high',
-        tags: ['equipment', 'training', 'monitoring'],
-        media: ['https://example.com/equipment.jpg'],
-        scheduledDate: '2024-01-20',
-        expirationDate: '2024-02-20',
-        autoExpire: true,
-        status: 'published',
-        createdAt: '2024-01-18',
-        viewCount: 234
-      },
-      {
-        id: 2,
-        title: 'Monthly Data Review Meeting',
-        content: 'Join us for our monthly data review meeting to discuss findings and plan future monitoring activities.',
-        type: 'news',
-        priority: 'normal',
-        tags: ['meeting', 'data-review', 'planning'],
-        media: [],
-        scheduledDate: '2024-01-25',
-        expirationDate: '',
-        autoExpire: false,
-        status: 'scheduled',
-        createdAt: '2024-01-19',
-        viewCount: 67
-      }
-    ]);
+      const demoUpdates = [
+        {
+          id: 1,
+          title: 'New Monitoring Equipment Available',
+          content: 'We have received new water quality monitoring equipment. Training sessions will be scheduled next week.',
+          type: 'announcement',
+          priority: 'high',
+          tags: ['equipment', 'training', 'monitoring'],
+          media: ['https://example.com/equipment.jpg'],
+          scheduledDate: '2024-01-20',
+          expirationDate: '2024-02-20',
+          autoExpire: true,
+          status: 'published',
+          createdAt: '2024-01-18',
+          viewCount: 234
+        },
+        {
+          id: 2,
+          title: 'Monthly Data Review Meeting',
+          content: 'Join us for our monthly data review meeting to discuss findings and plan future monitoring activities.',
+          type: 'news',
+          priority: 'normal',
+          tags: ['meeting', 'data-review', 'planning'],
+          media: [],
+          scheduledDate: '2024-01-25',
+          expirationDate: '',
+          autoExpire: false,
+          status: 'scheduled',
+          createdAt: '2024-01-19',
+          viewCount: 67
+        }
+      ];
 
-    setSystemStats({
-      totalUsers: 11,
-      activeUsers: 8,
-      totalReadings: 567,
-      averageAccuracy: 91.3,
-      newThisMonth: 3,
-      systemHealth: 'Excellent',
-      totalFAQs: 5,
-      totalUpdates: 2,
-      pendingApprovals: 0
-    });
-    
-    console.log('✅ Dashboard data loaded successfully');
-    console.log('👥 Users loaded:', 3);
-    console.log('❓ FAQs loaded:', 2);
-    console.log('📢 Updates loaded:', 2);
-    console.log('📊 Stats loaded:', systemStats);
+      const demoStats = {
+        totalUsers: 11,
+        activeUsers: 8,
+        totalReadings: 567,
+        averageAccuracy: 91.3,
+        newThisMonth: 3,
+        systemHealth: 'Excellent',
+        totalFAQs: 5,
+        totalUpdates: 2,
+        pendingApprovals: 0
+      };
+
+      console.log('📊 Setting users...');
+      setUsers(demoUsers);
+      
+      console.log('❓ Setting FAQs...');
+      setFaqs(demoFaqs);
+      
+      console.log('📢 Setting updates...');
+      setUpdates(demoUpdates);
+      
+      console.log('📈 Setting stats...');
+      setSystemStats(demoStats);
+      
+      console.log('✅ Dashboard data loaded successfully');
+      console.log('👥 Users loaded:', demoUsers.length);
+      console.log('❓ FAQs loaded:', demoFaqs.length);
+      console.log('📢 Updates loaded:', demoUpdates.length);
+      console.log('📊 Stats loaded:', demoStats);
+      
+    } catch (error) {
+      console.error('❌ Error loading dashboard data:', error);
+      setError('Error loading dashboard data. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFaqEdit = (faq) => {
@@ -651,35 +675,40 @@ function AdminDashboard({ onBack }) {
 
   const renderDashboard = () => (
     <div className="admin-dashboard">
+      <div className="dashboard-header">
+        <h3>📊 System Overview</h3>
+        <p>Welcome to the ESCOM Citizen Scientist Admin Dashboard</p>
+      </div>
+
       <div className="stats-grid">
         <div className="stat-card">
           <h3>Total Users</h3>
-          <div className="stat-value">{systemStats.totalUsers}</div>
+          <div className="stat-value">{systemStats.totalUsers || 0}</div>
           <div className="stat-label">1 admin + 10 citizens</div>
         </div>
         <div className="stat-card">
           <h3>Active Users</h3>
-          <div className="stat-value">{systemStats.activeUsers}</div>
+          <div className="stat-value">{systemStats.activeUsers || 0}</div>
           <div className="stat-label">Real-time active</div>
         </div>
         <div className="stat-card">
           <h3>Total Readings</h3>
-          <div className="stat-value">{systemStats.totalReadings}</div>
+          <div className="stat-value">{systemStats.totalReadings || 0}</div>
           <div className="stat-label">Monitoring data</div>
         </div>
         <div className="stat-card">
           <h3>Average Accuracy</h3>
-          <div className="stat-value">{systemStats.averageAccuracy}%</div>
+          <div className="stat-value">{systemStats.averageAccuracy || 0}%</div>
           <div className="stat-label">Data quality</div>
         </div>
         <div className="stat-card">
           <h3>New This Month</h3>
-          <div className="stat-value">{systemStats.newThisMonth}</div>
+          <div className="stat-value">{systemStats.newThisMonth || 0}</div>
           <div className="stat-label">Registrations</div>
         </div>
         <div className="stat-card">
           <h3>System Health</h3>
-          <div className="stat-value">{systemStats.systemHealth}</div>
+          <div className="stat-value">{systemStats.systemHealth || 'Checking...'}</div>
           <div className="stat-label">Status</div>
         </div>
       </div>
@@ -719,6 +748,24 @@ function AdminDashboard({ onBack }) {
             <span className="activity-icon">❓</span>
             <span className="activity-text">FAQ updated: Equipment calibration</span>
             <span className="activity-time">1 day ago</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="data-summary">
+        <h3>Data Summary</h3>
+        <div className="summary-grid">
+          <div className="summary-item">
+            <span className="summary-label">Total FAQs:</span>
+            <span className="summary-value">{faqs.length || 0}</span>
+          </div>
+          <div className="summary-item">
+            <span className="summary-label">Total Updates:</span>
+            <span className="summary-value">{updates.length || 0}</span>
+          </div>
+          <div className="summary-item">
+            <span className="summary-label">Pending Approvals:</span>
+            <span className="summary-value">{systemStats.pendingApprovals || 0}</span>
           </div>
         </div>
       </div>
@@ -1674,7 +1721,14 @@ function AdminDashboard({ onBack }) {
       </div>
 
       <div className="admin-content">
-        {renderMainContent()}
+        {loading ? (
+          <div className="loading-state">
+            <p>Loading dashboard data...</p>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+          </div>
+        ) : (
+          renderMainContent()
+        )}
       </div>
     </div>
   );
