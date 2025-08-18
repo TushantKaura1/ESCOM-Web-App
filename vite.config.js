@@ -7,14 +7,18 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'terser',
+    minify: 'esbuild', // Use esbuild instead of terser to avoid Rollup issues
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
         },
       },
+      // External dependencies to avoid Rollup issues
+      external: [],
     },
+    // Target modern browsers to avoid compatibility issues
+    target: 'es2015',
   },
   server: {
     port: 3000,
@@ -23,5 +27,9 @@ export default defineConfig({
   preview: {
     port: 3000,
     host: true,
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
   },
 })

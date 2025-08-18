@@ -1,7 +1,16 @@
 // Configuration file for API endpoints
 const config = {
-  // API Base URL - Always use Render backend for production
-  API_BASE_URL: 'https://citiscience-backend-95pp.onrender.com',
+  // API Base URL - Dynamic based on environment
+  get API_BASE_URL() {
+    // Check if we're in production (Netlify)
+    if (typeof window !== 'undefined' && window.location.hostname.includes('netlify.app')) {
+      // Production: Use Render backend
+      return 'https://citiscience-backend-95pp.onrender.com';
+    }
+    
+    // Development: Use local backend or Render backend
+    return 'https://citiscience-backend-95pp.onrender.com';
+  },
   
   // App Configuration
   APP_NAME: 'ESCOM Citizen Scientist',
