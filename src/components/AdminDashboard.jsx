@@ -5,32 +5,58 @@ function AdminDashboard({ onBack }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [users, setUsers] = useState([]);
   const [faqs, setFaqs] = useState([]);
+  const [updates, setUpdates] = useState([]);
   const [editingFaq, setEditingFaq] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [editingUpdate, setEditingUpdate] = useState(null);
   const [showAddFaq, setShowAddFaq] = useState(false);
-  const [newFaq, setNewFaq] = useState({ category: 'ESCOM Organization', question: '', answer: '' });
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [showAddUpdate, setShowAddUpdate] = useState(false);
+  const [newFaq, setNewFaq] = useState({ 
+    category: 'ESCOM Organization', 
+    subcategory: 'General',
+    question: '', 
+    answer: '',
+    priority: 'medium',
+    tags: [],
+    media: [],
+    importance: 'normal'
+  });
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    username: '',
+    password: '',
+    role: 'citizen',
+    team: 'Team Alpha',
+    status: 'active'
+  });
+  const [newUpdate, setNewUpdate] = useState({
+    title: '',
+    content: '',
+    type: 'announcement',
+    priority: 'normal',
+    tags: [],
+    media: [],
+    scheduledDate: '',
+    expirationDate: '',
+    autoExpire: false
+  });
   const [systemStats, setSystemStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
     totalReadings: 0,
     averageAccuracy: 0,
     newThisMonth: 0,
-    systemHealth: 'Excellent'
+    systemHealth: 'Excellent',
+    totalFAQs: 0,
+    totalUpdates: 0,
+    pendingApprovals: 0
   });
-  const [settings, setSettings] = useState({
-    notifications: true,
-    autoBackup: true,
-    dataRetention: '2 years',
-    privacyMode: false,
-    maintenanceMode: false,
-    debugMode: false
-  });
-  const [reports, setReports] = useState([
-    { id: 1, name: 'Monthly Activity Report', status: 'Completed', date: '2024-01-20', type: 'Monthly Activity' },
-    { id: 2, name: 'User Performance Report', status: 'Completed', date: '2024-01-19', type: 'User Performance' },
-    { id: 3, name: 'Data Quality Report', status: 'In Progress', date: '2024-01-20', type: 'Data Quality' },
-    { id: 4, name: 'System Health Report', status: 'Scheduled', date: '2024-01-21', type: 'System Health' }
-  ]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
+  const [viewMode, setViewMode] = useState('grid'); // grid or list
 
   useEffect(() => {
     console.log('👑 AdminDashboard component mounted');
@@ -40,21 +66,115 @@ function AdminDashboard({ onBack }) {
 
   const loadDashboardData = async () => {
     console.log('🔄 Loading demo data...');
-    // Load demo data for now
+    
+    // Enhanced demo data
     setUsers([
-      { id: 1, name: 'Lúcia Fernandes', email: 'lucia@example.com', team: 'Team Beta', status: 'Active', readings: 89, accuracy: 94, lastActivity: '2 hours ago' },
-      { id: 2, name: 'Carlos Silva', email: 'carlos@example.com', team: 'Team Alpha', status: 'Active', readings: 67, accuracy: 91, lastActivity: '1 day ago' },
-      { id: 3, name: 'Maria Santos', email: 'maria@example.com', team: 'Team Gamma', status: 'Active', readings: 78, accuracy: 89, lastActivity: '3 hours ago' },
-      { id: 4, name: 'João Costa', email: 'joao@example.com', team: 'Team Beta', status: 'Inactive', readings: 45, accuracy: 87, lastActivity: '1 week ago' },
-      { id: 5, name: 'Ana Oliveira', email: 'ana@example.com', team: 'Team Alpha', status: 'Active', readings: 92, accuracy: 96, lastActivity: '5 hours ago' }
+      { 
+        id: 1, 
+        name: 'Lúcia Fernandes', 
+        email: 'lucia@example.com', 
+        username: 'lucia.fernandes',
+        team: 'Team Beta', 
+        status: 'active', 
+        role: 'citizen',
+        readings: 89, 
+        accuracy: 94, 
+        lastActivity: '2 hours ago',
+        joinDate: '2024-01-15',
+        totalContributions: 156
+      },
+      { 
+        id: 2, 
+        name: 'Carlos Silva', 
+        email: 'carlos@example.com', 
+        username: 'carlos.silva',
+        team: 'Team Alpha', 
+        status: 'active', 
+        role: 'moderator',
+        readings: 67, 
+        accuracy: 91, 
+        lastActivity: '1 day ago',
+        joinDate: '2024-01-10',
+        totalContributions: 98
+      },
+      { 
+        id: 3, 
+        name: 'Maria Santos', 
+        email: 'maria@example.com', 
+        username: 'maria.santos',
+        team: 'Team Gamma', 
+        status: 'active', 
+        role: 'citizen',
+        readings: 78, 
+        accuracy: 89, 
+        lastActivity: '3 hours ago',
+        joinDate: '2024-01-20',
+        totalContributions: 134
+      }
     ]);
 
     setFaqs([
-      { id: 1, category: 'ESCOM Organization', question: 'How can I get involved with ESCOM?', answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.' },
-      { id: 2, category: 'Monitoring', question: 'What parameters do we monitor?', answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.' },
-      { id: 3, category: 'Training', question: 'How do I calibrate my monitoring equipment?', answer: 'Equipment calibration should be done monthly using the calibration kit provided.' },
-      { id: 4, category: 'Data', question: 'How often should I submit data?', answer: 'Data should be submitted immediately after each monitoring session, typically monthly.' },
-      { id: 5, category: 'Partners', question: 'Who are our research partners?', answer: 'We collaborate with Dalhousie University, local environmental organizations, and government agencies.' }
+      { 
+        id: 1, 
+        category: 'ESCOM Organization', 
+        subcategory: 'Getting Involved',
+        question: 'How can I get involved with ESCOM?', 
+        answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.',
+        priority: 'high',
+        tags: ['getting-started', 'volunteer', 'training'],
+        media: ['https://example.com/image1.jpg'],
+        importance: 'critical',
+        viewCount: 156,
+        createdAt: '2024-01-15',
+        updatedAt: '2024-01-18'
+      },
+      { 
+        id: 2, 
+        category: 'Monitoring', 
+        subcategory: 'Equipment',
+        question: 'What parameters do we monitor?', 
+        answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.',
+        priority: 'medium',
+        tags: ['monitoring', 'equipment', 'parameters'],
+        media: [],
+        importance: 'normal',
+        viewCount: 89,
+        createdAt: '2024-01-10',
+        updatedAt: '2024-01-10'
+      }
+    ]);
+
+    setUpdates([
+      {
+        id: 1,
+        title: 'New Monitoring Equipment Available',
+        content: 'We have received new water quality monitoring equipment. Training sessions will be scheduled next week.',
+        type: 'announcement',
+        priority: 'high',
+        tags: ['equipment', 'training', 'monitoring'],
+        media: ['https://example.com/equipment.jpg'],
+        scheduledDate: '2024-01-20',
+        expirationDate: '2024-02-20',
+        autoExpire: true,
+        status: 'published',
+        createdAt: '2024-01-18',
+        viewCount: 234
+      },
+      {
+        id: 2,
+        title: 'Monthly Data Review Meeting',
+        content: 'Join us for our monthly data review meeting to discuss findings and plan future monitoring activities.',
+        type: 'news',
+        priority: 'normal',
+        tags: ['meeting', 'data-review', 'planning'],
+        media: [],
+        scheduledDate: '2024-01-25',
+        expirationDate: '',
+        autoExpire: false,
+        status: 'scheduled',
+        createdAt: '2024-01-19',
+        viewCount: 67
+      }
     ]);
 
     setSystemStats({
@@ -63,12 +183,16 @@ function AdminDashboard({ onBack }) {
       totalReadings: 567,
       averageAccuracy: 91.3,
       newThisMonth: 3,
-      systemHealth: 'Excellent'
+      systemHealth: 'Excellent',
+      totalFAQs: 5,
+      totalUpdates: 2,
+      pendingApprovals: 0
     });
     
     console.log('✅ Dashboard data loaded successfully');
-    console.log('👥 Users loaded:', 5);
-    console.log('❓ FAQs loaded:', 5);
+    console.log('👥 Users loaded:', 3);
+    console.log('❓ FAQs loaded:', 2);
+    console.log('📢 Updates loaded:', 2);
     console.log('📊 Stats loaded:', systemStats);
   };
 
@@ -80,8 +204,9 @@ function AdminDashboard({ onBack }) {
   const handleFaqSave = () => {
     console.log('💾 Saving FAQ changes...');
     if (editingFaq) {
+      const updatedFaq = { ...editingFaq, updatedAt: new Date().toISOString() };
       setFaqs(faqs.map(faq => 
-        faq.id === editingFaq.id ? editingFaq : faq
+        faq.id === editingFaq.id ? updatedFaq : faq
       ));
       setEditingFaq(null);
       console.log('✅ FAQ saved successfully');
@@ -90,16 +215,42 @@ function AdminDashboard({ onBack }) {
 
   const handleFaqDelete = (faqId) => {
     console.log('🗑️ Deleting FAQ:', faqId);
-    setFaqs(faqs.filter(faq => faq.id !== faqId));
-    console.log('✅ FAQ deleted successfully');
+    if (window.confirm('Are you sure you want to delete this FAQ? This action cannot be undone.')) {
+      setFaqs(faqs.filter(faq => faq.id !== faqId));
+      console.log('✅ FAQ deleted successfully');
+    }
+  };
+
+  const handleFaqArchive = (faqId) => {
+    console.log('📦 Archiving FAQ:', faqId);
+    setFaqs(faqs.map(faq => 
+      faq.id === faqId ? { ...faq, status: 'archived' } : faq
+    ));
+    console.log('✅ FAQ archived successfully');
   };
 
   const handleAddFaq = () => {
     console.log('➕ Adding new FAQ:', newFaq);
     if (newFaq.question && newFaq.answer) {
-      const newFaqWithId = { ...newFaq, id: Date.now() };
+      const newFaqWithId = { 
+        ...newFaq, 
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        viewCount: 0,
+        status: 'active'
+      };
       setFaqs([...faqs, newFaqWithId]);
-      setNewFaq({ category: 'ESCOM Organization', question: '', answer: '' });
+      setNewFaq({ 
+        category: 'ESCOM Organization', 
+        subcategory: 'General',
+        question: '', 
+        answer: '',
+        priority: 'medium',
+        tags: [],
+        media: [],
+        importance: 'normal'
+      });
       setShowAddFaq(false);
       console.log('✅ New FAQ added successfully');
     } else {
@@ -107,16 +258,230 @@ function AdminDashboard({ onBack }) {
     }
   };
 
+  const handleAddTag = (faqId, tag) => {
+    if (tag.trim()) {
+      setFaqs(faqs.map(faq => 
+        faq.id === faqId 
+          ? { ...faq, tags: [...faq.tags, tag.trim()] }
+          : faq
+      ));
+    }
+  };
+
+  const handleRemoveTag = (faqId, tagToRemove) => {
+    setFaqs(faqs.map(faq => 
+      faq.id === faqId 
+        ? { ...faq, tags: faq.tags.filter(tag => tag !== tagToRemove) }
+        : faq
+    ));
+  };
+
+  const handleAddMedia = (faqId, mediaUrl) => {
+    if (mediaUrl.trim()) {
+      setFaqs(faqs.map(faq => 
+        faq.id === faqId 
+          ? { ...faq, media: [...faq.media, mediaUrl.trim()] }
+          : faq
+      ));
+    }
+  };
+
+  const handleRemoveMedia = (faqId, mediaToRemove) => {
+    setFaqs(faqs.map(faq => 
+      faq.id === faqId 
+        ? { ...faq, media: faq.media.filter(media => media !== mediaToRemove) }
+        : faq
+    ));
+  };
+
+  const handleUpdateEdit = (update) => {
+    console.log('✏️ Editing update:', update);
+    setEditingUpdate({ ...update });
+  };
+
+  const handleUpdateSave = () => {
+    console.log('💾 Saving update changes...');
+    if (editingUpdate) {
+      const updatedUpdate = { ...editingUpdate, updatedAt: new Date().toISOString() };
+      setUpdates(updates.map(update => 
+        update.id === editingUpdate.id ? updatedUpdate : update
+      ));
+      setEditingUpdate(null);
+      console.log('✅ Update saved successfully');
+    }
+  };
+
+  const handleUpdateDelete = (updateId) => {
+    console.log('🗑️ Deleting update:', updateId);
+    if (window.confirm('Are you sure you want to delete this update? This action cannot be undone.')) {
+      setUpdates(updates.filter(update => update.id !== updateId));
+      console.log('✅ Update deleted successfully');
+    }
+  };
+
+  const handleAddUpdate = () => {
+    console.log('➕ Adding new update:', newUpdate);
+    if (newUpdate.title && newUpdate.content) {
+      const newUpdateWithId = {
+        ...newUpdate,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        viewCount: 0,
+        status: newUpdate.scheduledDate ? 'scheduled' : 'published'
+      };
+      setUpdates([...updates, newUpdateWithId]);
+      setNewUpdate({
+        title: '',
+        content: '',
+        type: 'announcement',
+        priority: 'normal',
+        tags: [],
+        media: [],
+        scheduledDate: '',
+        expirationDate: '',
+        autoExpire: false
+      });
+      setShowAddUpdate(false);
+      console.log('✅ New update added successfully');
+    } else {
+      console.log('❌ Update validation failed - missing title or content');
+    }
+  };
+
+  const handleScheduleUpdate = (updateId, scheduledDate) => {
+    console.log('📅 Scheduling update:', updateId, 'for:', scheduledDate);
+    setUpdates(updates.map(update => 
+      update.id === updateId 
+        ? { ...update, scheduledDate, status: 'scheduled', updatedAt: new Date().toISOString() }
+        : update
+    ));
+    console.log('✅ Update scheduled successfully');
+  };
+
+  const handlePublishUpdate = (updateId) => {
+    console.log('📢 Publishing update:', updateId);
+    setUpdates(updates.map(update => 
+      update.id === updateId 
+        ? { ...update, status: 'published', scheduledDate: '', updatedAt: new Date().toISOString() }
+        : update
+    ));
+    console.log('✅ Update published successfully');
+  };
+
+  const handleAddUpdateTag = (updateId, tag) => {
+    if (tag.trim()) {
+      setUpdates(updates.map(update => 
+        update.id === updateId 
+          ? { ...update, tags: [...update.tags, tag.trim()] }
+          : update
+      ));
+    }
+  };
+
+  const handleRemoveUpdateTag = (updateId, tagToRemove) => {
+    setUpdates(updates.map(update => 
+      update.id === updateId 
+        ? { ...update, tags: update.tags.filter(tag => tag !== tagToRemove) }
+        : update
+    ));
+  };
+
+  const handleAddUpdateMedia = (updateId, mediaUrl) => {
+    if (mediaUrl.trim()) {
+      setUpdates(updates.map(update => 
+        update.id === updateId 
+          ? { ...update, media: [...update.media, mediaUrl.trim()] }
+          : update
+      ));
+    }
+  };
+
+  const handleRemoveUpdateMedia = (updateId, mediaToRemove) => {
+    setUpdates(updates.map(update => 
+      update.id === updateId 
+        ? { ...update, media: update.media.filter(media => media !== mediaToRemove) }
+        : update
+    ));
+  };
+
   const handleUserEdit = (user) => {
+    console.log('✏️ Editing user:', user);
     setEditingUser({ ...user });
   };
 
   const handleUserSave = () => {
+    console.log('💾 Saving user changes...');
     if (editingUser) {
+      const updatedUser = { ...editingUser, lastUpdated: new Date().toISOString() };
       setUsers(users.map(user => 
-        user.id === editingUser.id ? editingUser : user
+        user.id === editingUser.id ? updatedUser : user
       ));
       setEditingUser(null);
+      console.log('✅ User saved successfully');
+    }
+  };
+
+  const handleUserDelete = (userId) => {
+    console.log('🗑️ Deleting user:', userId);
+    const user = users.find(u => u.id === userId);
+    if (window.confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
+      setUsers(users.filter(user => user.id !== userId));
+      console.log('✅ User deleted successfully');
+    }
+  };
+
+  const handlePasswordReset = (userId) => {
+    console.log('🔑 Resetting password for user:', userId);
+    const newPassword = Math.random().toString(36).slice(-8);
+    if (window.confirm(`New password: ${newPassword}\n\nCopy this password and inform the user.`)) {
+      console.log('✅ Password reset successfully');
+    }
+  };
+
+  const handleRoleChange = (userId, newRole) => {
+    console.log('👑 Changing role for user:', userId, 'to:', newRole);
+    setUsers(users.map(user => 
+      user.id === userId ? { ...user, role: newRole, lastUpdated: new Date().toISOString() } : user
+    ));
+    console.log('✅ Role changed successfully');
+  };
+
+  const handleStatusChange = (userId, newStatus) => {
+    console.log('📊 Changing status for user:', userId, 'to:', newStatus);
+    setUsers(users.map(user => 
+      user.id === userId ? { ...user, status: newStatus, lastUpdated: new Date().toISOString() } : user
+    ));
+    console.log('✅ Status changed successfully');
+  };
+
+  const handleAddUser = () => {
+    console.log('➕ Adding new user:', newUser);
+    if (newUser.name && newUser.email && newUser.username && newUser.password) {
+      const newUserWithId = {
+        ...newUser,
+        id: Date.now(),
+        joinDate: new Date().toISOString(),
+        lastActivity: 'Never',
+        readings: 0,
+        accuracy: 0,
+        totalContributions: 0,
+        lastUpdated: new Date().toISOString()
+      };
+      setUsers([...users, newUserWithId]);
+      setNewUser({
+        name: '',
+        email: '',
+        username: '',
+        password: '',
+        role: 'citizen',
+        team: 'Team Alpha',
+        status: 'active'
+      });
+      setShowAddUser(false);
+      console.log('✅ New user added successfully');
+    } else {
+      console.log('❌ User validation failed - missing required fields');
     }
   };
 
@@ -157,6 +522,74 @@ function AdminDashboard({ onBack }) {
       );
     }, 3000);
   };
+
+  // Search and filter functions
+  const filteredFAQs = faqs.filter(faq => {
+    const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const filteredUsers = users.filter(user => {
+    return user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           user.team.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  const filteredUpdates = updates.filter(update => {
+    return update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           update.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           update.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+  });
+
+  const sortedFAQs = [...filteredFAQs].sort((a, b) => {
+    switch (sortBy) {
+      case 'date':
+        return new Date(b.updatedAt) - new Date(a.updatedAt);
+      case 'priority':
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      case 'views':
+        return b.viewCount - a.viewCount;
+      case 'category':
+        return a.category.localeCompare(b.category);
+      default:
+        return 0;
+    }
+  });
+
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    switch (sortBy) {
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'team':
+        return a.team.localeCompare(b.team);
+      case 'activity':
+        return new Date(b.lastActivity) - new Date(a.lastActivity);
+      case 'contributions':
+        return b.totalContributions - a.totalContributions;
+      default:
+        return 0;
+    }
+  });
+
+  const sortedUpdates = [...filteredUpdates].sort((a, b) => {
+    switch (sortBy) {
+      case 'date':
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      case 'priority':
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      case 'views':
+        return b.viewCount - a.viewCount;
+      case 'type':
+        return a.type.localeCompare(b.type);
+      default:
+        return 0;
+    }
+  });
 
   const renderDashboard = () => (
     <div className="admin-dashboard">

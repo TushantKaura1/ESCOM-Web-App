@@ -2,118 +2,304 @@ import React, { useState, useEffect } from 'react';
 import './UserDashboard.css';
 
 function UserDashboard({ user, onBack }) {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [faqs, setFaqs] = useState([]);
   const [updates, setUpdates] = useState([]);
-  const [monitoringData, setMonitoringData] = useState([]);
+  const [readings, setReadings] = useState([]);
   const [newReading, setNewReading] = useState({
-    location: 'Beach Point A',
-    dateTime: '',
     temperature: '',
     salinity: '',
     ph: '',
-    quality: 'Excellent',
-    notes: ''
+    turbidity: '',
+    location: '',
+    notes: '',
+    weather: 'sunny',
+    timeOfDay: 'morning'
   });
   const [botHelper, setBotHelper] = useState({
     isOpen: false,
     messages: [],
     currentMessage: ''
   });
+  const [learningResources, setLearningResources] = useState([]);
+  const [communityPosts, setCommunityPosts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
 
   useEffect(() => {
     console.log('🌊 UserDashboard component mounted for user:', user);
     loadUserData();
-  }, []);
+  }, [user]);
 
   const loadUserData = async () => {
     // Load demo data for now
     setFaqs([
-      { id: 1, category: 'ESCOM Organization', question: 'How can I get involved with ESCOM?', answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection. Contact your local team leader to get started.' },
-      { id: 2, category: 'Monitoring', question: 'What parameters do we monitor?', answer: 'We monitor water temperature, salinity, pH levels, and overall water quality. Each parameter is measured using specialized equipment and recorded in our database.' },
-      { id: 3, category: 'Training', question: 'How do I calibrate my monitoring equipment?', answer: 'Equipment calibration should be done monthly using the calibration kit provided. Follow the step-by-step guide in your training manual or contact your team leader for assistance.' },
-      { id: 4, category: 'Data', question: 'How often should I submit data?', answer: 'Data should be submitted immediately after each monitoring session, typically monthly. During extreme weather events, additional readings may be required.' },
-      { id: 5, category: 'Partners', question: 'Who are our research partners?', answer: 'We collaborate with Dalhousie University, local environmental organizations, and government agencies to advance coastal research and conservation efforts.' }
+      { 
+        id: 1, 
+        category: 'ESCOM Organization', 
+        subcategory: 'Getting Involved',
+        question: 'How can I get involved with ESCOM?', 
+        answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.',
+        priority: 'high',
+        tags: ['getting-started', 'volunteer', 'training'],
+        media: ['https://example.com/image1.jpg'],
+        importance: 'critical',
+        viewCount: 156,
+        createdAt: '2024-01-15'
+      },
+      { 
+        id: 2, 
+        category: 'Monitoring', 
+        subcategory: 'Equipment',
+        question: 'What parameters do we monitor?', 
+        answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.',
+        priority: 'medium',
+        tags: ['monitoring', 'equipment', 'parameters'],
+        media: [],
+        importance: 'normal',
+        viewCount: 89,
+        createdAt: '2024-01-10'
+      }
     ]);
 
     setUpdates([
-      { id: 1, title: 'New Monitoring Protocol Released', content: 'We have updated our water quality monitoring protocol to include additional parameters. Please review the new guidelines and update your monitoring procedures accordingly.', date: '2024-01-20', priority: 'high' },
-      { id: 2, title: 'Training Session This Weekend', content: 'Join us for a hands-on training session on equipment calibration and data collection techniques. The session will cover new monitoring protocols and best practices.', date: '2024-01-18', priority: 'medium' },
-      { id: 3, title: 'Monthly Data Review', content: 'Your January monitoring data has been reviewed. Great job maintaining high accuracy standards! Your contributions are making a real difference in our research.', date: '2024-01-15', priority: 'low' },
-      { id: 4, title: 'Equipment Maintenance Reminder', content: 'Remember to schedule your monthly equipment calibration. Proper maintenance ensures data accuracy and extends equipment lifespan.', date: '2024-01-12', priority: 'medium' }
+      {
+        id: 1,
+        title: 'New Monitoring Equipment Available',
+        content: 'We have received new water quality monitoring equipment. Training sessions will be scheduled next week.',
+        type: 'announcement',
+        priority: 'high',
+        tags: ['equipment', 'training', 'monitoring'],
+        media: ['https://example.com/equipment.jpg'],
+        status: 'published',
+        createdAt: '2024-01-18',
+        viewCount: 234
+      }
     ]);
 
-    setMonitoringData([
-      { id: 1, date: '2024-01-20', temperature: 18.5, salinity: 32.1, ph: 7.8, quality: 'excellent', location: 'Beach Point A' },
-      { id: 2, date: '2024-01-18', temperature: 17.8, salinity: 31.9, ph: 7.6, quality: 'good', location: 'Beach Point B' },
-      { id: 3, date: '2024-01-15', temperature: 19.2, salinity: 32.3, ph: 7.9, quality: 'excellent', location: 'Beach Point A' }
+    setReadings([
+      {
+        id: 1,
+        temperature: 18.5,
+        salinity: 35.2,
+        ph: 8.1,
+        turbidity: 2.3,
+        location: 'Beach Point A',
+        notes: 'Clear water, good conditions',
+        weather: 'sunny',
+        timeOfDay: 'morning',
+        timestamp: '2024-01-20T08:00:00Z',
+        quality: 'excellent'
+      },
+      {
+        id: 2,
+        temperature: 19.2,
+        salinity: 34.8,
+        ph: 8.0,
+        turbidity: 3.1,
+        location: 'Beach Point B',
+        notes: 'Slight cloudiness, normal readings',
+        weather: 'partly-cloudy',
+        timeOfDay: 'afternoon',
+        timestamp: '2024-01-19T14:00:00Z',
+        quality: 'good'
+      }
+    ]);
+
+    setLearningResources([
+      {
+        id: 1,
+        title: 'Water Quality Monitoring Basics',
+        type: 'video',
+        duration: '15 min',
+        difficulty: 'beginner',
+        tags: ['monitoring', 'basics', 'training'],
+        url: 'https://example.com/video1',
+        thumbnail: 'https://example.com/thumb1.jpg',
+        description: 'Learn the fundamentals of water quality monitoring'
+      },
+      {
+        id: 2,
+        title: 'Equipment Calibration Guide',
+        type: 'manual',
+        duration: '30 min',
+        difficulty: 'intermediate',
+        tags: ['equipment', 'calibration', 'maintenance'],
+        url: 'https://example.com/manual1',
+        thumbnail: 'https://example.com/thumb2.jpg',
+        description: 'Step-by-step guide to calibrating monitoring equipment'
+      }
+    ]);
+
+    setCommunityPosts([
+      {
+        id: 1,
+        author: 'Carlos Silva',
+        content: 'Just completed my first monitoring session! The new equipment is amazing. Any tips for beginners?',
+        timestamp: '2024-01-20T10:00:00Z',
+        likes: 5,
+        comments: 3,
+        tags: ['first-time', 'tips', 'equipment']
+      },
+      {
+        id: 2,
+        author: 'Maria Santos',
+        content: 'Found some interesting patterns in the salinity data this month. Anyone else notice similar trends?',
+        timestamp: '2024-01-19T16:00:00Z',
+        likes: 8,
+        comments: 6,
+        tags: ['data-analysis', 'patterns', 'salinity']
+      }
     ]);
   };
 
   const handleSubmitReading = (e) => {
     e.preventDefault();
-    if (newReading.temperature && newReading.salinity && newReading.ph) {
-      const reading = {
-        id: Date.now(),
-        date: new Date().toISOString().split('T')[0],
-        temperature: parseFloat(newReading.temperature),
-        salinity: parseFloat(newReading.salinity),
-        ph: parseFloat(newReading.ph),
-        quality: newReading.quality,
-        location: newReading.location,
-        notes: newReading.notes
-      };
-      
-      setMonitoringData([reading, ...monitoringData]);
-      setNewReading({
-        location: 'Beach Point A',
-        dateTime: '',
-        temperature: '',
-        salinity: '',
-        ph: '',
-        quality: 'Excellent',
-        notes: ''
-      });
-      
-      // Show success message
-      alert('Reading submitted successfully!');
+    
+    if (!newReading.temperature || !newReading.salinity || !newReading.ph || !newReading.turbidity) {
+      alert('Please fill in all required fields');
+      return;
     }
+
+    const reading = {
+      id: Date.now(),
+      ...newReading,
+      timestamp: new Date().toISOString(),
+      quality: calculateQuality(newReading),
+      userId: user.id,
+      userName: user.name
+    };
+    
+    setReadings([reading, ...readings]);
+    setNewReading({
+      temperature: '',
+      salinity: '',
+      ph: '',
+      turbidity: '',
+      location: '',
+      notes: '',
+      weather: 'sunny',
+      timeOfDay: 'morning'
+    });
+    
+    console.log('✅ New reading submitted:', reading);
+  };
+
+  const calculateQuality = (reading) => {
+    const temp = parseFloat(reading.temperature);
+    const sal = parseFloat(reading.salinity);
+    const ph = parseFloat(reading.ph);
+    const turb = parseFloat(reading.turbidity);
+    
+    let score = 0;
+    
+    // Temperature quality (ideal range: 15-25°C)
+    if (temp >= 15 && temp <= 25) score += 25;
+    else if (temp >= 10 && temp <= 30) score += 15;
+    else score += 5;
+    
+    // Salinity quality (ideal range: 30-40 ppt)
+    if (sal >= 30 && sal <= 40) score += 25;
+    else if (sal >= 25 && sal <= 45) score += 15;
+    else score += 5;
+    
+    // pH quality (ideal range: 7.5-8.5)
+    if (ph >= 7.5 && ph <= 8.5) score += 25;
+    else if (ph >= 7.0 && ph <= 9.0) score += 15;
+    else score += 5;
+    
+    // Turbidity quality (lower is better, ideal < 5 NTU)
+    if (turb < 5) score += 25;
+    else if (turb < 10) score += 15;
+    else score += 5;
+    
+    if (score >= 90) return 'excellent';
+    else if (score >= 70) return 'good';
+    else if (score >= 50) return 'fair';
+    else return 'poor';
   };
 
   const handleBotMessage = () => {
-    if (botHelper.currentMessage.trim()) {
-      const userMessage = {
-        type: 'user',
-        text: botHelper.currentMessage
-      };
-      
-      // Simulate bot response
-      const botResponse = {
-        type: 'bot',
-        text: getBotResponse(botHelper.currentMessage)
-      };
-      
-      setBotHelper({
-        ...botHelper,
-        messages: [...botHelper.messages, userMessage, botResponse],
-        currentMessage: ''
-      });
-    }
+    if (!botHelper.currentMessage.trim()) return;
+    
+    const userMessage = botHelper.currentMessage;
+    const botResponse = getBotResponse(userMessage);
+    
+    const newMessage = {
+      id: Date.now(),
+      type: 'user',
+      content: userMessage,
+      timestamp: new Date().toISOString()
+    };
+    
+    const botMessage = {
+      id: Date.now() + 1,
+      type: 'bot',
+      content: botResponse,
+      timestamp: new Date().toISOString()
+    };
+    
+    setBotHelper({
+      ...botHelper,
+      messages: [...botHelper.messages, newMessage, botMessage],
+      currentMessage: ''
+    });
   };
 
   const getBotResponse = (message) => {
     const lowerMessage = message.toLowerCase();
-    if (lowerMessage.includes('submit') || lowerMessage.includes('data')) {
-      return 'To submit data, go to the Monitoring tab and fill out the form. Make sure to record temperature, salinity, pH, and overall quality for each reading.';
-    } else if (lowerMessage.includes('equipment') || lowerMessage.includes('calibrate')) {
-      return 'Equipment calibration should be done monthly. Check your training manual for step-by-step instructions, or contact your team leader for assistance.';
-    } else if (lowerMessage.includes('training') || lowerMessage.includes('resources')) {
-      return 'Training resources are available in the Training section. We offer manuals, videos, and regular training sessions. Check the Updates tab for upcoming sessions.';
-    } else if (lowerMessage.includes('contact') || lowerMessage.includes('support')) {
-      return 'For support, contact your team leader or email support@escom.org. For urgent issues, use the emergency contact number provided in your welcome packet.';
+    
+    if (lowerMessage.includes('temperature') || lowerMessage.includes('temp')) {
+      return 'Water temperature should be measured at a depth of 30cm below the surface. Ideal range is 15-25°C. Use a calibrated thermometer for accurate readings.';
+    } else if (lowerMessage.includes('salinity') || lowerMessage.includes('salt')) {
+      return 'Salinity measures the salt content in water. Use a refractometer or conductivity meter. Normal ocean salinity is 30-40 ppt (parts per thousand).';
+    } else if (lowerMessage.includes('ph') || lowerMessage.includes('acidity')) {
+      return 'pH measures water acidity. Use pH strips or a pH meter. Ocean water typically has a pH of 7.5-8.5. Calibrate your equipment regularly.';
+    } else if (lowerMessage.includes('turbidity') || lowerMessage.includes('clarity')) {
+      return 'Turbidity measures water clarity. Use a Secchi disk or turbidity meter. Lower values indicate clearer water. Aim for readings below 5 NTU.';
+    } else if (lowerMessage.includes('calibrate') || lowerMessage.includes('calibration')) {
+      return 'Calibrate your equipment monthly using the calibration kit provided. Follow the step-by-step guide in your training manual. Contact your team leader if you need help.';
+    } else if (lowerMessage.includes('location') || lowerMessage.includes('where')) {
+      return 'Choose consistent monitoring locations marked with GPS coordinates. Use permanent markers or landmarks for easy identification. Record exact coordinates in your data.';
+    } else if (lowerMessage.includes('weather') || lowerMessage.includes('conditions')) {
+      return 'Record weather conditions during monitoring: temperature, wind speed, precipitation, and cloud cover. These factors can affect water quality readings.';
+    } else if (lowerMessage.includes('frequency') || lowerMessage.includes('how often')) {
+      return 'Submit data monthly, or more frequently during extreme weather events. Always submit within 24 hours of collection for best data quality.';
     } else {
-      return 'I can help you with data submission, equipment calibration, training resources, and general support. What specific question do you have?';
+      return 'I can help with monitoring questions about temperature, salinity, pH, turbidity, equipment calibration, locations, weather conditions, and data submission frequency. What would you like to know?';
     }
+  };
+
+  const handleLikePost = (postId) => {
+    setCommunityPosts(communityPosts.map(post => 
+      post.id === postId ? { ...post, likes: post.likes + 1 } : post
+    ));
+  };
+
+  const handleAddComment = (postId, comment) => {
+    if (!comment.trim()) return;
+    
+    setCommunityPosts(communityPosts.map(post => 
+      post.id === postId ? { ...post, comments: post.comments + 1 } : post
+    ));
+  };
+
+  const handleCreatePost = (content, tags) => {
+    if (!content.trim()) return;
+    
+    const newPost = {
+      id: Date.now(),
+      author: user.name,
+      content: content.trim(),
+      timestamp: new Date().toISOString(),
+      likes: 0,
+      comments: 0,
+      tags: tags || []
+    };
+    
+    setCommunityPosts([newPost, ...communityPosts]);
+    console.log('✅ New community post created:', newPost);
   };
 
   const renderOverview = () => (
@@ -126,7 +312,7 @@ function UserDashboard({ user, onBack }) {
       <div className="quick-stats">
         <div className="stat-card">
           <h4>Total Readings</h4>
-          <div className="stat-value">{monitoringData.length}</div>
+          <div className="stat-value">{readings.length}</div>
           <div className="stat-label">This month</div>
         </div>
         <div className="stat-card">
@@ -167,7 +353,7 @@ function UserDashboard({ user, onBack }) {
       <div className="recent-activity">
         <h4>Recent Activity</h4>
         <div className="activity-list">
-          {monitoringData.slice(0, 3).map(reading => (
+          {readings.slice(0, 3).map(reading => (
             <div key={reading.id} className="activity-item">
               <span className="activity-icon">📊</span>
               <span className="activity-text">Submitted water quality reading at {reading.location}</span>
@@ -283,7 +469,7 @@ function UserDashboard({ user, onBack }) {
       <div className="monitoring-history">
         <h4>Recent Readings</h4>
         <div className="readings-list">
-          {monitoringData.map(reading => (
+          {readings.map(reading => (
             <div key={reading.id} className="reading-card">
               <div className="reading-header">
                 <span className="reading-date">{reading.date}</span>
