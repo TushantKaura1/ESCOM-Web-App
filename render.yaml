@@ -18,5 +18,12 @@ services:
         sync: false
       - key: DB_NAME
         value: citiscience
+      - key: MONGODB_URI
+        sync: false
     healthCheckPath: /health
-    autoDeploy: true 
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - src/mongo-api/**
+        - package.json
+        - package-lock.json 

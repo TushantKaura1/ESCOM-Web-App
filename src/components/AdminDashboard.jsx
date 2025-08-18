@@ -5,6 +5,10 @@ function AdminDashboard({ onBack }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [users, setUsers] = useState([]);
   const [faqs, setFaqs] = useState([]);
+  const [editingFaq, setEditingFaq] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [showAddFaq, setShowAddFaq] = useState(false);
+  const [newFaq, setNewFaq] = useState({ category: 'ESCOM Organization', question: '', answer: '' });
   const [systemStats, setSystemStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -21,6 +25,12 @@ function AdminDashboard({ onBack }) {
     maintenanceMode: false,
     debugMode: false
   });
+  const [reports, setReports] = useState([
+    { id: 1, name: 'Monthly Activity Report', status: 'Completed', date: '2024-01-20', type: 'Monthly Activity' },
+    { id: 2, name: 'User Performance Report', status: 'Completed', date: '2024-01-19', type: 'User Performance' },
+    { id: 3, name: 'Data Quality Report', status: 'In Progress', date: '2024-01-20', type: 'Data Quality' },
+    { id: 4, name: 'System Health Report', status: 'Scheduled', date: '2024-01-21', type: 'System Health' }
+  ]);
 
   useEffect(() => {
     console.log('👑 AdminDashboard component mounted');
@@ -40,7 +50,9 @@ function AdminDashboard({ onBack }) {
     setFaqs([
       { id: 1, category: 'ESCOM Organization', question: 'How can I get involved with ESCOM?', answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.' },
       { id: 2, category: 'Monitoring', question: 'What parameters do we monitor?', answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.' },
-      { id: 3, category: 'Training', question: 'How do I calibrate my monitoring equipment?', answer: 'Equipment calibration should be done monthly using the calibration kit provided.' }
+      { id: 3, category: 'Training', question: 'How do I calibrate my monitoring equipment?', answer: 'Equipment calibration should be done monthly using the calibration kit provided.' },
+      { id: 4, category: 'Data', question: 'How often should I submit data?', answer: 'Data should be submitted immediately after each monitoring session, typically monthly.' },
+      { id: 5, category: 'Partners', question: 'Who are our research partners?', answer: 'We collaborate with Dalhousie University, local environmental organizations, and government agencies.' }
     ]);
 
     setSystemStats({
@@ -51,6 +63,83 @@ function AdminDashboard({ onBack }) {
       newThisMonth: 3,
       systemHealth: 'Excellent'
     });
+  };
+
+  const handleFaqEdit = (faq) => {
+    setEditingFaq({ ...faq });
+  };
+
+  const handleFaqSave = () => {
+    if (editingFaq) {
+      setFaqs(faqs.map(faq => 
+        faq.id === editingFaq.id ? editingFaq : faq
+      ));
+      setEditingFaq(null);
+    }
+  };
+
+  const handleFaqDelete = (faqId) => {
+    setFaqs(faqs.filter(faq => faq.id !== faqId));
+  };
+
+  const handleAddFaq = () => {
+    if (newFaq.question && newFaq.answer) {
+      const newFaqWithId = { ...newFaq, id: Date.now() };
+      setFaqs([...faqs, newFaqWithId]);
+      setNewFaq({ category: 'ESCOM Organization', question: '', answer: '' });
+      setShowAddFaq(false);
+    }
+  };
+
+  const handleUserEdit = (user) => {
+    setEditingUser({ ...user });
+  };
+
+  const handleUserSave = () => {
+    if (editingUser) {
+      setUsers(users.map(user => 
+        user.id === editingUser.id ? editingUser : user
+      ));
+      setEditingUser(null);
+    }
+  };
+
+  const handleSettingsSave = () => {
+    console.log('Settings saved:', settings);
+    // Here you would typically save to backend
+  };
+
+  const handleSettingsReset = () => {
+    setSettings({
+      notifications: true,
+      autoBackup: true,
+      dataRetention: '2 years',
+      privacyMode: false,
+      maintenanceMode: false,
+      debugMode: false
+    });
+  };
+
+  const generateReport = (type) => {
+    const newReport = {
+      id: Date.now(),
+      name: `${type} Report`,
+      status: 'In Progress',
+      date: new Date().toISOString().split('T')[0],
+      type: type
+    };
+    setReports([...reports, newReport]);
+    
+    // Simulate report completion
+    setTimeout(() => {
+      setReports(prevReports => 
+        prevReports.map(report => 
+          report.id === newReport.id 
+            ? { ...report, status: 'Completed' }
+            : report
+        )
+      );
+    }, 3000);
   };
 
   const renderDashboard = () => (
@@ -158,12 +247,58 @@ function AdminDashboard({ onBack }) {
               </div>
             </div>
             <div className="user-actions">
-              <button className="edit-btn">✏️ Edit</button>
+              <button className="edit-btn" onClick={() => handleUserEdit(user)}>✏️ Edit</button>
               <button className="view-btn">👁️ View</button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Edit User: {editingUser.name}</h3>
+            <div className="form-group">
+              <label>Name:</label>
+              <input 
+                type="text" 
+                value={editingUser.name}
+                onChange={(e) => setEditingUser({...editingUser, name: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Team:</label>
+              <select 
+                value={editingUser.team}
+                onChange={(e) => setEditingUser({...editingUser, team: e.target.value})}
+                className="form-input"
+              >
+                <option>Team Alpha</option>
+                <option>Team Beta</option>
+                <option>Team Gamma</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Status:</label>
+              <select 
+                value={editingUser.status}
+                onChange={(e) => setEditingUser({...editingUser, status: e.target.value})}
+                className="form-input"
+              >
+                <option>Active</option>
+                <option>Inactive</option>
+                <option>Suspended</option>
+              </select>
+            </div>
+            <div className="modal-actions">
+              <button onClick={handleUserSave} className="save-btn">💾 Save</button>
+              <button onClick={() => setEditingUser(null)} className="cancel-btn">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -339,8 +474,8 @@ function AdminDashboard({ onBack }) {
       </div>
 
       <div className="settings-actions">
-        <button className="save-btn">💾 Save Settings</button>
-        <button className="reset-btn">🔄 Reset to Default</button>
+        <button onClick={handleSettingsSave} className="save-btn">💾 Save Settings</button>
+        <button onClick={handleSettingsReset} className="reset-btn">🔄 Reset to Default</button>
       </div>
     </div>
   );
@@ -355,22 +490,22 @@ function AdminDashboard({ onBack }) {
           <div className="report-type">
             <h5>📊 Monthly Activity</h5>
             <p>Comprehensive monthly summary</p>
-            <button className="generate-btn">📈 Generate</button>
+            <button onClick={() => generateReport('Monthly Activity')} className="generate-btn">📈 Generate</button>
           </div>
           <div className="report-type">
             <h5>👥 User Performance</h5>
             <p>Individual user metrics</p>
-            <button className="generate-btn">📈 Generate</button>
+            <button onClick={() => generateReport('User Performance')} className="generate-btn">📈 Generate</button>
           </div>
           <div className="report-type">
             <h5>🎯 Data Quality</h5>
             <p>Data quality analysis</p>
-            <button className="generate-btn">📈 Generate</button>
+            <button onClick={() => generateReport('Data Quality')} className="generate-btn">📈 Generate</button>
           </div>
           <div className="report-type">
             <h5>⚙️ System Health</h5>
             <p>System performance metrics</p>
-            <button className="generate-btn">📈 Generate</button>
+            <button onClick={() => generateReport('System Health')} className="generate-btn">📈 Generate</button>
           </div>
         </div>
       </div>
@@ -378,30 +513,14 @@ function AdminDashboard({ onBack }) {
       <div className="recent-reports">
         <h4>Recent Reports</h4>
         <div className="report-list">
-          <div className="report-item completed">
-            <span className="report-name">Monthly Activity Report</span>
-            <span className="report-status">Completed</span>
-            <span className="report-date">2024-01-20</span>
-            <button className="view-btn">View</button>
-          </div>
-          <div className="report-item completed">
-            <span className="report-name">User Performance Report</span>
-            <span className="report-status">Completed</span>
-            <span className="report-date">2024-01-19</span>
-            <button className="view-btn">View</button>
-          </div>
-          <div className="report-item in-progress">
-            <span className="report-name">Data Quality Report</span>
-            <span className="report-status">In Progress</span>
-            <span className="report-date">2024-01-20</span>
-            <button className="view-btn">View</button>
-          </div>
-          <div className="report-item scheduled">
-            <span className="report-name">System Health Report</span>
-            <span className="report-status">Scheduled</span>
-            <span className="report-date">2024-01-21</span>
-            <button className="view-btn">View</button>
-          </div>
+          {reports.map(report => (
+            <div key={report.id} className={`report-item ${report.status.toLowerCase().replace(' ', '-')}`}>
+              <span className="report-name">{report.name}</span>
+              <span className={`report-status ${report.status.toLowerCase().replace(' ', '-')}`}>{report.status}</span>
+              <span className="report-date">{report.date}</span>
+              <button className="view-btn">View</button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -428,8 +547,8 @@ function AdminDashboard({ onBack }) {
             <div className="faq-header">
               <span className="faq-category">{faq.category}</span>
               <div className="faq-actions">
-                <button className="edit-btn">✏️ Edit</button>
-                <button className="delete-btn">🗑️ Delete</button>
+                <button className="edit-btn" onClick={() => handleFaqEdit(faq)}>✏️ Edit</button>
+                <button className="delete-btn" onClick={() => handleFaqDelete(faq.id)}>🗑️ Delete</button>
               </div>
             </div>
             <div className="faq-content">
@@ -441,8 +560,100 @@ function AdminDashboard({ onBack }) {
       </div>
 
       <div className="add-faq">
-        <button className="add-btn">➕ Add New Question</button>
+        <button onClick={() => setShowAddFaq(true)} className="add-btn">➕ Add New Question</button>
       </div>
+
+      {/* Add FAQ Modal */}
+      {showAddFaq && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Add New FAQ</h3>
+            <div className="form-group">
+              <label>Category:</label>
+              <select 
+                value={newFaq.category}
+                onChange={(e) => setNewFaq({...newFaq, category: e.target.value})}
+                className="form-input"
+              >
+                <option>ESCOM Organization</option>
+                <option>Monitoring</option>
+                <option>Training</option>
+                <option>Data</option>
+                <option>Partners</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Question:</label>
+              <input 
+                type="text" 
+                value={newFaq.question}
+                onChange={(e) => setNewFaq({...newFaq, question: e.target.value})}
+                className="form-input"
+                placeholder="Enter your question..."
+              />
+            </div>
+            <div className="form-group">
+              <label>Answer:</label>
+              <textarea 
+                value={newFaq.answer}
+                onChange={(e) => setNewFaq({...newFaq, answer: e.target.value})}
+                className="form-input"
+                placeholder="Enter the answer..."
+                rows="4"
+              />
+            </div>
+            <div className="modal-actions">
+              <button onClick={handleAddFaq} className="save-btn">💾 Add FAQ</button>
+              <button onClick={() => setShowAddFaq(false)} className="cancel-btn">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit FAQ Modal */}
+      {editingFaq && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Edit FAQ</h3>
+            <div className="form-group">
+              <label>Category:</label>
+              <select 
+                value={editingFaq.category}
+                onChange={(e) => setEditingFaq({...editingFaq, category: e.target.value})}
+                className="form-input"
+              >
+                <option>ESCOM Organization</option>
+                <option>Monitoring</option>
+                <option>Training</option>
+                <option>Data</option>
+                <option>Partners</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Question:</label>
+              <input 
+                type="text" 
+                value={editingFaq.question}
+                onChange={(e) => setEditingFaq({...editingFaq, question: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Answer:</label>
+              <textarea 
+                value={editingFaq.answer}
+                onChange={(e) => setEditingFaq({...editingFaq, answer: e.target.value})}
+                className="form-input"
+                rows="4"
+              />
+            </div>
+            <div className="modal-actions">
+              <button onClick={handleFaqSave} className="save-btn">💾 Save Changes</button>
+              <button onClick={() => setEditingFaq(null)} className="cancel-btn">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 

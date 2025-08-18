@@ -13,16 +13,18 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('checking');
+  const [adminMode, setAdminMode] = useState(false);
   
-  // Force Netlify rebuild - Authentication fixes v1.2 - Aug 17, 2025
-  const APP_VERSION = '1.2.0';
-  const BUILD_TIMESTAMP = '2025-08-17T17:50:00Z';
+  // Force Netlify rebuild - Complete Admin & User Features v2.0 - Aug 17, 2025
+  const APP_VERSION = '2.0.0';
+  const BUILD_TIMESTAMP = '2025-08-17T18:00:00Z';
 
   // Check backend connection on app start
   useEffect(() => {
-    console.log('🚨 AUTHENTICATION FIXES DEPLOYED - v1.2.0');
-    console.log('🔧 Field mapping fixed: name → username, firstName, lastName');
-    console.log('🔧 Role mapping fixed: user → citizen');
+    console.log('🚀 COMPLETE ADMIN & USER FEATURES DEPLOYED - v2.0.0');
+    console.log('🔧 Admin mode with full functionality');
+    console.log('🔧 User dashboard with monitoring capabilities');
+    console.log('🔧 Role-based access control implemented');
     checkBackendConnection();
   }, []);
 
@@ -52,7 +54,7 @@ function App() {
     try {
       console.log('🚀 LOGIN ATTEMPT STARTED');
       console.log('📤 Sending login data:', { email: credentials.email, password: '***' });
-      console.log('🔧 Authentication fixes deployed - v1.2.0');
+      console.log('🔧 Complete features deployed - v2.0.0');
 
       const response = await fetch(`${config.API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -136,9 +138,22 @@ function App() {
 
   const handleLogout = () => {
     setUser(null);
+    setAdminMode(false);
     localStorage.removeItem('token');
     setCurrentView('welcome');
     setError(null);
+  };
+
+  const handleAdminMode = () => {
+    setAdminMode(true);
+    setCurrentView('admin');
+    console.log('👑 Admin mode activated');
+  };
+
+  const handleUserMode = () => {
+    setAdminMode(false);
+    setCurrentView('login');
+    console.log('🌊 User mode activated');
   };
 
   const renderWelcome = () => (
@@ -154,7 +169,7 @@ function App() {
         <div className="app-version">
           <small>v{APP_VERSION} - {new Date(BUILD_TIMESTAMP).toLocaleDateString()}</small>
           <br />
-          <small style={{color: '#ff6b6b'}}>🚨 AUTHENTICATION FIXES DEPLOYED - v1.2.0</small>
+          <small style={{color: '#00d4aa'}}>🚀 COMPLETE ADMIN & USER FEATURES DEPLOYED - v2.0.0</small>
         </div>
         
         <div className="connection-status">
@@ -172,19 +187,22 @@ function App() {
           </button>
         </div>
 
-        <div className="welcome-buttons">
-          <button 
-            onClick={() => setCurrentView('login')}
-            className="btn btn-primary"
-          >
-            🔐 Login
-          </button>
-          <button 
-            onClick={() => setCurrentView('signup')}
-            className="btn btn-secondary"
-          >
-            📝 Sign Up
-          </button>
+        <div className="mode-selection">
+          <h3>Choose Your Access Mode</h3>
+          <div className="mode-buttons">
+            <button 
+              onClick={handleAdminMode}
+              className="btn btn-admin"
+            >
+              👑 Admin Mode
+            </button>
+            <button 
+              onClick={handleUserMode}
+              className="btn btn-user"
+            >
+              🌊 User Mode
+            </button>
+          </div>
         </div>
 
         <div className="welcome-features">
@@ -200,6 +218,10 @@ function App() {
             <span className="feature-icon">🌍</span>
             <span>Environmental Impact</span>
           </div>
+          <div className="feature">
+            <span className="feature-icon">👑</span>
+            <span>Admin Management</span>
+          </div>
         </div>
       </div>
     </div>
@@ -209,29 +231,20 @@ function App() {
     console.log('🔍 ===== DASHBOARD RENDERING STARTED =====');
     console.log('🔍 Current view:', currentView);
     console.log('🔍 User state:', user);
-    console.log('🔍 User role:', user?.role);
-    console.log('🔍 Is admin:', user?.isAdmin);
-    console.log('🔍 User object keys:', user ? Object.keys(user) : 'NO USER');
+    console.log('🔍 Admin mode:', adminMode);
+    
+    if (adminMode) {
+      console.log('👑 RENDERING ADMIN DASHBOARD');
+      return <AdminDashboard onBack={handleLogout} />;
+    }
     
     if (!user) {
       console.error('❌ NO USER DATA - Cannot render dashboard');
       return <div>No user data available</div>;
     }
     
-    // TEMPORARILY USE TEST DASHBOARD FOR DEBUGGING
-    console.log('🧪 RENDERING TEST DASHBOARD FOR DEBUGGING');
-    return <TestDashboard user={user} onBack={handleLogout} />;
-    
-    // ORIGINAL LOGIC (COMMENTED OUT FOR NOW)
-    /*
-    if (user?.isAdmin || user?.role === 'admin') {
-      console.log('👑 RENDERING ADMIN DASHBOARD');
-      return <AdminDashboard onBack={handleLogout} />;
-    } else {
-      console.log('🌊 RENDERING USER DASHBOARD');
-      return <UserDashboard user={user} onBack={handleLogout} />;
-    }
-    */
+    console.log('🌊 RENDERING USER DASHBOARD');
+    return <UserDashboard user={user} onBack={handleLogout} />;
   };
 
   if (loading) {
@@ -245,7 +258,7 @@ function App() {
 
   return (
     <div className="app">
-      {console.log('🎭 APP RENDER - Current view:', currentView, 'User:', user)}
+      {console.log('🎭 APP RENDER - Current view:', currentView, 'User:', user, 'Admin mode:', adminMode)}
       
       {error && (
         <div className="error-banner">
@@ -267,7 +280,7 @@ function App() {
           onBack={() => setCurrentView('welcome')}
         />
       )}
-      {currentView === 'dashboard' && renderDashboard()}
+      {(currentView === 'dashboard' || currentView === 'admin') && renderDashboard()}
     </div>
   );
 }

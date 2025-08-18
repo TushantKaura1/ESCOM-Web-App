@@ -6,6 +6,15 @@ function UserDashboard({ user, onBack }) {
   const [faqs, setFaqs] = useState([]);
   const [updates, setUpdates] = useState([]);
   const [monitoringData, setMonitoringData] = useState([]);
+  const [newReading, setNewReading] = useState({
+    location: 'Beach Point A',
+    dateTime: '',
+    temperature: '',
+    salinity: '',
+    ph: '',
+    quality: 'Excellent',
+    notes: ''
+  });
   const [botHelper, setBotHelper] = useState({
     isOpen: false,
     messages: [],
@@ -23,13 +32,15 @@ function UserDashboard({ user, onBack }) {
       { id: 1, category: 'ESCOM Organization', question: 'How can I get involved with ESCOM?', answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection. Contact your local team leader to get started.' },
       { id: 2, category: 'Monitoring', question: 'What parameters do we monitor?', answer: 'We monitor water temperature, salinity, pH levels, and overall water quality. Each parameter is measured using specialized equipment and recorded in our database.' },
       { id: 3, category: 'Training', question: 'How do I calibrate my monitoring equipment?', answer: 'Equipment calibration should be done monthly using the calibration kit provided. Follow the step-by-step guide in your training manual or contact your team leader for assistance.' },
-      { id: 4, category: 'Data', question: 'How often should I submit data?', answer: 'Data should be submitted immediately after each monitoring session, typically monthly. During extreme weather events, additional readings may be required.' }
+      { id: 4, category: 'Data', question: 'How often should I submit data?', answer: 'Data should be submitted immediately after each monitoring session, typically monthly. During extreme weather events, additional readings may be required.' },
+      { id: 5, category: 'Partners', question: 'Who are our research partners?', answer: 'We collaborate with Dalhousie University, local environmental organizations, and government agencies to advance coastal research and conservation efforts.' }
     ]);
 
     setUpdates([
-      { id: 1, title: 'New Monitoring Protocol Released', content: 'We have updated our water quality monitoring protocol to include additional parameters. Please review the new guidelines.', date: '2024-01-20', priority: 'high' },
-      { id: 2, title: 'Training Session This Weekend', content: 'Join us for a hands-on training session on equipment calibration and data collection techniques.', date: '2024-01-18', priority: 'medium' },
-      { id: 3, title: 'Monthly Data Review', content: 'Your January monitoring data has been reviewed. Great job maintaining high accuracy standards!', date: '2024-01-15', priority: 'low' }
+      { id: 1, title: 'New Monitoring Protocol Released', content: 'We have updated our water quality monitoring protocol to include additional parameters. Please review the new guidelines and update your monitoring procedures accordingly.', date: '2024-01-20', priority: 'high' },
+      { id: 2, title: 'Training Session This Weekend', content: 'Join us for a hands-on training session on equipment calibration and data collection techniques. The session will cover new monitoring protocols and best practices.', date: '2024-01-18', priority: 'medium' },
+      { id: 3, title: 'Monthly Data Review', content: 'Your January monitoring data has been reviewed. Great job maintaining high accuracy standards! Your contributions are making a real difference in our research.', date: '2024-01-15', priority: 'low' },
+      { id: 4, title: 'Equipment Maintenance Reminder', content: 'Remember to schedule your monthly equipment calibration. Proper maintenance ensures data accuracy and extends equipment lifespan.', date: '2024-01-12', priority: 'medium' }
     ]);
 
     setMonitoringData([
@@ -37,6 +48,72 @@ function UserDashboard({ user, onBack }) {
       { id: 2, date: '2024-01-18', temperature: 17.8, salinity: 31.9, ph: 7.6, quality: 'good', location: 'Beach Point B' },
       { id: 3, date: '2024-01-15', temperature: 19.2, salinity: 32.3, ph: 7.9, quality: 'excellent', location: 'Beach Point A' }
     ]);
+  };
+
+  const handleSubmitReading = (e) => {
+    e.preventDefault();
+    if (newReading.temperature && newReading.salinity && newReading.ph) {
+      const reading = {
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        temperature: parseFloat(newReading.temperature),
+        salinity: parseFloat(newReading.salinity),
+        ph: parseFloat(newReading.ph),
+        quality: newReading.quality,
+        location: newReading.location,
+        notes: newReading.notes
+      };
+      
+      setMonitoringData([reading, ...monitoringData]);
+      setNewReading({
+        location: 'Beach Point A',
+        dateTime: '',
+        temperature: '',
+        salinity: '',
+        ph: '',
+        quality: 'Excellent',
+        notes: ''
+      });
+      
+      // Show success message
+      alert('Reading submitted successfully!');
+    }
+  };
+
+  const handleBotMessage = () => {
+    if (botHelper.currentMessage.trim()) {
+      const userMessage = {
+        type: 'user',
+        text: botHelper.currentMessage
+      };
+      
+      // Simulate bot response
+      const botResponse = {
+        type: 'bot',
+        text: getBotResponse(botHelper.currentMessage)
+      };
+      
+      setBotHelper({
+        ...botHelper,
+        messages: [...botHelper.messages, userMessage, botResponse],
+        currentMessage: ''
+      });
+    }
+  };
+
+  const getBotResponse = (message) => {
+    const lowerMessage = message.toLowerCase();
+    if (lowerMessage.includes('submit') || lowerMessage.includes('data')) {
+      return 'To submit data, go to the Monitoring tab and fill out the form. Make sure to record temperature, salinity, pH, and overall quality for each reading.';
+    } else if (lowerMessage.includes('equipment') || lowerMessage.includes('calibrate')) {
+      return 'Equipment calibration should be done monthly. Check your training manual for step-by-step instructions, or contact your team leader for assistance.';
+    } else if (lowerMessage.includes('training') || lowerMessage.includes('resources')) {
+      return 'Training resources are available in the Training section. We offer manuals, videos, and regular training sessions. Check the Updates tab for upcoming sessions.';
+    } else if (lowerMessage.includes('contact') || lowerMessage.includes('support')) {
+      return 'For support, contact your team leader or email support@escom.org. For urgent issues, use the emergency contact number provided in your welcome packet.';
+    } else {
+      return 'I can help you with data submission, equipment calibration, training resources, and general support. What specific question do you have?';
+    }
   };
 
   const renderOverview = () => (
@@ -49,7 +126,7 @@ function UserDashboard({ user, onBack }) {
       <div className="quick-stats">
         <div className="stat-card">
           <h4>Total Readings</h4>
-          <div className="stat-value">23</div>
+          <div className="stat-value">{monitoringData.length}</div>
           <div className="stat-label">This month</div>
         </div>
         <div className="stat-card">
@@ -90,21 +167,13 @@ function UserDashboard({ user, onBack }) {
       <div className="recent-activity">
         <h4>Recent Activity</h4>
         <div className="activity-list">
-          <div className="activity-item">
-            <span className="activity-icon">📊</span>
-            <span className="activity-text">Submitted water quality reading</span>
-            <span className="activity-time">2 hours ago</span>
-          </div>
-          <div className="activity-item">
-            <span className="activity-icon">📚</span>
-            <span className="activity-text">Completed training module</span>
-            <span className="activity-time">1 day ago</span>
-          </div>
-          <div className="activity-item">
-            <span className="activity-icon">🏆</span>
-            <span className="activity-text">Achieved 90% accuracy milestone</span>
-            <span className="activity-time">3 days ago</span>
-          </div>
+          {monitoringData.slice(0, 3).map(reading => (
+            <div key={reading.id} className="activity-item">
+              <span className="activity-icon">📊</span>
+              <span className="activity-text">Submitted water quality reading at {reading.location}</span>
+              <span className="activity-time">{reading.date}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -116,11 +185,15 @@ function UserDashboard({ user, onBack }) {
       
       <div className="monitoring-form">
         <h4>Submit New Reading</h4>
-        <form className="reading-form">
+        <form className="reading-form" onSubmit={handleSubmitReading}>
           <div className="form-row">
             <div className="form-group">
               <label>Location</label>
-              <select className="form-input">
+              <select 
+                className="form-input"
+                value={newReading.location}
+                onChange={(e) => setNewReading({...newReading, location: e.target.value})}
+              >
                 <option>Beach Point A</option>
                 <option>Beach Point B</option>
                 <option>Harbor Entrance</option>
@@ -129,29 +202,62 @@ function UserDashboard({ user, onBack }) {
             </div>
             <div className="form-group">
               <label>Date & Time</label>
-              <input type="datetime-local" className="form-input" />
+              <input 
+                type="datetime-local" 
+                className="form-input"
+                value={newReading.dateTime}
+                onChange={(e) => setNewReading({...newReading, dateTime: e.target.value})}
+              />
             </div>
           </div>
           
           <div className="form-row">
             <div className="form-group">
               <label>Water Temperature (°C)</label>
-              <input type="number" step="0.1" className="form-input" placeholder="18.5" />
+              <input 
+                type="number" 
+                step="0.1" 
+                className="form-input" 
+                placeholder="18.5"
+                value={newReading.temperature}
+                onChange={(e) => setNewReading({...newReading, temperature: e.target.value})}
+                required
+              />
             </div>
             <div className="form-group">
               <label>Salinity (ppt)</label>
-              <input type="number" step="0.1" className="form-input" placeholder="32.1" />
+              <input 
+                type="number" 
+                step="0.1" 
+                className="form-input" 
+                placeholder="32.1"
+                value={newReading.salinity}
+                onChange={(e) => setNewReading({...newReading, salinity: e.target.value})}
+                required
+              />
             </div>
           </div>
           
           <div className="form-row">
             <div className="form-group">
               <label>pH Level</label>
-              <input type="number" step="0.1" className="form-input" placeholder="7.8" />
+              <input 
+                type="number" 
+                step="0.1" 
+                className="form-input" 
+                placeholder="7.8"
+                value={newReading.ph}
+                onChange={(e) => setNewReading({...newReading, ph: e.target.value})}
+                required
+              />
             </div>
             <div className="form-group">
               <label>Overall Quality</label>
-              <select className="form-input">
+              <select 
+                className="form-input"
+                value={newReading.quality}
+                onChange={(e) => setNewReading({...newReading, quality: e.target.value})}
+              >
                 <option>Excellent</option>
                 <option>Good</option>
                 <option>Fair</option>
@@ -162,7 +268,12 @@ function UserDashboard({ user, onBack }) {
           
           <div className="form-group">
             <label>Notes</label>
-            <textarea className="form-input" placeholder="Any observations or special conditions..."></textarea>
+            <textarea 
+              className="form-input" 
+              placeholder="Any observations or special conditions..."
+              value={newReading.notes}
+              onChange={(e) => setNewReading({...newReading, notes: e.target.value})}
+            ></textarea>
           </div>
           
           <button type="submit" className="submit-btn">📊 Submit Reading</button>
@@ -289,10 +400,10 @@ function UserDashboard({ user, onBack }) {
             <div className="message-content">
               <p>Hello! I'm your ESCOM Citizen Science Assistant. How can I help you today?</p>
               <div className="quick-questions">
-                <button className="quick-question">How do I submit data?</button>
-                <button className="quick-question">What equipment do I need?</button>
-                <button className="quick-question">Training resources</button>
-                <button className="quick-question">Contact support</button>
+                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'How do I submit data?'})}>How do I submit data?</button>
+                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'What equipment do I need?'})}>What equipment do I need?</button>
+                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'Training resources'})}>Training resources</button>
+                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'Contact support'})}>Contact support</button>
               </div>
             </div>
           </div>
@@ -314,8 +425,9 @@ function UserDashboard({ user, onBack }) {
             value={botHelper.currentMessage}
             onChange={(e) => setBotHelper({...botHelper, currentMessage: e.target.value})}
             className="message-input"
+            onKeyPress={(e) => e.key === 'Enter' && handleBotMessage()}
           />
-          <button className="send-btn">📤</button>
+          <button onClick={handleBotMessage} className="send-btn">📤</button>
         </div>
       </div>
 

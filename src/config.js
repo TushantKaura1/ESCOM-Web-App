@@ -1,11 +1,11 @@
 // Configuration file for API endpoints
 const config = {
-  // API Base URL - Always use Render backend for now
+  // API Base URL - Always use Render backend for production
   API_BASE_URL: 'https://citiscience-backend-95pp.onrender.com',
   
   // App Configuration
   APP_NAME: 'ESCOM Citizen Scientist',
-  APP_VERSION: '1.0.0',
+  APP_VERSION: '2.0.0',
   
   // Feature Flags
   ENABLE_TELEGRAM: false,

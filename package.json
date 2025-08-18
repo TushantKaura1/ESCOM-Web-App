@@ -1,37 +1,19 @@
 {
-  "name": "escom-citizen-scientist-app",
+  "name": "escom-citizen-scientist",
   "private": true,
-  "version": "0.0.0",
-  "type": "commonjs",
+  "version": "2.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:netlify": "node build-frontend.js",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "node src/mongo-api/admin-api.js",
-    "start:prod": "node src/mongo-api/admin-api.js",
-    "server": "node src/mongo-api/server.js",
-    "bot": "node src/bot.js",
-    "load-demo": "node scripts/load-demo-accounts.js",
-    "test-db": "node test-db.js"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "deploy:netlify": "npm run build && netlify deploy --prod",
+    "deploy:render": "npm run build && echo 'Frontend built successfully. Backend deploys automatically on Render.'"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.3",
-    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "telegraf": "^4.15.6"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -41,6 +23,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "terser": "^5.43.1",
     "vite": "^5.0.8"
   }
 }
