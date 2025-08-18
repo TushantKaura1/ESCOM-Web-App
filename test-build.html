@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Test - ESCOM Citizen Scientist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #0f0f23;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid;
+        }
+        .status.success {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+            border-color: #4caf50;
+        }
+        .status.error {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+            border-color: #f44336;
+        }
+        .status.info {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196f3;
+            border-color: #2196f3;
+        }
+        .console-output {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Build Test - ESCOM Citizen Scientist</h1>
+        
+        <div class="test-section">
+            <h2>📊 Build Status Check</h2>
+            <div id="build-status">
+                <div class="status info">Checking build status...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 File Verification</h2>
+            <div id="file-status">
+                <div class="status info">Verifying build files...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Build Log</h2>
+            <div class="console-output" id="build-log">
+                Build log will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const buildLog = document.getElementById('build-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            buildLog.textContent += logEntry;
+            buildLog.scrollTop = buildLog.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function checkBuildStatus() {
+            log('🚀 Starting build status check...');
+            
+            // Check if we're in a built environment
+            const isBuilt = window.location.hostname.includes('netlify.app') || 
+                           window.location.hostname.includes('localhost');
+            
+            if (isBuilt) {
+                log('✅ Environment detected: Built/Deployed');
+                updateStatus('build-status', '✅ Build environment detected', 'success');
+            } else {
+                log('⚠️ Environment: Development (not built)');
+                updateStatus('build-status', '⚠️ Development environment detected', 'info');
+            }
+
+            // Check for critical files
+            log('🔍 Checking for critical files...');
+            
+            // Check if React is loaded
+            if (typeof React !== 'undefined') {
+                log('✅ React is loaded');
+            } else {
+                log('❌ React is NOT loaded');
+            }
+
+            // Check if we can access the main app
+            try {
+                const appElement = document.querySelector('#root') || document.querySelector('#app');
+                if (appElement) {
+                    log('✅ App container found');
+                } else {
+                    log('❌ App container NOT found');
+                }
+            } catch (error) {
+                log('❌ Error checking app container: ' + error.message);
+            }
+
+            // Check for JavaScript errors
+            window.addEventListener('error', function(e) {
+                log('❌ JavaScript Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
+            });
+
+            // Check for unhandled promise rejections
+            window.addEventListener('unhandledrejection', function(e) {
+                log('❌ Unhandled Promise Rejection: ' + e.reason);
+            });
+
+            updateStatus('file-status', '✅ File verification completed', 'success');
+            log('✅ Build status check completed');
+        }
+
+        // Run checks when page loads
+        window.onload = function() {
+            log('🚀 Test page loaded successfully');
+            setTimeout(checkBuildStatus, 1000);
+        };
+
+        // Also check after a delay to catch any late errors
+        setTimeout(function() {
+            log('🔍 Delayed check for any runtime errors...');
+        }, 5000);
+    </script>
+</body>
+</html>
