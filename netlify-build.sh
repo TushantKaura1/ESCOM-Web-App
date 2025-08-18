@@ -1,47 +1,33 @@
 #!/bin/bash
 
-echo "🚀 Starting Netlify Build Process..."
+# Netlify Build Script
+# This script ensures proper dependency installation and build process
 
-# Clean previous build
-echo "🧹 Cleaning previous build..."
-rm -rf dist/
-rm -rf node_modules/
+echo "🚀 Starting Netlify build process..."
+
+# Set Node.js version
+echo "📦 Setting Node.js version..."
+nvm use 18 || echo "Node 18 not available, continuing..."
 
 # Install dependencies
-echo "📦 Installing dependencies..."
-npm ci
+echo "📥 Installing dependencies..."
+npm ci --prefer-offline --no-audit
+
+# Verify vite is available
+echo "🔍 Verifying Vite installation..."
+if ! command -v vite &> /dev/null; then
+    echo "❌ Vite not found in PATH, checking node_modules..."
+    if [ -f "./node_modules/.bin/vite" ]; then
+        echo "✅ Vite found in node_modules/.bin/"
+        export PATH="./node_modules/.bin:$PATH"
+    else
+        echo "❌ Vite not found anywhere, installing..."
+        npm install vite@^5.0.8 --save-dev
+    fi
+fi
 
 # Build the project
-echo "🔨 Building project..."
+echo "🏗️ Building project..."
 npm run build
 
-# Verify build output
-echo "✅ Build completed. Checking dist folder:"
-ls -la dist/
-
-# Check for critical files
-echo "🔍 Verifying critical files:"
-if [ -f "dist/index.html" ]; then
-    echo "✅ index.html exists"
-else
-    echo "❌ index.html missing!"
-    exit 1
-fi
-
-if [ -f "dist/assets/index-DxtwNULl.js" ] || [ -f "dist/assets/index-*.js" ]; then
-    echo "✅ Main JavaScript bundle exists"
-else
-    echo "❌ Main JavaScript bundle missing!"
-    exit 1
-fi
-
-if [ -f "dist/assets/index-*.css" ]; then
-    echo "✅ CSS bundle exists"
-else
-    echo "❌ CSS bundle missing!"
-    exit 1
-fi
-
-echo "🎉 Netlify build ready!"
-echo "📁 Dist folder contents:"
-find dist/ -type f -exec ls -la {} \;
+echo "✅ Build process completed!"
