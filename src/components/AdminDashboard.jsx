@@ -34,10 +34,12 @@ function AdminDashboard({ onBack }) {
 
   useEffect(() => {
     console.log('👑 AdminDashboard component mounted');
+    console.log('📊 Loading dashboard data...');
     loadDashboardData();
   }, []);
 
   const loadDashboardData = async () => {
+    console.log('🔄 Loading demo data...');
     // Load demo data for now
     setUsers([
       { id: 1, name: 'Lúcia Fernandes', email: 'lucia@example.com', team: 'Team Beta', status: 'Active', readings: 89, accuracy: 94, lastActivity: '2 hours ago' },
@@ -63,31 +65,45 @@ function AdminDashboard({ onBack }) {
       newThisMonth: 3,
       systemHealth: 'Excellent'
     });
+    
+    console.log('✅ Dashboard data loaded successfully');
+    console.log('👥 Users loaded:', 5);
+    console.log('❓ FAQs loaded:', 5);
+    console.log('📊 Stats loaded:', systemStats);
   };
 
   const handleFaqEdit = (faq) => {
+    console.log('✏️ Editing FAQ:', faq);
     setEditingFaq({ ...faq });
   };
 
   const handleFaqSave = () => {
+    console.log('💾 Saving FAQ changes...');
     if (editingFaq) {
       setFaqs(faqs.map(faq => 
         faq.id === editingFaq.id ? editingFaq : faq
       ));
       setEditingFaq(null);
+      console.log('✅ FAQ saved successfully');
     }
   };
 
   const handleFaqDelete = (faqId) => {
+    console.log('🗑️ Deleting FAQ:', faqId);
     setFaqs(faqs.filter(faq => faq.id !== faqId));
+    console.log('✅ FAQ deleted successfully');
   };
 
   const handleAddFaq = () => {
+    console.log('➕ Adding new FAQ:', newFaq);
     if (newFaq.question && newFaq.answer) {
       const newFaqWithId = { ...newFaq, id: Date.now() };
       setFaqs([...faqs, newFaqWithId]);
       setNewFaq({ category: 'ESCOM Organization', question: '', answer: '' });
       setShowAddFaq(false);
+      console.log('✅ New FAQ added successfully');
+    } else {
+      console.log('❌ FAQ validation failed - missing question or answer');
     }
   };
 
@@ -657,21 +673,30 @@ function AdminDashboard({ onBack }) {
     </div>
   );
 
-  const renderContent = () => {
+  const renderMainContent = () => {
+    console.log('🔍 Rendering main content for tab:', activeTab);
+    
     switch (activeTab) {
       case 'dashboard':
+        console.log('📊 Rendering dashboard tab');
         return renderDashboard();
       case 'users':
+        console.log('👥 Rendering users tab');
         return renderUserManagement();
       case 'analytics':
+        console.log('📈 Rendering analytics tab');
         return renderDataAnalytics();
       case 'settings':
+        console.log('⚙️ Rendering settings tab');
         return renderSystemSettings();
       case 'reports':
+        console.log('📋 Rendering reports tab');
         return renderReports();
       case 'faqs':
+        console.log('❓ Rendering FAQs tab');
         return renderFAQManagement();
       default:
+        console.log('📊 Defaulting to dashboard tab');
         return renderDashboard();
     }
   };
@@ -722,7 +747,7 @@ function AdminDashboard({ onBack }) {
       </div>
 
       <div className="admin-content">
-        {renderContent()}
+        {renderMainContent()}
       </div>
     </div>
   );

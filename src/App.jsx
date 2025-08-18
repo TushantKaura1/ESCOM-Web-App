@@ -280,7 +280,7 @@ function App() {
           onBack={() => setCurrentView('welcome')}
         />
       )}
-      {(currentView === 'dashboard' || currentView === 'admin') && renderDashboard()}
+      {(currentView === 'dashboard' || currentView === 'admin' || adminMode) && renderDashboard()}
     </div>
   );
 }
