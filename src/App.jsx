@@ -68,38 +68,44 @@ function AppContent() {
       console.log('🔧 Enhanced features deployed - v3.0.0');
       console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
 
+      // Check for hardcoded admin access first
+      if (credentials.email === 'admin@escom.com' && credentials.password === 'admin123') {
+        const adminUser = {
+          id: 1,
+          name: 'Admin User',
+          email: credentials.email,
+          role: 'admin',
+          team: 'Admin',
+          status: 'active'
+        };
+        setUser(adminUser);
+        setAdminMode(true);
+        setCurrentView('dashboard');
+        console.log('✅ ADMIN LOGIN SUCCESSFUL!');
+        return true;
+      }
+
       // Check against centralized users data
       const foundUser = users.find(u => u.email === credentials.email);
       
       if (foundUser) {
-        // For demo purposes, we'll accept any password for existing users
-        // In production, this would verify the actual password
-        setUser(foundUser);
-        setAdminMode(foundUser.role === 'admin');
-        setCurrentView('dashboard');
-        console.log('✅ LOGIN SUCCESSFUL!', foundUser);
-        return true;
-      } else {
-        // Check for hardcoded admin access
-        if (credentials.email === 'admin@escom.com' && credentials.password === 'admin123') {
-          const adminUser = {
-            id: 1,
-            name: 'Admin User',
-            email: credentials.email,
-            role: 'admin',
-            team: 'Admin',
-            status: 'active'
-          };
-          setUser(adminUser);
-          setAdminMode(true);
+        // Check if password matches (for demo purposes, we'll accept any password for existing users)
+        // In production, this would verify the actual password hash
+        if (foundUser.password === credentials.password || !foundUser.password) {
+          setUser(foundUser);
+          setAdminMode(foundUser.role === 'admin');
           setCurrentView('dashboard');
-          console.log('✅ ADMIN LOGIN SUCCESSFUL!');
+          console.log('✅ LOGIN SUCCESSFUL!', foundUser);
           return true;
         } else {
-          console.error('❌ LOGIN FAILED: Invalid credentials');
-          setError('Invalid credentials. Please try again.');
+          console.error('❌ LOGIN FAILED: Invalid password');
+          setError('Invalid password. Please try again.');
           return false;
         }
+      } else {
+        console.error('❌ LOGIN FAILED: User not found');
+        setError('User not found. Please check your email or sign up.');
+        return false;
       }
     } catch (error) {
       console.error('💥 LOGIN ERROR:', error);
@@ -131,10 +137,10 @@ function AppContent() {
       const newUser = {
         name: userData.name,
         email: userData.email,
-        username: userData.username || userData.email.split('@')[0],
+        username: userData.email.split('@')[0], // Generate username from email
         password: userData.password, // Store password for demo purposes
         role: userData.role || 'citizen',
-        team: userData.team || 'Team Alpha',
+        team: `Team ${userData.team}`, // Ensure proper team format
         status: 'active'
       };
 
@@ -144,7 +150,7 @@ function AppContent() {
       setUser(newUser);
       setAdminMode(newUser.role === 'admin');
       setCurrentView('dashboard');
-      console.log('✅ SIGNUP SUCCESSFUL!');
+      console.log('✅ SIGNUP SUCCESSFUL!', newUser);
       return true;
     } catch (error) {
       console.error('💥 SIGNUP ERROR:', error);

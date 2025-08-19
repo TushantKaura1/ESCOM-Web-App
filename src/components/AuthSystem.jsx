@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AuthSystem.css';
 
 const AuthSystem = ({ onLogin, onSignup, onClose, mode = 'login' }) => {
+  const [currentMode, setCurrentMode] = useState(mode);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,19 +15,33 @@ const AuthSystem = ({ onLogin, onSignup, onClose, mode = 'login' }) => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  // Reset form when mode changes
+  useEffect(() => {
+    setCurrentMode(mode);
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+      role: 'citizen',
+      team: 'Alpha'
+    });
+    setError('');
+  }, [mode]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      if (mode === 'signup' && formData.password !== formData.confirmPassword) {
+      if (currentMode === 'signup' && formData.password !== formData.confirmPassword) {
         setError('Passwords do not match');
         setIsLoading(false);
         return;
       }
 
-      if (mode === 'login') {
+      if (currentMode === 'login') {
         // Handle login
         const success = await onLogin({
           email: formData.email,
@@ -68,12 +83,12 @@ const AuthSystem = ({ onLogin, onSignup, onClose, mode = 'login' }) => {
     <div className="auth-overlay">
       <div className="auth-modal">
         <div className="auth-header">
-          <h2>{mode === 'login' ? '🔐 Login' : '📝 Sign Up'}</h2>
+          <h2>{currentMode === 'login' ? '🔐 Login' : '📝 Sign Up'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {mode === 'signup' && (
+          {currentMode === 'signup' && (
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
               <input
@@ -179,23 +194,53 @@ const AuthSystem = ({ onLogin, onSignup, onClose, mode = 'login' }) => {
               className="auth-submit-btn"
               disabled={isLoading}
             >
-              {isLoading ? '⏳ Processing...' : (mode === 'login' ? '🔐 Login' : '📝 Sign Up')}
+              {isLoading ? '⏳ Processing...' : (currentMode === 'login' ? '🔐 Login' : '📝 Sign Up')}
             </button>
           </div>
         </form>
 
         <div className="auth-footer">
-          {mode === 'login' ? (
+          {currentMode === 'login' ? (
             <p>
               Don't have an account?{' '}
-              <button className="link-btn" onClick={() => window.location.reload()}>
+              <button 
+                type="button"
+                className="link-btn" 
+                onClick={() => {
+                  setCurrentMode('signup');
+                  setFormData({
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    name: '',
+                    role: 'citizen',
+                    team: 'Alpha'
+                  });
+                  setError('');
+                }}
+              >
                 Sign up here
               </button>
             </p>
           ) : (
             <p>
               Already have an account?{' '}
-              <button className="link-btn" onClick={() => window.location.reload()}>
+              <button 
+                type="button"
+                className="link-btn" 
+                onClick={() => {
+                  setCurrentMode('login');
+                  setFormData({
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    name: '',
+                    role: 'citizen',
+                    team: 'Alpha'
+                  });
+                  setError('');
+                }}
+              >
                 Login here
               </button>
             </p>
