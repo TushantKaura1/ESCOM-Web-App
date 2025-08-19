@@ -219,11 +219,11 @@ function AdminDashboard({ onBack }) {
       ];
 
       const demoStats = {
-        totalUsers: 11,
-        activeUsers: 8,
-        totalReadings: 567,
-        averageAccuracy: 91.3,
-        newThisMonth: 3,
+      totalUsers: 11,
+      activeUsers: 8,
+      totalReadings: 567,
+      averageAccuracy: 91.3,
+      newThisMonth: 3,
         systemHealth: 'Excellent',
         totalFAQs: 5,
         totalUpdates: 2,
@@ -1022,23 +1022,23 @@ function AdminDashboard({ onBack }) {
       <h3>📈 Data Analytics</h3>
       
       <div className="analytics-overview">
-        <h4>Overall Statistics</h4>
+          <h4>Overall Statistics</h4>
         <div className="stats-grid">
           <div className="stat-card">
             <h5>Total Readings</h5>
             <div className="stat-value">{dataAnalytics.totalReadings}</div>
             <div className="stat-label">Monitoring entries</div>
-          </div>
+            </div>
           <div className="stat-card">
             <h5>Average Accuracy</h5>
             <div className="stat-value">{dataAnalytics.averageAccuracy}%</div>
             <div className="stat-label">Data quality</div>
-          </div>
+            </div>
           <div className="stat-card">
             <h5>Top Performer</h5>
             <div className="stat-value">{dataAnalytics.topPerformer}</div>
             <div className="stat-label">{dataAnalytics.topPerformerReadings} readings</div>
-          </div>
+            </div>
           <div className="stat-card">
             <h5>Most Active Team</h5>
             <div className="stat-value">{dataAnalytics.mostActiveTeam}</div>
@@ -1061,11 +1061,11 @@ function AdminDashboard({ onBack }) {
                     backgroundColor: `hsl(${120 + (trend.accuracy - 80) * 2}, 70%, 50%)`
                   }}
                 ></div>
-              </div>
+            </div>
               <div className="trend-stats">
                 <span className="readings">{trend.readings} readings</span>
                 <span className="accuracy">{trend.accuracy}% accuracy</span>
-              </div>
+          </div>
             </div>
           ))}
         </div>
@@ -1237,19 +1237,19 @@ function AdminDashboard({ onBack }) {
                 <h5>{report.name}</h5>
                 <p>Type: {report.type}</p>
                 <p>Date: {report.date}</p>
-              </div>
+          </div>
               <div className="report-status">
                 <span className={`status-badge ${report.status.toLowerCase()}`}>
                   {report.status}
                 </span>
-              </div>
+          </div>
               <div className="report-actions">
                 <button onClick={() => viewReport(report.id)} className="view-btn">👁️ View</button>
                 {report.status === 'Completed' && (
                   <button onClick={() => downloadReport(report.id)} className="download-btn">📥 Download</button>
                 )}
-              </div>
-            </div>
+          </div>
+          </div>
           ))}
         </div>
       </div>
