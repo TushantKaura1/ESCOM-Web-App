@@ -23,9 +23,11 @@ function App() {
   const [showDailyUpdates, setShowDailyUpdates] = useState(false);
   const [currentSection, setCurrentSection] = useState('dashboard');
   
-  // Force Netlify rebuild - Enhanced Admin & User Features v3.0 - Aug 19, 2025
+  // FORCE NETLIFY REBUILD - Enhanced Admin & User Features v3.0 - Aug 19, 2025
+  // This version includes: Authentication, Bot Helper, Daily Updates, Real-time Sync
   const APP_VERSION = '3.0.0';
-  const BUILD_TIMESTAMP = '2025-08-19T00:00:00Z';
+  const BUILD_TIMESTAMP = '2025-08-19T11:30:00Z';
+  const FORCE_REBUILD = 'NETLIFY_REBUILD_REQUIRED_v3.0.0';
 
   // Check backend connection on app start
   useEffect(() => {
@@ -34,6 +36,7 @@ function App() {
     console.log('🤖 Dynamic bot helper with context awareness');
     console.log('📢 Daily updates management');
     console.log('🔄 Real-time synchronization between admin and user');
+    console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
     checkBackendConnection();
   }, []);
 
@@ -64,6 +67,7 @@ function App() {
       console.log('🚀 LOGIN ATTEMPT STARTED');
       console.log('📤 Sending login data:', { email: credentials.email, password: '***' });
       console.log('🔧 Enhanced features deployed - v3.0.0');
+      console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
 
       // For demo purposes, simulate authentication
       // In production, this would call your backend API
@@ -117,6 +121,7 @@ function App() {
     try {
       console.log('🚀 SIGNUP ATTEMPT STARTED');
       console.log('📤 Sending signup data:', { ...userData, password: '***' });
+      console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
 
       // For demo purposes, simulate user creation
       // In production, this would call your backend API
@@ -184,6 +189,7 @@ function App() {
           <div className="version-info">
             <span>Version {APP_VERSION}</span>
             <span>Built: {new Date(BUILD_TIMESTAMP).toLocaleDateString()}</span>
+            <span style={{color: '#00d4aa'}}>🚀 ENHANCED v3.0.0 DEPLOYED!</span>
           </div>
         </div>
 
