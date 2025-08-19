@@ -1,14 +1,23 @@
 # FORCE NETLIFY REBUILD - Updated configuration with proper build settings and no-cache headers
 # This file ensures Netlify builds from the correct directory and serves fresh content
+# Project: still testing CitizenScientistMiniApp copy 2
+# Build Date: $(date)
 
 [build]
+  # Build command - this runs in the project root directory
   command = "npm ci && npm run build"
+  # Publish directory - this is the output folder created by the build
   publish = "dist"
+  # Base directory - ensure we're building from the current project
+  base = "."
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
   NODE_ENV = "production"
+  # Force rebuild
+  FORCE_REBUILD = "true"
+  BUILD_TIMESTAMP = "2025-08-19T12:05:00Z"
 
 [[redirects]]
   from = "/*"
