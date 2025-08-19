@@ -6,11 +6,12 @@ import UserDashboard from './components/UserDashboard';
 import AuthSystem from './components/AuthSystem';
 import DynamicBotHelper from './components/DynamicBotHelper';
 import DailyUpdatesManager from './components/DailyUpdatesManager';
-import { DataProvider } from './contexts/DataContext';
+import { DataProvider, useData } from './contexts/DataContext';
 import config from './config';
 import './App.css';
 
-function App() {
+function AppContent() {
+  const { users, addUser } = useData();
   const [currentView, setCurrentView] = useState('welcome');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -69,40 +70,38 @@ function App() {
       console.log('🔧 Enhanced features deployed - v3.0.0');
       console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
 
-      // For demo purposes, simulate authentication
-      // In production, this would call your backend API
-      if (credentials.email === 'admin@escom.com' && credentials.password === 'admin123') {
-        const adminUser = {
-          id: 1,
-          name: 'Admin User',
-          email: credentials.email,
-          role: 'admin',
-          team: 'Admin',
-          status: 'active'
-        };
-        setUser(adminUser);
-        setAdminMode(true);
+      // Check against centralized users data
+      const foundUser = users.find(u => u.email === credentials.email);
+      
+      if (foundUser) {
+        // For demo purposes, we'll accept any password for existing users
+        // In production, this would verify the actual password
+        setUser(foundUser);
+        setAdminMode(foundUser.role === 'admin');
         setCurrentView('dashboard');
-        console.log('✅ ADMIN LOGIN SUCCESSFUL!');
-        return true;
-      } else if (credentials.email === 'user@escom.com' && credentials.password === 'user123') {
-        const regularUser = {
-          id: 2,
-          name: 'Citizen Scientist',
-          email: credentials.email,
-          role: 'citizen',
-          team: 'Alpha',
-          status: 'active'
-        };
-        setUser(regularUser);
-        setAdminMode(false);
-        setCurrentView('dashboard');
-        console.log('✅ USER LOGIN SUCCESSFUL!');
+        console.log('✅ LOGIN SUCCESSFUL!', foundUser);
         return true;
       } else {
-        console.error('❌ LOGIN FAILED: Invalid credentials');
-        setError('Invalid credentials. Please try again.');
-        return false;
+        // Check for hardcoded admin access
+        if (credentials.email === 'admin@escom.com' && credentials.password === 'admin123') {
+          const adminUser = {
+            id: 1,
+            name: 'Admin User',
+            email: credentials.email,
+            role: 'admin',
+            team: 'Admin',
+            status: 'active'
+          };
+          setUser(adminUser);
+          setAdminMode(true);
+          setCurrentView('dashboard');
+          console.log('✅ ADMIN LOGIN SUCCESSFUL!');
+          return true;
+        } else {
+          console.error('❌ LOGIN FAILED: Invalid credentials');
+          setError('Invalid credentials. Please try again.');
+          return false;
+        }
       }
     } catch (error) {
       console.error('💥 LOGIN ERROR:', error);
@@ -123,25 +122,29 @@ function App() {
       console.log('📤 Sending signup data:', { ...userData, password: '***' });
       console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
 
-      // For demo purposes, simulate user creation
-      // In production, this would call your backend API
+      // Check if user already exists
+      const existingUser = users.find(u => u.email === userData.email);
+      if (existingUser) {
+        setError('User with this email already exists.');
+        return false;
+      }
+
+      // Create new user with password
       const newUser = {
-        id: Date.now(),
         name: userData.name,
         email: userData.email,
-        role: userData.role,
-        team: userData.team,
-        status: 'active',
-        joinDate: new Date().toISOString()
+        username: userData.username || userData.email.split('@')[0],
+        password: userData.password, // Store password for demo purposes
+        role: userData.role || 'citizen',
+        team: userData.team || 'Team Alpha',
+        status: 'active'
       };
 
-      // Store user in localStorage for demo
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      existingUsers.push(newUser);
-      localStorage.setItem('users', JSON.stringify(existingUsers));
+      // Add user to centralized system
+      addUser(newUser);
 
       setUser(newUser);
-      setAdminMode(userData.role === 'admin');
+      setAdminMode(newUser.role === 'admin');
       setCurrentView('dashboard');
       console.log('✅ SIGNUP SUCCESSFUL!');
       return true;
@@ -265,79 +268,85 @@ function App() {
   };
 
   return (
-    <DataProvider>
-      <div className="App">
-        {renderMainContent()}
+    <div className="App">
+      {renderMainContent()}
 
-        {/* Authentication Modal */}
-        {showAuth && (
-          <AuthSystem
-            mode={authMode}
-            onLogin={handleLogin}
-            onSignup={handleSignup}
-            onClose={closeAuth}
-          />
-        )}
+      {/* Authentication Modal */}
+      {showAuth && (
+        <AuthSystem
+          mode={authMode}
+          onLogin={handleLogin}
+          onSignup={handleSignup}
+          onClose={closeAuth}
+        />
+      )}
 
-        {/* Dynamic Bot Helper */}
-        {user && (
-          <DynamicBotHelper
-            userRole={user.role}
-            currentSection={currentSection}
-            onClose={() => setShowBotHelper(false)}
-          />
-        )}
+      {/* Dynamic Bot Helper */}
+      {user && (
+        <DynamicBotHelper
+          userRole={user.role}
+          currentSection={currentSection}
+          onClose={() => setShowBotHelper(false)}
+        />
+      )}
 
-        {/* Daily Updates Manager */}
-        {showDailyUpdates && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <DailyUpdatesManager
-                userRole={user?.role || 'citizen'}
-                onClose={() => setShowDailyUpdates(false)}
-              />
-            </div>
+      {/* Daily Updates Manager */}
+      {showDailyUpdates && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <DailyUpdatesManager
+              userRole={user?.role || 'citizen'}
+              onClose={() => setShowDailyUpdates(false)}
+            />
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Floating Action Buttons */}
-        {user && (
-          <div className="floating-actions">
-            <button 
-              className="fab-btn bot-helper-btn"
-              onClick={toggleBotHelper}
-              title="AI Assistant"
-            >
-              🤖
-            </button>
-            <button 
-              className="fab-btn updates-btn"
-              onClick={toggleDailyUpdates}
-              title="Daily Updates"
+      {/* Floating Action Buttons */}
+      {user && (
+        <div className="floating-actions">
+          <button 
+            className="fab-btn bot-helper-btn"
+            onClick={toggleBotHelper}
+            title="AI Assistant"
           >
-              📢
-            </button>
-          </div>
-        )}
+            🤖
+          </button>
+          <button 
+            className="fab-btn updates-btn"
+            onClick={toggleDailyUpdates}
+            title="Daily Updates"
+        >
+            📢
+          </button>
+        </div>
+      )}
 
-        {/* Loading Overlay */}
-        {loading && (
-          <div className="loading-overlay">
-            <div className="loading-spinner">
-              <div className="spinner"></div>
-              <p>Processing...</p>
-            </div>
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Processing...</p>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Error Display */}
-        {error && (
-          <div className="error-toast">
-            <span>❌ {error}</span>
-            <button onClick={() => setError(null)}>×</button>
-          </div>
-        )}
-      </div>
+      {/* Error Display */}
+      {error && (
+        <div className="error-toast">
+          <span>❌ {error}</span>
+          <button onClick={() => setError(null)}>×</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DataProvider>
+      <AppContent />
     </DataProvider>
   );
 }

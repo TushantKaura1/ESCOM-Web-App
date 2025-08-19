@@ -19,7 +19,9 @@ function AdminDashboard({ onBack }) {
     deleteUser,
     forceSync,
     isSyncing,
-    lastSync
+    lastSync,
+    exportData,
+    importData
   } = useData();
   
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -1182,6 +1184,59 @@ function AdminDashboard({ onBack }) {
             <option value="5 years">5 years</option>
             <option value="10 years">10 years</option>
           </select>
+        </div>
+      </div>
+
+      <div className="settings-section">
+        <h4>Data Management</h4>
+        <div className="setting-item">
+          <span className="setting-label">📊 Data Export</span>
+          <button onClick={exportData} className="action-btn">📥 Export All Data</button>
+        </div>
+        <div className="setting-item">
+          <span className="setting-label">📁 Data Import</span>
+          <input 
+            type="file" 
+            accept=".json"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  try {
+                    const data = JSON.parse(event.target.result);
+                    if (window.confirm('Are you sure you want to import this data? This will replace all current data.')) {
+                      importData(data);
+                    }
+                  } catch (error) {
+                    alert('Invalid data file. Please select a valid JSON backup file.');
+                  }
+                };
+                reader.readAsText(file);
+              }
+            }}
+            className="file-input"
+          />
+        </div>
+        <div className="setting-item">
+          <span className="setting-label">🔄 Force Sync</span>
+          <button onClick={forceSync} className={`action-btn ${isSyncing ? 'syncing' : ''}`}>
+            {isSyncing ? '🔄 Syncing...' : '🔄 Sync Now'}
+          </button>
+        </div>
+        <div className="setting-item">
+          <span className="setting-label">🗑️ Clear All Data</span>
+          <button 
+            onClick={() => {
+              if (window.confirm('⚠️ WARNING: This will delete ALL data including FAQs, updates, and users. This action cannot be undone. Are you sure?')) {
+                localStorage.clear();
+                window.location.reload();
+              }
+            }} 
+            className="action-btn danger"
+          >
+            🗑️ Clear All Data
+          </button>
         </div>
       </div>
 
