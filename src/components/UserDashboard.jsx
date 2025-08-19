@@ -21,11 +21,11 @@ function UserDashboard({ user, onBack }) {
     messages: [],
     currentMessage: ''
   });
-  const [learningResources, setLearningResources] = useState([]);
-  const [communityPosts, setCommunityPosts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [viewMode, setViewMode] = useState('grid');
+  // const [learningResources, setLearningResources] = useState([]);
+  // const [communityPosts, setCommunityPosts] = useState([]);
+  // const [searchTerm, setSearchTerm] = useState('');
+  // const [filterCategory, setFilterCategory] = useState('all');
+  // const [viewMode, setViewMode] = useState('grid');
 
   useEffect(() => {
     console.log('🌊 UserDashboard component mounted for user:', user);
@@ -107,58 +107,58 @@ function UserDashboard({ user, onBack }) {
       }
     ]);
 
-    setLearningResources([
-      {
-        id: 1,
-        title: 'Water Quality Monitoring Basics',
-        type: 'video',
-        duration: '15 min',
-        difficulty: 'beginner',
-        tags: ['monitoring', 'basics', 'training'],
-        url: 'https://example.com/video1',
-        thumbnail: 'https://example.com/thumb1.jpg',
-        description: 'Learn the fundamentals of water quality monitoring'
-      },
-      {
-        id: 2,
-        title: 'Equipment Calibration Guide',
-        type: 'manual',
-        duration: '30 min',
-        difficulty: 'intermediate',
-        tags: ['equipment', 'calibration', 'maintenance'],
-        url: 'https://example.com/manual1',
-        thumbnail: 'https://example.com/thumb2.jpg',
-        description: 'Step-by-step guide to calibrating monitoring equipment'
-      }
-    ]);
+    // setLearningResources([
+    //   {
+    //     id: 1,
+    //     title: 'Water Quality Monitoring Basics',
+    //     type: 'video',
+    //     duration: '15 min',
+    //     difficulty: 'beginner',
+    //     tags: ['monitoring', 'basics', 'training'],
+    //     url: 'https://example.com/video1',
+    //     thumbnail: 'https://example.com/thumb1.jpg',
+    //     description: 'Learn the fundamentals of water quality monitoring'
+    //   },
+    //   {
+    //     id: 2,
+    //     title: 'Equipment Calibration Guide',
+    //     type: 'manual',
+    //     duration: '30 min',
+    //     difficulty: 'intermediate',
+    //     tags: ['equipment', 'calibration', 'maintenance'],
+    //     url: 'https://example.com/manual1',
+    //     thumbnail: 'https://example.com/thumb2.jpg',
+    //     description: 'Step-by-step guide to calibrating monitoring equipment'
+    //   }
+    // ]);
 
-    setCommunityPosts([
-      {
-        id: 1,
-        author: 'Carlos Silva',
-        content: 'Just completed my first monitoring session! The new equipment is amazing. Any tips for beginners?',
-        timestamp: '2024-01-20T10:00:00Z',
-        likes: 5,
-        comments: 3,
-        tags: ['first-time', 'tips', 'equipment']
-      },
-      {
-        id: 2,
-        author: 'Maria Santos',
-        content: 'Found some interesting patterns in the salinity data this month. Anyone else notice similar trends?',
-        timestamp: '2024-01-19T16:00:00Z',
-        likes: 8,
-        comments: 6,
-        tags: ['data-analysis', 'patterns', 'salinity']
-      }
-    ]);
+    // setCommunityPosts([
+    //   {
+    //     id: 1,
+    //     author: 'Carlos Silva',
+    //     content: 'Just completed my first monitoring session! The new equipment is amazing. Any tips for beginners?',
+    //     timestamp: '2024-01-20T10:00:00Z',
+    //     likes: 5,
+    //     comments: 3,
+    //     tags: ['first-time', 'tips', 'equipment']
+    //   },
+    //   {
+    //     id: 2,
+    //     author: 'Maria Santos',
+    //     content: 'Found some interesting patterns in the salinity data this month. Anyone else notice similar trends?',
+    //     timestamp: '2024-01-19T16:00:00Z',
+    //     likes: 8,
+    //     comments: 6,
+    //     tags: ['data-analysis', 'patterns', 'salinity']
+    //   }
+    // ]);
   };
 
   const handleSubmitReading = (e) => {
     e.preventDefault();
     
     if (!newReading.temperature || !newReading.salinity || !newReading.ph || !newReading.turbidity) {
-      alert('Please fill in all required fields');
+              console.log('Please fill in all required fields');
       return;
     }
 
@@ -271,36 +271,35 @@ function UserDashboard({ user, onBack }) {
     }
   };
 
-  const handleLikePost = (postId) => {
-    setCommunityPosts(communityPosts.map(post => 
-      post.id === postId ? { ...post, likes: post.likes + 1 } : post
-    ));
-  };
+  // const handleLikePost = (postId) => {
+  //   setCommunityPosts(communityPosts.map(post => 
+  //     post.id === postId ? { ...post, likes: post.likes + 1 } : post
+  //   ));
+  // };
 
-  const handleAddComment = (postId, comment) => {
-    if (!comment.trim()) return;
-    
-    setCommunityPosts(communityPosts.map(post => 
-      post.id === postId ? { ...post, comments: post.comments + 1 } : post
-    ));
-  };
+  // const handleAddComment = (postId, comment) => {
+  //   if (!comment.trim()) return;
+  //   
+  //   setCommunityPosts(communityPosts.map(post => 
+  //     post.id === postId ? { ...post, comments: post.comments + 1 } : post
+  //   ));
+  // };
 
-  const handleCreatePost = (content, tags) => {
-    if (!content.trim()) return;
-    
-    const newPost = {
-      id: Date.now(),
-      author: user.name,
-      content: content.trim(),
-      timestamp: new Date().toISOString(),
-      likes: 0,
-      comments: 0,
-      tags: tags || []
-    };
-    
-    setCommunityPosts([newPost, ...communityPosts]);
-    console.log('✅ New community post created:', newPost);
-  };
+  // const handleCreatePost = (content, tags) => {
+  //   if (!content.trim()) return;
+  //   
+  //   const newPost = {
+  //     //   author: user.name,
+  //   content: content.trim(),
+  //   timestamp: new Date().toISOString(),
+  //   likes: 0,
+  //   comments: 0,
+  //   tags: tags || []
+  // };
+  //   
+  //   setCommunityPosts([newPost, ...communityPosts]);
+  //   console.log('✅ New community post created:', newPost);
+  // };
 
   const renderOverview = () => (
     <div className="user-overview">

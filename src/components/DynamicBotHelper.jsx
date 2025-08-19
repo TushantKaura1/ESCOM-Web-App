@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './DynamicBotHelper.css';
 
 const DynamicBotHelper = ({ userRole, currentSection, onClose }) => {
@@ -10,7 +10,7 @@ const DynamicBotHelper = ({ userRole, currentSection, onClose }) => {
   const [suggestions, setSuggestions] = useState([]);
 
   // Context-aware suggestions based on user role and current section
-  const getContextSuggestions = () => {
+  const getContextSuggestions = useCallback(() => {
     const baseSuggestions = [
       "How can I help you today?",
       "Need assistance with something specific?",
@@ -66,7 +66,7 @@ const DynamicBotHelper = ({ userRole, currentSection, onClose }) => {
       };
       return userSuggestions[currentSection] || baseSuggestions;
     }
-  };
+  }, [userRole, currentSection]);
 
   // Initialize bot with welcome message
   useEffect(() => {
@@ -78,7 +78,7 @@ const DynamicBotHelper = ({ userRole, currentSection, onClose }) => {
     };
     setMessages([welcomeMessage]);
     setSuggestions(getContextSuggestions());
-  }, [userRole, currentSection]);
+  }, [userRole, currentSection, getContextSuggestions]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -90,7 +90,7 @@ const DynamicBotHelper = ({ userRole, currentSection, onClose }) => {
     setIsTyping(true);
     
     // Simulate typing delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+    await new Promise(resolve => window.setTimeout(resolve, 1000 + Math.random() * 2000));
 
     let response = '';
     const lowerMessage = userMessage.toLowerCase();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './AuthSystem.css';
 
 const AuthSystem = ({ onLogin, onSignup, onClose, mode = 'login' }) => {

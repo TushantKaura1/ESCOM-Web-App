@@ -56,9 +56,9 @@ function AdminDashboard({ onBack }) {
     pendingApprovals: 0
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
+  // const [filterCategory, setFilterCategory] = useState('all');
   const [sortBy, setSortBy] = useState('date');
-  const [viewMode, setViewMode] = useState('grid'); // grid or list
+  // const [viewMode, setViewMode] = useState('grid'); // grid or list - commented out for now
 
   const [settings, setSettings] = useState({
     notifications: true,
@@ -76,7 +76,7 @@ function AdminDashboard({ onBack }) {
     { id: 4, name: 'System Health Report', status: 'Scheduled', date: '2024-01-21', type: 'System Health' }
   ]);
 
-  const [dataAnalytics, setDataAnalytics] = useState({
+  const [dataAnalytics] = useState({
     totalReadings: 567,
     averageAccuracy: 91.3,
     topPerformer: 'Lúcia Fernandes',
@@ -281,13 +281,13 @@ function AdminDashboard({ onBack }) {
     }
   };
 
-  const handleFaqArchive = (faqId) => {
-    console.log('📦 Archiving FAQ:', faqId);
-    setFaqs(faqs.map(faq => 
-      faq.id === faqId ? { ...faq, status: 'archived' } : faq
-    ));
-    console.log('✅ FAQ archived successfully');
-  };
+  // const handleFaqArchive = (faqId) => {
+  //   console.log('📦 Archiving FAQ:', faqId);
+  //   setFaqs(faqs.map(faq => 
+  //     faq.id === faqId ? { ...faq, status: 'archived' } : faq
+  //   ));
+  //   console.log('✅ FAQ archived successfully');
+  // };
 
   const handleAddFaq = () => {
     console.log('➕ Adding new FAQ:', newFaq);
@@ -318,41 +318,41 @@ function AdminDashboard({ onBack }) {
     }
   };
 
-  const handleAddTag = (faqId, tag) => {
-    if (tag.trim()) {
-      setFaqs(faqs.map(faq => 
-        faq.id === faqId 
-          ? { ...faq, tags: [...faq.tags, tag.trim()] }
-          : faq
-      ));
-    }
-  };
+  // const handleAddTag = (faqId, tag) => {
+  //   if (tag.trim()) {
+  //     setFaqs(faqs.map(faq => 
+  //       faq.id === faqId 
+  //         ? { ...faq, tags: [...faq.tags, tag.trim()] }
+  //         : faq
+  //     ));
+  //   }
+  // };
 
-  const handleRemoveTag = (faqId, tagToRemove) => {
-    setFaqs(faqs.map(faq => 
-      faq.id === faqId 
-        ? { ...faq, tags: faq.tags.filter(tag => tag !== tagToRemove) }
-        : faq
-    ));
-  };
+  // const handleRemoveTag = (faqId, tagToRemove) => {
+  //   setFaqs(faqs.map(faq => 
+  //       faq.id === faqId 
+  //         ? { ...faq, tags: faq.tags.filter(tag => tag !== tagToRemove) }
+  //         : faq
+  //     ));
+  // };
 
-  const handleAddMedia = (faqId, mediaUrl) => {
-    if (mediaUrl.trim()) {
-      setFaqs(faqs.map(faq => 
-        faq.id === faqId 
-          ? { ...faq, media: [...faq.media, mediaUrl.trim()] }
-          : faq
-      ));
-    }
-  };
+  // const handleAddMedia = (faqId, mediaUrl) => {
+  //   if (tag.trim()) {
+  //     setFaqs(faqs.map(faq => 
+  //       faq.id === faqId 
+  //         ? { ...faq, media: [...faq.media, mediaUrl.trim()] }
+  //         : faq
+  //     ));
+  //   }
+  // };
 
-  const handleRemoveMedia = (faqId, mediaToRemove) => {
-    setFaqs(faqs.map(faq => 
-      faq.id === faqId 
-        ? { ...faq, media: faq.media.filter(media => media !== mediaToRemove) }
-        : faq
-    ));
-  };
+  // const handleRemoveMedia = (faqId, mediaToRemove) => {
+  //   setFaqs(faqs.map(faq => 
+  //       faq.id === faqId 
+  //         ? { ...faq, media: faq.media.filter(media => media !== mediaToRemove) }
+  //         : faq
+  //     ));
+  // };
 
   const handleUpdateEdit = (update) => {
     console.log('✏️ Editing update:', update);
@@ -429,41 +429,40 @@ function AdminDashboard({ onBack }) {
     console.log('✅ Update published successfully');
   };
 
-  const handleAddUpdateTag = (updateId, tag) => {
-    if (tag.trim()) {
-      setUpdates(updates.map(update => 
-        update.id === updateId 
-          ? { ...update, tags: [...update.tags, tag.trim()] }
-          : update
-      ));
-    }
-  };
+  // const handleAddUpdateTag = (updateId, tag) => {
+  //   if (tag.trim()) {
+  //     setUpdates(updates.map(update => 
+  //       update.id === updateId 
+  //         ? { ...update, tags: [...update.tags, tag.trim()] }
+  //         : update
+  //     ));
+  //   }
+  // };
 
-  const handleRemoveUpdateTag = (updateId, tagToRemove) => {
-    setUpdates(updates.map(update => 
-      update.id === updateId 
-        ? { ...update, tags: update.tags.filter(tag => tag !== tagToRemove) }
-        : update
-    ));
-  };
+  // const handleRemoveUpdateTag = (updateId, tagToRemove) => {
+  //   setUpdates(updates.map(update => 
+  //       update.id === updateId 
+  //         : update
+  //     ));
+  // };
 
-  const handleAddUpdateMedia = (updateId, mediaUrl) => {
-    if (mediaUrl.trim()) {
-      setUpdates(updates.map(update => 
-        update.id === updateId 
-          ? { ...update, media: [...update.media, mediaUrl.trim()] }
-          : update
-      ));
-    }
-  };
+  // const handleAddUpdateTag = (updateId, tag) => {
+  //   if (tag.trim()) {
+  //     setUpdates(updates.map(update => 
+  //       updateId 
+  //         ? { ...update, media: [...update.media, mediaUrl.trim()] }
+  //         : update
+  //     ));
+  //   }
+  // };
 
-  const handleRemoveUpdateMedia = (updateId, mediaToRemove) => {
-    setUpdates(updates.map(update => 
-      update.id === updateId 
-        ? { ...update, media: update.media.filter(media => media !== mediaToRemove) }
-        : update
-    ));
-  };
+  // const handleRemoveUpdateMedia = (updateId, mediaToRemove) => {
+  //   setUpdates(updates.map(update => 
+  //       update.id === updateId 
+  //         ? { ...update, media: update.media.filter(media => media !== mediaToRemove) }
+  //         : update
+  //     ));
+  // };
 
   const handleUserEdit = (user) => {
     console.log('✏️ Editing user:', user);
@@ -548,7 +547,7 @@ function AdminDashboard({ onBack }) {
   const handleSettingsSave = () => {
     console.log('💾 Settings saved:', settings);
     // Here you would typically save to backend
-    alert('Settings saved successfully!');
+            console.log('Settings saved successfully!');
   };
 
   const handleSettingsReset = () => {
@@ -574,7 +573,7 @@ function AdminDashboard({ onBack }) {
     setReports([...reports, newReport]);
     
     // Simulate report completion
-    setTimeout(() => {
+    window.setTimeout(() => {
       setReports(prevReports => 
         prevReports.map(report => 
           report.id === newReport.id 
@@ -592,7 +591,7 @@ function AdminDashboard({ onBack }) {
     if (report) {
       console.log('📥 Downloading report:', report.name);
       // Here you would generate and download the actual report
-      alert(`Downloading ${report.name}...`);
+              console.log(`Downloading ${report.name}...`);
     }
   };
 
@@ -601,18 +600,18 @@ function AdminDashboard({ onBack }) {
     if (report) {
       console.log('👁️ Viewing report:', report.name);
       // Here you would show the report details
-      alert(`Viewing ${report.name}...`);
+              console.log(`Viewing ${report.name}...`);
     }
   };
 
   // Search and filter functions
-  const filteredFAQs = faqs.filter(faq => {
-    const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // const filteredFAQs = faqs.filter(faq => {
+  //   const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //                        faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //                        faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+  //   // const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
+  //   return matchesSearch; // && matchesCategory;
+  // });
 
   const filteredUsers = users.filter(user => {
     return user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -626,21 +625,21 @@ function AdminDashboard({ onBack }) {
            update.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
   });
 
-  const sortedFAQs = [...filteredFAQs].sort((a, b) => {
-    switch (sortBy) {
-      case 'date':
-        return new Date(b.updatedAt) - new Date(a.updatedAt);
-      case 'priority':
-        const priorityOrder = { high: 3, medium: 2, low: 1 };
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
-      case 'views':
-        return b.viewCount - a.viewCount;
-      case 'category':
-        return a.category.localeCompare(b.category);
-      default:
-        return 0;
-    }
-  });
+  // const sortedFAQs = [...filteredFAQs].sort((a, b) => {
+  //   switch (sortBy) {
+  //     case 'date':
+  //       return new Date(b.updatedAt) - new Date(a.updatedAt);
+  //     case 'priority':
+  //       const priorityOrder = { high: 3, medium: 2, low: 1 };
+  //       return priorityOrder[b.priority] - priorityOrder[a.priority];
+  //     case 'views':
+  //       return b.viewCount - a.viewCount;
+  //     case 'category':
+  //       return a.category.localeCompare(b.category);
+  //     default:
+  //       return 0;
+  //   }
+  // });
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     switch (sortBy) {
@@ -648,10 +647,12 @@ function AdminDashboard({ onBack }) {
         return a.name.localeCompare(b.name);
       case 'team':
         return a.team.localeCompare(b.team);
-      case 'activity':
+      case 'activity': {
         return new Date(b.lastActivity) - new Date(a.lastActivity);
-      case 'contributions':
+      }
+      case 'contributions': {
         return b.totalContributions - a.totalContributions;
+      }
       default:
         return 0;
     }
@@ -661,9 +662,10 @@ function AdminDashboard({ onBack }) {
     switch (sortBy) {
       case 'date':
         return new Date(b.createdAt) - new Date(a.createdAt);
-      case 'priority':
+      case 'priority': {
         const priorityOrder = { high: 3, medium: 2, low: 1 };
         return priorityOrder[b.priority] - priorityOrder[a.priority];
+      }
       case 'views':
         return b.viewCount - a.viewCount;
       case 'type':

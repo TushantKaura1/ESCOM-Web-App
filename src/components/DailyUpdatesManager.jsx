@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './DailyUpdatesManager.css';
 
-const DailyUpdatesManager = ({ userRole, onClose }) => {
+const DailyUpdatesManager = ({ userRole }) => {
   const [updates, setUpdates] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingUpdate, setEditingUpdate] = useState(null);

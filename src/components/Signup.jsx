@@ -47,9 +47,9 @@ function Signup({ onSignup, onBack }) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (!formData.confirmPassword) {
+    if (!formData.confirmPassword) { // eslint-disable-line no-unused-vars
       newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
+    } else if (formData.password !== formData.confirmPassword) { // eslint-disable-line no-unused-vars
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -66,6 +66,7 @@ function Signup({ onSignup, onBack }) {
 
     try {
       // Remove confirmPassword before sending to API
+      // eslint-disable-next-line no-unused-vars
       const { confirmPassword, ...signupData } = formData;
       await onSignup(signupData);
     } catch (error) {
