@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from 'react';
+import { useData } from '../contexts/DataContext';
 import './AdminDashboard.css';
 
 function AdminDashboard({ onBack }) {
+  const { 
+    faqs, 
+    updates, 
+    users, 
+    systemStats,
+    addFaq, 
+    updateFaq, 
+    deleteFaq,
+    addDailyUpdate, 
+    updateDailyUpdate, 
+    deleteDailyUpdate,
+    addUser, 
+    updateUser, 
+    deleteUser,
+    forceSync,
+    isSyncing,
+    lastSync
+  } = useData();
+  
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [users, setUsers] = useState([]);
-  const [faqs, setFaqs] = useState([]);
-  const [updates, setUpdates] = useState([]);
   const [editingFaq, setEditingFaq] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [editingUpdate, setEditingUpdate] = useState(null);
   const [showAddFaq, setShowAddFaq] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
   const [showAddUpdate, setShowAddUpdate] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [newFaq, setNewFaq] = useState({ 
     category: 'ESCOM Organization', 
@@ -44,17 +61,7 @@ function AdminDashboard({ onBack }) {
     expirationDate: '',
     autoExpire: false
   });
-  const [systemStats, setSystemStats] = useState({
-    totalUsers: 0,
-    activeUsers: 0,
-    totalReadings: 0,
-    averageAccuracy: 0,
-    newThisMonth: 0,
-    systemHealth: 'Excellent',
-    totalFAQs: 0,
-    totalUpdates: 0,
-    pendingApprovals: 0
-  });
+
   const [searchTerm, setSearchTerm] = useState('');
   // const [filterCategory, setFilterCategory] = useState('all');
   const [sortBy, setSortBy] = useState('date');
@@ -292,15 +299,7 @@ function AdminDashboard({ onBack }) {
   const handleAddFaq = () => {
     console.log('➕ Adding new FAQ:', newFaq);
     if (newFaq.question && newFaq.answer) {
-      const newFaqWithId = { 
-        ...newFaq, 
-        id: Date.now(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        viewCount: 0,
-        status: 'active'
-      };
-      setFaqs([...faqs, newFaqWithId]);
+      addFaq(newFaq);
       setNewFaq({ 
         category: 'ESCOM Organization', 
         subcategory: 'General',
@@ -362,10 +361,7 @@ function AdminDashboard({ onBack }) {
   const handleUpdateSave = () => {
     console.log('💾 Saving update changes...');
     if (editingUpdate) {
-      const updatedUpdate = { ...editingUpdate, updatedAt: new Date().toISOString() };
-      setUpdates(updates.map(update => 
-        update.id === editingUpdate.id ? updatedUpdate : update
-      ));
+      updateDailyUpdate(editingUpdate.id, editingUpdate);
       setEditingUpdate(null);
       console.log('✅ Update saved successfully');
     }
@@ -374,7 +370,7 @@ function AdminDashboard({ onBack }) {
   const handleUpdateDelete = (updateId) => {
     console.log('🗑️ Deleting update:', updateId);
     if (window.confirm('Are you sure you want to delete this update? This action cannot be undone.')) {
-      setUpdates(updates.filter(update => update.id !== updateId));
+      deleteDailyUpdate(updateId);
       console.log('✅ Update deleted successfully');
     }
   };
@@ -382,15 +378,7 @@ function AdminDashboard({ onBack }) {
   const handleAddUpdate = () => {
     console.log('➕ Adding new update:', newUpdate);
     if (newUpdate.title && newUpdate.content) {
-      const newUpdateWithId = {
-        ...newUpdate,
-        id: Date.now(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        viewCount: 0,
-        status: newUpdate.scheduledDate ? 'scheduled' : 'published'
-      };
-      setUpdates([...updates, newUpdateWithId]);
+      addDailyUpdate(newUpdate);
       setNewUpdate({
         title: '',
         content: '',
@@ -472,10 +460,7 @@ function AdminDashboard({ onBack }) {
   const handleUserSave = () => {
     console.log('💾 Saving user changes...');
     if (editingUser) {
-      const updatedUser = { ...editingUser, lastUpdated: new Date().toISOString() };
-      setUsers(users.map(user => 
-        user.id === editingUser.id ? updatedUser : user
-      ));
+      updateUser(editingUser.id, editingUser);
       setEditingUser(null);
       console.log('✅ User saved successfully');
     }
@@ -485,7 +470,7 @@ function AdminDashboard({ onBack }) {
     console.log('🗑️ Deleting user:', userId);
     const user = users.find(u => u.id === userId);
     if (window.confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
-      setUsers(users.filter(user => user.id !== userId));
+      deleteUser(userId);
       console.log('✅ User deleted successfully');
     }
   };
@@ -517,17 +502,7 @@ function AdminDashboard({ onBack }) {
   const handleAddUser = () => {
     console.log('➕ Adding new user:', newUser);
     if (newUser.name && newUser.email && newUser.username && newUser.password) {
-      const newUserWithId = {
-        ...newUser,
-        id: Date.now(),
-        joinDate: new Date().toISOString(),
-        lastActivity: 'Never',
-        readings: 0,
-        accuracy: 0,
-        totalContributions: 0,
-        lastUpdated: new Date().toISOString()
-      };
-      setUsers([...users, newUserWithId]);
+      addUser(newUser);
       setNewUser({
         name: '',
         email: '',
@@ -678,8 +653,25 @@ function AdminDashboard({ onBack }) {
   const renderDashboard = () => (
     <div className="admin-dashboard">
       <div className="dashboard-header">
-        <h3>📊 System Overview</h3>
-        <p>Welcome to the ESCOM Citizen Scientist Admin Dashboard</p>
+        <div className="header-main">
+          <h3>📊 System Overview</h3>
+          <p>Welcome to the ESCOM Citizen Scientist Admin Dashboard</p>
+        </div>
+        <div className="sync-status">
+          <button 
+            onClick={forceSync} 
+            className={`sync-btn ${isSyncing ? 'syncing' : ''}`}
+            disabled={isSyncing}
+            title="Force data synchronization"
+          >
+            {isSyncing ? '🔄 Syncing...' : '🔄 Sync'}
+          </button>
+          {lastSync && (
+            <span className="last-sync">
+              Last sync: {new Date(lastSync).toLocaleTimeString()}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="stats-grid">

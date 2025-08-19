@@ -3,10 +3,10 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
-import TestDashboard from './components/TestDashboard';
 import AuthSystem from './components/AuthSystem';
 import DynamicBotHelper from './components/DynamicBotHelper';
 import DailyUpdatesManager from './components/DailyUpdatesManager';
+import { DataProvider } from './contexts/DataContext';
 import config from './config';
 import './App.css';
 
@@ -228,42 +228,6 @@ function App() {
             <p className="admin-note">Admin credentials: admin@escom.com / admin123</p>
           </div>
 
-          <div className="action-group">
-            <h3>🧪 Demo Access</h3>
-            <button 
-              className="action-btn demo"
-              onClick={() => setCurrentView('test')}
-            >
-              🧪 Test Dashboard
-            </button>
-            <p className="demo-note">Quick access to test features</p>
-          </div>
-        </div>
-
-        <div className="feature-highlights">
-          <h3>✨ New Features Available</h3>
-          <div className="features-grid">
-            <div className="feature-card">
-              <span className="feature-icon">🔐</span>
-              <h4>Secure Authentication</h4>
-              <p>Login/signup system for all users</p>
-            </div>
-            <div className="feature-card">
-              <span className="feature-icon">🤖</span>
-              <h4>AI Bot Helper</h4>
-              <p>Context-aware assistance</p>
-            </div>
-            <div className="feature-card">
-              <span className="feature-icon">📢</span>
-              <h4>Daily Updates</h4>
-              <p>Real-time announcements</p>
-            </div>
-            <div className="feature-card">
-              <span className="feature-icon">🔄</span>
-              <h4>Live Sync</h4>
-              <p>Admin changes appear instantly</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -295,86 +259,86 @@ function App() {
         return renderWelcome();
       case 'dashboard':
         return renderDashboard();
-      case 'test':
-        return <TestDashboard onBack={() => setCurrentView('welcome')} />;
       default:
         return renderWelcome();
     }
   };
 
   return (
-    <div className="App">
-      {renderMainContent()}
+    <DataProvider>
+      <div className="App">
+        {renderMainContent()}
 
-      {/* Authentication Modal */}
-      {showAuth && (
-        <AuthSystem
-          mode={authMode}
-          onLogin={handleLogin}
-          onSignup={handleSignup}
-          onClose={closeAuth}
-        />
-      )}
+        {/* Authentication Modal */}
+        {showAuth && (
+          <AuthSystem
+            mode={authMode}
+            onLogin={handleLogin}
+            onSignup={handleSignup}
+            onClose={closeAuth}
+          />
+        )}
 
-      {/* Dynamic Bot Helper */}
-      {user && (
-        <DynamicBotHelper
-          userRole={user.role}
-          currentSection={currentSection}
-          onClose={() => setShowBotHelper(false)}
-        />
-      )}
+        {/* Dynamic Bot Helper */}
+        {user && (
+          <DynamicBotHelper
+            userRole={user.role}
+            currentSection={currentSection}
+            onClose={() => setShowBotHelper(false)}
+          />
+        )}
 
-      {/* Daily Updates Manager */}
-      {showDailyUpdates && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <DailyUpdatesManager
-              userRole={user?.role || 'citizen'}
-              onClose={() => setShowDailyUpdates(false)}
-            />
+        {/* Daily Updates Manager */}
+        {showDailyUpdates && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <DailyUpdatesManager
+                userRole={user?.role || 'citizen'}
+                onClose={() => setShowDailyUpdates(false)}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Floating Action Buttons */}
-      {user && (
-        <div className="floating-actions">
-          <button 
-            className="fab-btn bot-helper-btn"
-            onClick={toggleBotHelper}
-            title="AI Assistant"
+        {/* Floating Action Buttons */}
+        {user && (
+          <div className="floating-actions">
+            <button 
+              className="fab-btn bot-helper-btn"
+              onClick={toggleBotHelper}
+              title="AI Assistant"
+            >
+              🤖
+            </button>
+            <button 
+              className="fab-btn updates-btn"
+              onClick={toggleDailyUpdates}
+              title="Daily Updates"
           >
-            🤖
-          </button>
-          <button 
-            className="fab-btn updates-btn"
-            onClick={toggleDailyUpdates}
-            title="Daily Updates"
-          >
-            📢
-          </button>
-        </div>
-      )}
-
-      {/* Loading Overlay */}
-      {loading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-            <p>Processing...</p>
+              📢
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Error Display */}
-      {error && (
-        <div className="error-toast">
-          <span>❌ {error}</span>
-          <button onClick={() => setError(null)}>×</button>
-        </div>
-      )}
-    </div>
+        {/* Loading Overlay */}
+        {loading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner">
+              <div className="spinner"></div>
+              <p>Processing...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error Display */}
+        {error && (
+          <div className="error-toast">
+            <span>❌ {error}</span>
+            <button onClick={() => setError(null)}>×</button>
+          </div>
+        )}
+      </div>
+    </DataProvider>
   );
 }
 
