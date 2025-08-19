@@ -16,11 +16,7 @@ function UserDashboard({ user, onBack }) {
     weather: 'sunny',
     timeOfDay: 'morning'
   });
-  const [botHelper, setBotHelper] = useState({
-    isOpen: false,
-    messages: [],
-    currentMessage: ''
-  });
+
   // const [learningResources, setLearningResources] = useState([]);
   // const [communityPosts, setCommunityPosts] = useState([]);
   // const [searchTerm, setSearchTerm] = useState('');
@@ -301,7 +297,7 @@ function UserDashboard({ user, onBack }) {
   //   console.log('✅ New community post created:', newPost);
   // };
 
-  const renderOverview = () => (
+  const renderDashboard = () => (
     <div className="user-overview">
       <div className="welcome-section">
         <h3>🌊 Welcome back, {user?.firstName || 'Citizen Scientist'}!</h3>
@@ -366,7 +362,10 @@ function UserDashboard({ user, onBack }) {
 
   const renderMonitoring = () => (
     <div className="monitoring">
-      <h3>📊 Monitoring Dashboard</h3>
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>📊 Monitoring Dashboard</h3>
+      </div>
       
       <div className="monitoring-form">
         <h4>Submit New Reading</h4>
@@ -501,7 +500,10 @@ function UserDashboard({ user, onBack }) {
 
   const renderFAQs = () => (
     <div className="user-faqs">
-      <h3>❓ Frequently Asked Questions</h3>
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>❓ Frequently Asked Questions</h3>
+      </div>
       
       <div className="faq-categories">
         <div className="category-tabs">
@@ -527,15 +529,16 @@ function UserDashboard({ user, onBack }) {
         ))}
       </div>
 
-      <div className="faq-help">
-        <p>Can't find what you're looking for? Use our <button onClick={() => setBotHelper({...botHelper, isOpen: true})} className="link-btn">Bot Helper</button> for instant assistance!</p>
-      </div>
+
     </div>
   );
 
   const renderUpdates = () => (
     <div className="user-updates">
-      <h3>📢 Latest Updates</h3>
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>📢 Latest Updates</h3>
+      </div>
       
       <div className="updates-list">
         {updates.map(update => (
@@ -574,76 +577,20 @@ function UserDashboard({ user, onBack }) {
     </div>
   );
 
-  const renderBotHelper = () => (
-    <div className="bot-helper">
-      <h3>🤖 Bot Helper</h3>
-      
-      <div className="bot-chat">
-        <div className="chat-messages">
-          <div className="message bot">
-            <span className="message-avatar">🤖</span>
-            <div className="message-content">
-              <p>Hello! I'm your ESCOM Citizen Science Assistant. How can I help you today?</p>
-              <div className="quick-questions">
-                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'How do I submit data?'})}>How do I submit data?</button>
-                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'What equipment do I need?'})}>What equipment do I need?</button>
-                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'Training resources'})}>Training resources</button>
-                <button className="quick-question" onClick={() => setBotHelper({...botHelper, currentMessage: 'Contact support'})}>Contact support</button>
-              </div>
-            </div>
-          </div>
-          
-          {botHelper.messages.map((msg, index) => (
-            <div key={index} className={`message ${msg.type}`}>
-              <span className="message-avatar">{msg.type === 'user' ? '👤' : '🤖'}</span>
-              <div className="message-content">
-                <p>{msg.text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="chat-input">
-          <input 
-            type="text" 
-            placeholder="Type your question..."
-            value={botHelper.currentMessage}
-            onChange={(e) => setBotHelper({...botHelper, currentMessage: e.target.value})}
-            className="message-input"
-            onKeyPress={(e) => e.key === 'Enter' && handleBotMessage()}
-          />
-          <button onClick={handleBotMessage} className="send-btn">📤</button>
-        </div>
-      </div>
 
-      <div className="bot-features">
-        <h4>What I can help with:</h4>
-        <ul>
-          <li>📊 Data submission guidance</li>
-          <li>🔬 Equipment instructions</li>
-          <li>📚 Training resources</li>
-          <li>❓ FAQ answers</li>
-          <li>📢 Latest updates</li>
-          <li>🔗 Contact information</li>
-        </ul>
-      </div>
-    </div>
-  );
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview':
-        return renderOverview();
+      case 'dashboard':
+        return renderDashboard();
       case 'monitoring':
         return renderMonitoring();
       case 'faqs':
         return renderFAQs();
       case 'updates':
         return renderUpdates();
-      case 'bot':
-        return renderBotHelper();
       default:
-        return renderOverview();
+        return renderDashboard();
     }
   };
 
@@ -660,10 +607,10 @@ function UserDashboard({ user, onBack }) {
 
       <div className="dashboard-nav">
         <button 
-          className={`nav-btn ${activeTab === 'overview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('overview')}
+          className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dashboard')}
         >
-          📊 Overview
+          📊 Dashboard
         </button>
         <button 
           className={`nav-btn ${activeTab === 'monitoring' ? 'active' : ''}`}
@@ -683,12 +630,7 @@ function UserDashboard({ user, onBack }) {
         >
           📢 Updates
         </button>
-        <button 
-          className={`nav-btn ${activeTab === 'bot' ? 'active' : ''}`}
-          onClick={() => setActiveTab('bot')}
-        >
-          🤖 Bot Helper
-        </button>
+
       </div>
 
       <div className="dashboard-content">

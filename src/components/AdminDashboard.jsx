@@ -680,7 +680,7 @@ function AdminDashboard({ onBack }) {
         <div className="stat-card">
           <h3>Total Users</h3>
           <div className="stat-value">{systemStats.totalUsers || 0}</div>
-          <div className="stat-label">1 admin + 10 citizens</div>
+          <div className="stat-label">Registered users</div>
         </div>
         <div className="stat-card">
           <h3>Active Users</h3>
@@ -688,14 +688,14 @@ function AdminDashboard({ onBack }) {
           <div className="stat-label">Real-time active</div>
         </div>
         <div className="stat-card">
-          <h3>Total Readings</h3>
-          <div className="stat-value">{systemStats.totalReadings || 0}</div>
-          <div className="stat-label">Monitoring data</div>
+          <h3>Total FAQs</h3>
+          <div className="stat-value">{faqs.length || 0}</div>
+          <div className="stat-label">Knowledge base</div>
         </div>
         <div className="stat-card">
-          <h3>Average Accuracy</h3>
-          <div className="stat-value">{systemStats.averageAccuracy || 0}%</div>
-          <div className="stat-label">Data quality</div>
+          <h3>Total Updates</h3>
+          <div className="stat-value">{updates.length || 0}</div>
+          <div className="stat-label">Published announcements</div>
         </div>
         <div className="stat-card">
           <h3>New This Month</h3>
@@ -704,7 +704,7 @@ function AdminDashboard({ onBack }) {
         </div>
         <div className="stat-card">
           <h3>System Health</h3>
-          <div className="stat-value">{systemStats.systemHealth || 'Checking...'}</div>
+          <div className="stat-value">{systemStats.systemHealth || 'Excellent'}</div>
           <div className="stat-label">Status</div>
         </div>
       </div>
@@ -715,14 +715,14 @@ function AdminDashboard({ onBack }) {
           <button onClick={() => setActiveTab('users')} className="action-btn">
             👥 Manage Users
           </button>
-          <button onClick={() => setActiveTab('analytics')} className="action-btn">
-            📈 View Analytics
+          <button onClick={() => setActiveTab('faqs')} className="action-btn">
+            ❓ Manage FAQs
+          </button>
+          <button onClick={() => setActiveTab('updates')} className="action-btn">
+            📢 Manage Updates
           </button>
           <button onClick={() => setActiveTab('settings')} className="action-btn">
             ⚙️ System Settings
-          </button>
-          <button onClick={() => setActiveTab('reports')} className="action-btn">
-            📋 Generate Report
           </button>
         </div>
       </div>
@@ -770,7 +770,10 @@ function AdminDashboard({ onBack }) {
 
   const renderUserManagement = () => (
     <div className="user-management">
-      <h3>👥 User Management</h3>
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>👥 User Management</h3>
+      </div>
       
       <div className="user-actions-header">
         <button onClick={() => setShowAddUser(true)} className="add-btn">➕ Add New User</button>
@@ -1113,7 +1116,10 @@ function AdminDashboard({ onBack }) {
 
   const renderSystemSettings = () => (
     <div className="system-settings">
-      <h3>⚙️ System Settings</h3>
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>⚙️ System Settings</h3>
+      </div>
       
       <div className="settings-section">
         <h4>Notification Settings</h4>
@@ -1307,7 +1313,10 @@ function AdminDashboard({ onBack }) {
 
   const renderFAQManagement = () => (
     <div className="faq-management">
-      <h3>❓ FAQ Management</h3>
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>❓ FAQ Management</h3>
+      </div>
       
       <div className="faq-categories">
         <h4>FAQ Categories</h4>
@@ -1438,7 +1447,10 @@ function AdminDashboard({ onBack }) {
 
   const renderUpdatesManagement = () => (
     <div className="updates-management">
-      <h3>📢 Update Management</h3>
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>📢 Update Management</h3>
+      </div>
       
       <div className="update-actions-header">
         <button onClick={() => setShowAddUpdate(true)} className="add-btn">➕ Add New Update</button>
@@ -1697,15 +1709,9 @@ function AdminDashboard({ onBack }) {
       case 'users':
         console.log('👥 Rendering users tab');
         return renderUserManagement();
-      case 'analytics':
-        console.log('📈 Rendering analytics tab');
-        return renderDataAnalytics();
       case 'settings':
         console.log('⚙️ Rendering settings tab');
         return renderSystemSettings();
-      case 'reports':
-        console.log('📋 Rendering reports tab');
-        return renderReports();
       case 'faqs':
         console.log('❓ Rendering FAQs tab');
         return renderFAQManagement();
@@ -1737,22 +1743,10 @@ function AdminDashboard({ onBack }) {
             👥 Users
           </button>
           <button 
-            className={`nav-btn ${activeTab === 'analytics' ? 'active' : ''}`}
-            onClick={() => setActiveTab('analytics')}
-          >
-            📈 Analytics
-          </button>
-          <button 
             className={`nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
             ⚙️ Settings
-          </button>
-          <button 
-            className={`nav-btn ${activeTab === 'reports' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reports')}
-          >
-            📋 Reports
           </button>
           <button 
             className={`nav-btn ${activeTab === 'faqs' ? 'active' : ''}`}

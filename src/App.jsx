@@ -4,7 +4,6 @@ import Signup from './components/Signup';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import AuthSystem from './components/AuthSystem';
-import DynamicBotHelper from './components/DynamicBotHelper';
 import DailyUpdatesManager from './components/DailyUpdatesManager';
 import { DataProvider, useData } from './contexts/DataContext';
 import config from './config';
@@ -20,7 +19,6 @@ function AppContent() {
   const [adminMode, setAdminMode] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState('login');
-  const [showBotHelper, setShowBotHelper] = useState(false);
   const [showDailyUpdates, setShowDailyUpdates] = useState(false);
   const [currentSection, setCurrentSection] = useState('dashboard');
   
@@ -175,10 +173,6 @@ function AppContent() {
     setError(null);
   };
 
-  const toggleBotHelper = () => {
-    setShowBotHelper(!showBotHelper);
-  };
-
   const toggleDailyUpdates = () => {
     setShowDailyUpdates(!showDailyUpdates);
   };
@@ -281,15 +275,6 @@ function AppContent() {
         />
       )}
 
-      {/* Dynamic Bot Helper */}
-      {user && (
-        <DynamicBotHelper
-          userRole={user.role}
-          currentSection={currentSection}
-          onClose={() => setShowBotHelper(false)}
-        />
-      )}
-
       {/* Daily Updates Manager */}
       {showDailyUpdates && (
         <div className="modal-overlay">
@@ -299,26 +284,6 @@ function AppContent() {
               onClose={() => setShowDailyUpdates(false)}
             />
           </div>
-        </div>
-      )}
-
-      {/* Floating Action Buttons */}
-      {user && (
-        <div className="floating-actions">
-          <button 
-            className="fab-btn bot-helper-btn"
-            onClick={toggleBotHelper}
-            title="AI Assistant"
-          >
-            🤖
-          </button>
-          <button 
-            className="fab-btn updates-btn"
-            onClick={toggleDailyUpdates}
-            title="Daily Updates"
-        >
-            📢
-          </button>
         </div>
       )}
 
