@@ -16,9 +16,19 @@ body {
 }
 
 /* App Container */
-.app {
+.App {
   min-height: 100vh;
   position: relative;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Profile System Z-Index Management */
+.profile-container {
+  z-index: 9999;
+}
+
+.profile-dropdown {
+  z-index: 10000;
 }
 
 /* Loading Container */

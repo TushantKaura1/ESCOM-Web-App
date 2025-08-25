@@ -1,8 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Profile.css';
 
 const Profile = ({ user, onLogout, onClose }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const profileRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setIsOpen(false);
+      });
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   const toggleProfile = () => {
     setIsOpen(!isOpen);
@@ -16,26 +38,31 @@ const Profile = ({ user, onLogout, onClose }) => {
   if (!user) return null;
 
   return (
-    <div className="profile-container">
+    <div className="profile-container" ref={profileRef}>
       {/* Profile Button */}
       <button className="profile-button" onClick={toggleProfile}>
         <div className="profile-avatar">
           {user.role === 'admin' ? '👑' : '👤'}
         </div>
-        <span className="profile-name">{user.name}</span>
-        <span className="profile-role">{user.role === 'admin' ? 'Admin' : 'Citizen'}</span>
+        <div className="profile-info">
+          <span className="profile-name">{user.name}</span>
+          <span className="profile-role">{user.role === 'admin' ? 'Admin' : 'Citizen'}</span>
+        </div>
+        <div className="profile-arrow">
+          {isOpen ? '▲' : '▼'}
+        </div>
       </button>
 
       {/* Profile Dropdown */}
       {isOpen && (
-        <div className="profile-dropdown">
+        <div className="profile-dropdown" ref={dropdownRef}>
           <div className="profile-header">
-            <div className="profile-info">
+            <div className="profile-info-large">
               <div className="profile-avatar-large">
                 {user.role === 'admin' ? '👑' : '👤'}
               </div>
               <div className="profile-details">
-                <h3>{user.name}</h3>
+                <h3 className="profile-title">{user.name}</h3>
                 <p className="profile-email">{user.email}</p>
                 <p className="profile-role-badge">
                   {user.role === 'admin' ? '👑 Administrator' : '👤 Citizen Scientist'}
@@ -49,22 +76,22 @@ const Profile = ({ user, onLogout, onClose }) => {
 
           <div className="profile-actions">
             <button className="profile-action-btn" onClick={() => setIsOpen(false)}>
-              📋 View Profile
+              <span className="action-icon">📋</span>
+              <span className="action-text">View Profile</span>
             </button>
             <button className="profile-action-btn" onClick={() => setIsOpen(false)}>
-              ⚙️ Settings
+              <span className="action-icon">⚙️</span>
+              <span className="action-text">Settings</span>
             </button>
             <button className="profile-action-btn danger" onClick={handleLogout}>
-              🚪 Logout
+              <span className="action-icon">🚪</span>
+              <span className="action-text">Logout</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Backdrop to close dropdown */}
-      {isOpen && (
-        <div className="profile-backdrop" onClick={() => setIsOpen(false)} />
-      )}
+
     </div>
   );
 };
