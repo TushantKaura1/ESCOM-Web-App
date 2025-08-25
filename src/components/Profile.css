@@ -1,7 +1,9 @@
 /* Profile Component - Optimized Styling */
 .profile-container {
-  position: relative;
-  z-index: 9999; /* Ensure it's above everything */
+  position: relative !important;
+  z-index: 9999 !important; /* Ensure it's above everything */
+  display: block !important;
+  visibility: visible !important;
 }
 
 /* Profile Button */
@@ -90,21 +92,26 @@
 
 /* Profile Dropdown */
 .profile-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: white;
-  border-radius: 20px;
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  background: white !important;
+  border-radius: 20px !important;
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.15),
     0 8px 25px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(20px);
-  min-width: 320px;
-  overflow: hidden;
-  animation: profileSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 10000; /* Ensure dropdown is above everything */
+    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(20px) !important;
+  min-width: 320px !important;
+  overflow: hidden !important;
+  animation: profileSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 10000 !important; /* Ensure dropdown is above everything */
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: none !important;
 }
 
 @keyframes profileSlideDown {
