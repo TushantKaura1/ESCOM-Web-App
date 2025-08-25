@@ -4,6 +4,8 @@
   z-index: 9999 !important; /* Ensure it's above everything */
   display: block !important;
   visibility: visible !important;
+  /* Prevent dropdown from affecting other elements */
+  isolation: isolate !important;
 }
 
 /* Profile Button */
@@ -95,15 +97,16 @@
   position: absolute !important;
   top: calc(100% + 8px) !important;
   right: 0 !important;
-  background: white !important;
+  background: #ffffff !important;
   border-radius: 20px !important;
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.15),
-    0 8px 25px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  backdrop-filter: blur(20px) !important;
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 0, 0, 0.1) !important;
+  border: 2px solid #e5e7eb !important;
+  backdrop-filter: none !important;
   min-width: 320px !important;
+  max-width: 350px !important;
   overflow: hidden !important;
   animation: profileSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   z-index: 10000 !important; /* Ensure dropdown is above everything */
@@ -112,6 +115,9 @@
   opacity: 1 !important;
   pointer-events: auto !important;
   transform: none !important;
+  /* Ensure it doesn't overlap other content */
+  max-height: 80vh !important;
+  overflow-y: auto !important;
 }
 
 @keyframes profileSlideDown {
@@ -127,11 +133,12 @@
 
 /* Profile Header */
 .profile-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: #ffffff !important;
+  padding: 24px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 20px 20px 0 0 !important;
 }
 
 .profile-header::before {
@@ -214,11 +221,12 @@
 
 /* Profile Actions */
 .profile-actions {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: #fafbfc;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  background: #fafbfc !important;
+  border-radius: 0 0 20px 20px !important;
 }
 
 .profile-action-btn {

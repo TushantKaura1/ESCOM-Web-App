@@ -63,7 +63,6 @@ const Profile = ({ user, onLogout, onClose }) => {
         type="button"
         aria-expanded={isOpen}
         aria-haspopup="true"
-        style={{ border: '2px solid red' }} // Debug border
       >
         <div className="profile-avatar">
           {user.role === 'admin' ? '👑' : '👤'}
@@ -77,31 +76,11 @@ const Profile = ({ user, onLogout, onClose }) => {
         </div>
       </button>
 
-      {/* Debug Info */}
-      <div style={{ 
-        position: 'absolute', 
-        top: '100%', 
-        left: 0, 
-        background: 'red', 
-        color: 'white', 
-        padding: '5px', 
-        fontSize: '12px',
-        zIndex: 9999
-      }}>
-        Debug: isOpen = {isOpen.toString()}
-      </div>
+
 
       {/* Profile Dropdown */}
       {isOpen && (
-        <div 
-          className="profile-dropdown" 
-          style={{ 
-            display: 'block',
-            border: '3px solid green', // Debug border
-            background: 'white',
-            color: 'black'
-          }}
-        >
+        <div className="profile-dropdown">
           <div className="profile-header">
             <div className="profile-info-large">
               <div className="profile-avatar-large">
