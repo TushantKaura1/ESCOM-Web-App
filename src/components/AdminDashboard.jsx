@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
+import Profile from './Profile';
 import './AdminDashboard.css';
 
-function AdminDashboard({ onBack }) {
+function AdminDashboard({ user, onLogout, onSectionChange }) {
+  
   const { 
     faqs, 
     updates, 
@@ -86,16 +88,18 @@ function AdminDashboard({ onBack }) {
   ]);
 
   const [dataAnalytics] = useState({
-    totalReadings: 567,
-    averageAccuracy: 91.3,
-    topPerformer: 'Lúcia Fernandes',
-    topPerformerReadings: 89,
-    mostActiveTeam: 'Team Beta',
+    totalReadings: 1247,
+    averageAccuracy: 94.2,
+    topPerformer: 'Dr. Maria Santos',
+    topPerformerReadings: 156,
+    mostActiveTeam: 'Team Alpha',
     monthlyTrends: [
-      { month: 'January', readings: 45, accuracy: 88 },
-      { month: 'February', readings: 52, accuracy: 91 },
-      { month: 'March', readings: 48, accuracy: 89 },
-      { month: 'April', readings: 61, accuracy: 93 }
+      { month: 'January', readings: 89, accuracy: 92 },
+      { month: 'February', readings: 124, accuracy: 94 },
+      { month: 'March', readings: 156, accuracy: 95 },
+      { month: 'April', readings: 178, accuracy: 96 },
+      { month: 'May', readings: 203, accuracy: 97 },
+      { month: 'June', readings: 234, accuracy: 98 }
     ],
     dataQuality: {
       completeness: 95,
@@ -228,12 +232,12 @@ function AdminDashboard({ onBack }) {
       ];
 
       const demoStats = {
-      totalUsers: 11,
-      activeUsers: 8,
-      totalReadings: 567,
-      averageAccuracy: 91.3,
-      newThisMonth: 3,
-        systemHealth: 'Excellent',
+          totalUsers: 24,
+    activeUsers: 21,
+    totalReadings: 1247,
+    averageAccuracy: 94.2,
+    newThisMonth: 7,
+    systemHealth: 'Excellent',
         totalFAQs: 5,
         totalUpdates: 2,
         pendingApprovals: 0
@@ -772,7 +776,7 @@ function AdminDashboard({ onBack }) {
     <div className="user-management">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-        <h3>👥 User Management</h3>
+      <h3>👥 User Management</h3>
       </div>
       
       <div className="user-actions-header">
@@ -1118,7 +1122,7 @@ function AdminDashboard({ onBack }) {
     <div className="system-settings">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-        <h3>⚙️ System Settings</h3>
+      <h3>⚙️ System Settings</h3>
       </div>
       
       <div className="settings-section">
@@ -1315,7 +1319,7 @@ function AdminDashboard({ onBack }) {
     <div className="faq-management">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-        <h3>❓ FAQ Management</h3>
+      <h3>❓ FAQ Management</h3>
       </div>
       
       <div className="faq-categories">
@@ -1727,8 +1731,11 @@ function AdminDashboard({ onBack }) {
   return (
     <div className="admin-panel">
       <div className="admin-header">
-        <button onClick={onBack} className="back-btn">← Back</button>
-        <h2>👑 Admin Panel</h2>
+        <div className="header-left">
+          <button onClick={() => onSectionChange('welcome')} className="back-btn">← Back</button>
+          <h2>👑 Admin Panel</h2>
+        </div>
+        
         <div className="admin-nav">
           <button 
             className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
@@ -1760,6 +1767,10 @@ function AdminDashboard({ onBack }) {
           >
             📢 Updates
           </button>
+        </div>
+
+        <div className="header-right">
+          <Profile user={user} onLogout={onLogout} />
         </div>
       </div>
 

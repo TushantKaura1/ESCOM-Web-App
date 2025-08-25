@@ -48,7 +48,10 @@ const AuthSystem = ({ onLogin, onSignup, onClose, mode = 'login' }) => {
           password: formData.password
         });
         
-        if (!success) {
+        if (success) {
+          // Login successful, form will be closed by parent component
+          return;
+        } else {
           setError('Invalid credentials. Please try again.');
         }
       } else {
@@ -61,7 +64,10 @@ const AuthSystem = ({ onLogin, onSignup, onClose, mode = 'login' }) => {
           team: formData.team
         });
         
-        if (!success) {
+        if (success) {
+          // Signup successful, form will be closed by parent component
+          return;
+        } else {
           setError('Signup failed. Please try again.');
         }
       }

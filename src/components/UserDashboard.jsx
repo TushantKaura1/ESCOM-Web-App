@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import Profile from './Profile';
 import './UserDashboard.css';
 
-function UserDashboard({ user, onBack }) {
+function UserDashboard({ user, onLogout, onSectionChange }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [faqs, setFaqs] = useState([]);
   const [updates, setUpdates] = useState([]);
@@ -71,6 +72,30 @@ function UserDashboard({ user, onBack }) {
         status: 'published',
         createdAt: '2024-01-18',
         viewCount: 234
+      },
+      {
+        id: 2,
+        title: 'Monthly Data Review Meeting',
+        content: 'Join us for our monthly data review meeting where we analyze trends and discuss findings. All citizen scientists welcome!',
+        type: 'meeting',
+        priority: 'medium',
+        tags: ['meeting', 'data-review', 'collaboration'],
+        media: [],
+        status: 'published',
+        createdAt: '2024-01-20',
+        viewCount: 156
+      },
+      {
+        id: 3,
+        title: 'Weather Alert: Storm Approaching',
+        content: 'Heavy rainfall expected this weekend. Please avoid monitoring during severe weather conditions for safety.',
+        type: 'alert',
+        priority: 'high',
+        tags: ['weather', 'safety', 'alert'],
+        media: [],
+        status: 'published',
+        createdAt: '2024-01-21',
+        viewCount: 89
       }
     ]);
 
@@ -99,6 +124,45 @@ function UserDashboard({ user, onBack }) {
         weather: 'partly-cloudy',
         timeOfDay: 'afternoon',
         timestamp: '2024-01-19T14:00:00Z',
+        quality: 'good'
+      },
+      {
+        id: 3,
+        temperature: 17.8,
+        salinity: 35.5,
+        ph: 8.2,
+        turbidity: 1.8,
+        location: 'Beach Point C',
+        notes: 'Excellent water clarity, perfect for monitoring',
+        weather: 'clear',
+        timeOfDay: 'evening',
+        timestamp: '2024-01-18T18:00:00Z',
+        quality: 'excellent'
+      },
+      {
+        id: 4,
+        temperature: 20.1,
+        salinity: 34.9,
+        ph: 7.9,
+        turbidity: 4.2,
+        location: 'Beach Point D',
+        notes: 'Higher turbidity due to recent rainfall',
+        weather: 'rainy',
+        timeOfDay: 'morning',
+        timestamp: '2024-01-17T09:00:00Z',
+        quality: 'fair'
+      },
+      {
+        id: 5,
+        temperature: 19.5,
+        salinity: 35.1,
+        ph: 8.0,
+        turbidity: 2.9,
+        location: 'Beach Point A',
+        notes: 'Stable conditions, consistent with previous readings',
+        weather: 'partly-cloudy',
+        timeOfDay: 'afternoon',
+        timestamp: '2024-01-16T15:00:00Z',
         quality: 'good'
       }
     ]);
@@ -350,10 +414,10 @@ function UserDashboard({ user, onBack }) {
         <div className="activity-list">
           {readings.slice(0, 3).map(reading => (
             <div key={reading.id} className="activity-item">
-              <span className="activity-icon">📊</span>
+            <span className="activity-icon">📊</span>
               <span className="activity-text">Submitted water quality reading at {reading.location}</span>
               <span className="activity-time">{reading.date}</span>
-            </div>
+          </div>
           ))}
         </div>
       </div>
@@ -364,7 +428,7 @@ function UserDashboard({ user, onBack }) {
     <div className="monitoring">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-        <h3>📊 Monitoring Dashboard</h3>
+      <h3>📊 Monitoring Dashboard</h3>
       </div>
       
       <div className="monitoring-form">
@@ -502,7 +566,7 @@ function UserDashboard({ user, onBack }) {
     <div className="user-faqs">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-        <h3>❓ Frequently Asked Questions</h3>
+      <h3>❓ Frequently Asked Questions</h3>
       </div>
       
       <div className="faq-categories">
@@ -537,7 +601,7 @@ function UserDashboard({ user, onBack }) {
     <div className="user-updates">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-        <h3>📢 Latest Updates</h3>
+      <h3>📢 Latest Updates</h3>
       </div>
       
       <div className="updates-list">
@@ -597,11 +661,13 @@ function UserDashboard({ user, onBack }) {
   return (
     <div className="user-dashboard">
       <div className="dashboard-header">
-        <button onClick={onBack} className="back-btn">← Back</button>
-        <h2>🌊 Citizen Scientist Dashboard</h2>
-        <div className="user-info">
-          <span className="user-name">{user?.firstName} {user?.lastName}</span>
-          <span className="user-role">{user?.role}</span>
+        <div className="header-left">
+          <button onClick={() => onSectionChange('welcome')} className="back-btn">← Back</button>
+          <h2>🌊 Citizen Scientist Dashboard</h2>
+        </div>
+        
+        <div className="header-right">
+          <Profile user={user} onLogout={onLogout} />
         </div>
       </div>
 

@@ -17,6 +17,17 @@
   gap: 20px;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
 .back-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -41,24 +52,7 @@
   background-clip: text;
 }
 
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-}
 
-.user-name {
-  font-weight: 600;
-  color: #ffffff;
-  font-size: 1.1rem;
-}
-
-.user-role {
-  color: #00d4ff;
-  font-size: 0.9rem;
-  text-transform: capitalize;
-}
 
 .dashboard-nav {
   background: rgba(255, 255, 255, 0.03);

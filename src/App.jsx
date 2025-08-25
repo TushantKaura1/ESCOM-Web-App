@@ -22,11 +22,11 @@ function AppContent() {
   const [showDailyUpdates, setShowDailyUpdates] = useState(false);
   const [currentSection, setCurrentSection] = useState('dashboard');
   
-  // FORCE NETLIFY REBUILD - Enhanced Admin & User Features v3.0 - Aug 19, 2025
-  // This version includes: Authentication, Bot Helper, Daily Updates, Real-time Sync
-  const APP_VERSION = '3.0.0';
-  const BUILD_TIMESTAMP = '2025-08-19T11:30:00Z';
-  const FORCE_REBUILD = 'NETLIFY_REBUILD_REQUIRED_v3.0.0';
+  // FORCE NETLIFY REBUILD - Enhanced Admin & User Features v3.1 - Aug 25, 2025
+  // This version includes: Profile System, Logout, Bug Fixes, Enhanced Data
+  const APP_VERSION = '3.1.0';
+  const BUILD_TIMESTAMP = '2025-08-25T08:50:00Z';
+  const FORCE_REBUILD = 'NETLIFY_REBUILD_REQUIRED_v3.1.0';
 
   // Check backend connection on app start
   useEffect(() => {
@@ -81,6 +81,7 @@ function AppContent() {
         setUser(adminUser);
         setAdminMode(true);
         setCurrentView('dashboard');
+        setShowAuth(false); // Close the auth modal
         console.log('✅ ADMIN LOGIN SUCCESSFUL!');
         return true;
       }
@@ -95,6 +96,7 @@ function AppContent() {
           setUser(foundUser);
           setAdminMode(foundUser.role === 'admin');
           setCurrentView('dashboard');
+          setShowAuth(false); // Close the auth modal
           console.log('✅ LOGIN SUCCESSFUL!', foundUser);
           return true;
         } else {
@@ -150,6 +152,7 @@ function AppContent() {
       setUser(newUser);
       setAdminMode(newUser.role === 'admin');
       setCurrentView('dashboard');
+      setShowAuth(false); // Close the auth modal
       console.log('✅ SIGNUP SUCCESSFUL!', newUser);
       return true;
     } catch (error) {
@@ -212,12 +215,6 @@ function AppContent() {
             >
               🔐 Login
             </button>
-            <button 
-              className="action-btn secondary"
-              onClick={() => openAuth('signup')}
-            >
-              📝 Sign Up
-            </button>
           </div>
 
           <div className="action-group">
@@ -242,7 +239,15 @@ function AppContent() {
         <AdminDashboard 
           user={user}
           onLogout={handleLogout}
-          onSectionChange={setCurrentSection}
+          onSectionChange={(section) => {
+            if (section === 'welcome') {
+              setCurrentView('welcome');
+              setUser(null);
+              setAdminMode(false);
+            } else {
+              setCurrentSection(section);
+            }
+          }}
         />
       );
     } else {
@@ -250,7 +255,15 @@ function AppContent() {
         <UserDashboard 
           user={user}
           onLogout={handleLogout}
-          onSectionChange={setCurrentSection}
+          onSectionChange={(section) => {
+            if (section === 'welcome') {
+              setCurrentView('welcome');
+              setUser(null);
+              setAdminMode(false);
+            } else {
+              setCurrentSection(section);
+            }
+          }}
         />
       );
     }
