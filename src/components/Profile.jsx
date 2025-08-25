@@ -5,27 +5,18 @@ const Profile = ({ user, onLogout, onClose }) => {
   const [isOpen, setIsOpen] = useState(false);
   const profileRef = useRef(null);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('🔍 Profile component mounted with user:', user);
-    console.log('🔍 User object keys:', user ? Object.keys(user) : 'No user');
-  }, [user]);
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
-        console.log('🖱️ Click outside detected, closing dropdown');
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
-      console.log('➕ Adding click outside listener');
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-          console.log('⌨️ Escape key pressed, closing dropdown');
           setIsOpen(false);
         }
       });
@@ -37,22 +28,17 @@ const Profile = ({ user, onLogout, onClose }) => {
   }, [isOpen]);
 
   const toggleProfile = () => {
-    console.log('🔄 Profile toggle clicked, current state:', isOpen, 'new state:', !isOpen);
     setIsOpen(!isOpen);
   };
 
   const handleLogout = () => {
-    console.log('🚪 Logout clicked');
     onLogout();
     setIsOpen(false);
   };
 
   if (!user) {
-    console.log('❌ No user provided to Profile component');
-    return <div className="profile-container">No user data</div>;
+    return null;
   }
-
-  console.log('🎨 Rendering Profile component, isOpen:', isOpen, 'user:', user);
 
   return (
     <div className="profile-container" ref={profileRef}>
@@ -68,15 +54,13 @@ const Profile = ({ user, onLogout, onClose }) => {
           {user.role === 'admin' ? '👑' : '👤'}
         </div>
         <div className="profile-info">
-          <span className="profile-name">{user.name || 'Unknown'}</span>
+          <span className="profile-name">{user.name || 'User'}</span>
           <span className="profile-role">{user.role === 'admin' ? 'Admin' : 'Citizen'}</span>
         </div>
         <div className="profile-arrow">
           {isOpen ? '▲' : '▼'}
         </div>
       </button>
-
-
 
       {/* Profile Dropdown */}
       {isOpen && (
@@ -87,7 +71,7 @@ const Profile = ({ user, onLogout, onClose }) => {
                 {user.role === 'admin' ? '👑' : '👤'}
               </div>
               <div className="profile-details">
-                <h3 className="profile-title">{user.name || 'Unknown'}</h3>
+                <h3 className="profile-title">{user.name || 'User'}</h3>
                 <p className="profile-email">{user.email || 'No email'}</p>
                 <div className="profile-role-badge">
                   {user.role === 'admin' ? '👑 Administrator' : '👤 Citizen Scientist'}
@@ -111,6 +95,7 @@ const Profile = ({ user, onLogout, onClose }) => {
             <button className="profile-action-btn danger" onClick={handleLogout}>
               <span className="action-icon">🚪</span>
               <span className="action-text">Logout</span>
+              <span className="action-description">Sign out of your account</span>
             </button>
           </div>
         </div>

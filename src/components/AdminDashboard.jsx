@@ -1770,7 +1770,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
 
         <div className="header-right">
-          {console.log('AdminDashboard rendering Profile with user:', user)}
           <Profile user={user} onLogout={onLogout} />
         </div>
       </div>
