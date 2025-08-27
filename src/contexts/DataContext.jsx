@@ -426,6 +426,8 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+
+
   const updateDailyUpdate = (updateId, updates) => {
     try {
       const updatedUpdates = updates.map(update => 

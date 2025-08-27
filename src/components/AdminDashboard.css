@@ -47,6 +47,24 @@
   transform: translateY(-2px);
 }
 
+.logout-btn {
+  background: linear-gradient(45deg, #dc2626, #ef4444);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+  font-weight: 600;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(45deg, #b91c1c, #dc2626);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+}
+
 .admin-header h2 {
   margin: 0;
   font-size: 2rem;

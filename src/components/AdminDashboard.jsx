@@ -67,7 +67,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
   });
 
   const [searchTerm, setSearchTerm] = useState('');
-  // const [filterCategory, setFilterCategory] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   // const [viewMode, setViewMode] = useState('grid'); // grid or list - commented out for now
 
@@ -277,10 +277,8 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
   const handleFaqSave = () => {
     console.log('💾 Saving FAQ changes...');
     if (editingFaq) {
-      const updatedFaq = { ...editingFaq, updatedAt: new Date().toISOString() };
-      setFaqs(faqs.map(faq => 
-        faq.id === editingFaq.id ? updatedFaq : faq
-      ));
+      const { id, ...updates } = editingFaq;
+      updateFaq(id, updates);
       setEditingFaq(null);
       console.log('✅ FAQ saved successfully');
     }
@@ -590,8 +588,8 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (faq.tags && faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())));
-    // const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
-    return matchesSearch; // && matchesCategory;
+    const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
+    return matchesSearch && matchesCategory;
   });
 
   const filteredUsers = users.filter(user => {
@@ -1324,6 +1322,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     <div className="faq-management">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <button onClick={() => onLogout()} className="logout-btn">🚪 Logout</button>
         <h3>❓ FAQ Management</h3>
       </div>
       
@@ -1358,11 +1357,42 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
       <div className="faq-categories">
         <h4>FAQ Categories</h4>
         <div className="category-tabs">
-          <button className="category-tab active">ESCOM Organization</button>
-          <button className="category-tab">Monitoring</button>
-          <button className="category-tab">Training</button>
-          <button className="category-tab">Data</button>
-          <button className="category-tab">Partners</button>
+          <button 
+            className={`category-tab ${filterCategory === 'all' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('all')}
+          >
+            All Categories
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'ESCOM Organization' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('ESCOM Organization')}
+          >
+            ESCOM Organization
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'Monitoring' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('Monitoring')}
+          >
+            Monitoring
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'Training' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('Training')}
+          >
+            Training
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'Data' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('Data')}
+          >
+            Data
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'Partners' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('Partners')}
+          >
+            Partners
+          </button>
         </div>
       </div>
 
@@ -2034,7 +2064,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     <div className="admin-panel">
       <div className="admin-header">
         <div className="header-left">
-          <button onClick={() => onSectionChange('welcome')} className="back-btn">← Back</button>
+          <button onClick={() => onLogout()} className="logout-btn">🚪 Logout</button>
           <h2>👑 Admin Panel</h2>
         </div>
         
@@ -2066,7 +2096,17 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
 
         <div className="header-right">
-          <Profile user={user} onLogout={onLogout} onSectionChange={setActiveTab} />
+          <Profile 
+            user={user} 
+            onLogout={onLogout} 
+            onSectionChange={(section) => {
+              if (section === 'welcome') {
+                onSectionChange('welcome');
+              } else {
+                setActiveTab(section);
+              }
+            }} 
+          />
         </div>
       </div>
 
