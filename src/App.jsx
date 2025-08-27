@@ -55,11 +55,20 @@ function AppContent() {
       if (credentials.email === 'admin@escom.com' && credentials.password === 'admin123') {
         const adminUser = {
           id: 1,
-          name: 'Admin User',
+          name: 'Dr. Camilo Admin',
           email: credentials.email,
+          username: 'camilo_admin',
           role: 'admin',
-          team: 'Admin',
-          status: 'active'
+          team: 'ESCOM Administration',
+          status: 'active',
+          telegramId: '@camilo_admin_escom',
+          phone: '+52 55 1234 5678',
+          department: 'Coastal Monitoring',
+          permissions: ['full_access', 'user_management', 'data_export', 'system_settings'],
+          lastLogin: new Date().toISOString(),
+          joinDate: '2024-01-15',
+          profileImage: '👑',
+          bio: 'Lead Administrator for Citizen Scientist Coastal Monitoring Platform'
         };
         setUser(adminUser);
         setAdminMode(true);

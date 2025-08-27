@@ -88,7 +88,7 @@ const Profile = ({ user, onLogout, onSectionChange }) => {
           <div className="profile-header-unique">
             <div className="profile-info-large-unique">
               <div className="profile-avatar-large-unique">
-                {user.role === 'admin' ? '👑' : '👤'}
+                {user.profileImage || (user.role === 'admin' ? '👑' : '👤')}
               </div>
               <div className="profile-details-unique">
                 <h3 className="profile-title-unique">{user.name || 'User'}</h3>
@@ -99,8 +99,67 @@ const Profile = ({ user, onLogout, onSectionChange }) => {
                 {user.team && (
                   <p className="profile-team-unique">Team: {user.team}</p>
                 )}
+                {user.department && (
+                  <p className="profile-department-unique">Department: {user.department}</p>
+                )}
+                {user.username && (
+                  <p className="profile-username-unique">Username: {user.username}</p>
+                )}
               </div>
             </div>
+            
+            {/* Admin-specific information */}
+            {user.role === 'admin' && (
+              <div className="admin-info-section-unique">
+                <h4 className="admin-info-title-unique">👑 Administrator Details</h4>
+                {user.telegramId && (
+                  <div className="admin-info-item-unique">
+                    <span className="admin-info-icon-unique">📱</span>
+                    <span className="admin-info-label-unique">Telegram:</span>
+                    <span className="admin-info-value-unique">{user.telegramId}</span>
+                  </div>
+                )}
+                {user.phone && (
+                  <div className="admin-info-item-unique">
+                    <span className="admin-info-icon-unique">📞</span>
+                    <span className="admin-info-label-unique">Phone:</span>
+                    <span className="admin-info-value-unique">{user.phone}</span>
+                  </div>
+                )}
+                {user.joinDate && (
+                  <div className="admin-info-item-unique">
+                    <span className="admin-info-icon-unique">📅</span>
+                    <span className="admin-info-label-unique">Joined:</span>
+                    <span className="admin-info-value-unique">{new Date(user.joinDate).toLocaleDateString()}</span>
+                  </div>
+                )}
+                {user.lastLogin && (
+                  <div className="admin-info-item-unique">
+                    <span className="admin-info-icon-unique">🕒</span>
+                    <span className="admin-info-label-unique">Last Login:</span>
+                    <span className="admin-info-value-unique">{new Date(user.lastLogin).toLocaleString()}</span>
+                  </div>
+                )}
+                {user.bio && (
+                  <div className="admin-info-item-unique">
+                    <span className="admin-info-icon-unique">📝</span>
+                    <span className="admin-info-label-unique">Bio:</span>
+                    <span className="admin-info-value-unique">{user.bio}</span>
+                  </div>
+                )}
+                {user.permissions && user.permissions.length > 0 && (
+                  <div className="admin-info-item-unique">
+                    <span className="admin-info-icon-unique">🔐</span>
+                    <span className="admin-info-label-unique">Permissions:</span>
+                    <div className="permissions-list-unique">
+                      {user.permissions.map((permission, index) => (
+                        <span key={index} className="permission-tag-unique">{permission}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="profile-actions-unique">

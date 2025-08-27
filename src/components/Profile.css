@@ -367,3 +367,95 @@
 .profile-actions-unique {
   background: #f8fafc !important;
 }
+
+/* Admin Profile Specific Styling */
+.admin-info-section-unique {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  margin: 15px 0;
+  padding: 20px;
+  border-radius: 12px;
+  color: #1f2937;
+  border: 2px solid #f59e0b;
+}
+
+.admin-info-title-unique {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #92400e;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.admin-info-item-unique {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-info-icon-unique {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.admin-info-label-unique {
+  font-weight: 600;
+  color: #92400e;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.admin-info-value-unique {
+  font-weight: 500;
+  color: #1f2937;
+  flex: 1;
+  word-break: break-word;
+}
+
+.permissions-list-unique {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.permission-tag-unique {
+  background: rgba(255, 255, 255, 0.4);
+  color: #92400e;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+}
+
+/* Profile Department and Username */
+.profile-department-unique,
+.profile-username-unique {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.profile-department-unique {
+  color: #059669;
+  background: rgba(5, 150, 105, 0.1);
+}
+
+.profile-username-unique {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}

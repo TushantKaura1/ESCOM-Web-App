@@ -606,21 +606,26 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
            update.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
   });
 
-  // const sortedFAQs = [...filteredFAQs].sort((a, b) => {
-  //   switch (sortBy) {
-  //     case 'date':
-  //       return new Date(b.updatedAt) - new Date(a.updatedAt);
-  //     case 'priority':
-  //       const priorityOrder = { high: 3, medium: 2, low: 1 };
-  //       return priorityOrder[b.priority] - priorityOrder[a.priority];
-  //     case 'views':
-  //       return b.viewCount - a.viewCount;
-  //     case 'category':
-  //       return a.category.localeCompare(b.category);
-  //     default:
-  //       return 0;
-  //   }
-  // });
+  const sortedFAQs = [...filteredFAQs].sort((a, b) => {
+    switch (sortBy) {
+      case 'date':
+        return new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0);
+      case 'priority':
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      case 'views':
+        return (b.viewCount || 0) - (a.viewCount || 0);
+      case 'category':
+        return a.category.localeCompare(b.category);
+      case 'question':
+        return a.question.localeCompare(b.question);
+      case 'importance':
+        const importanceOrder = { critical: 4, high: 3, medium: 2, low: 1, normal: 0 };
+        return importanceOrder[b.importance] - importanceOrder[a.importance];
+      default:
+        return 0;
+    }
+  });
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     switch (sortBy) {
@@ -1319,9 +1324,37 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     <div className="faq-management">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-      <h3>❓ FAQ Management</h3>
+        <h3>❓ FAQ Management</h3>
       </div>
       
+      {/* Search and Filter Controls */}
+      <div className="faq-controls">
+        <div className="search-section">
+          <input
+            type="text"
+            placeholder="Search FAQs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        
+        <div className="filter-section">
+          <select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value)}
+            className="sort-select"
+          >
+            <option value="date">Sort by Date</option>
+            <option value="category">Sort by Category</option>
+            <option value="question">Sort by Question</option>
+            <option value="priority">Sort by Priority</option>
+            <option value="importance">Sort by Importance</option>
+            <option value="views">Sort by Views</option>
+          </select>
+        </div>
+      </div>
+
       <div className="faq-categories">
         <h4>FAQ Categories</h4>
         <div className="category-tabs">
@@ -1333,22 +1366,71 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
       </div>
 
+      <div className="faq-stats">
+        <div className="stat-item">
+          <span className="stat-label">Total FAQs:</span>
+          <span className="stat-value">{faqs.length}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Filtered:</span>
+          <span className="stat-value">{sortedFAQs.length}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Sorting by:</span>
+          <span className="stat-value">{sortBy}</span>
+        </div>
+      </div>
+
       <div className="faq-list">
-        {faqs.map(faq => (
-          <div key={faq.id} className="faq-item">
-            <div className="faq-header">
-              <span className="faq-category">{faq.category}</span>
-              <div className="faq-actions">
-                <button className="edit-btn" onClick={() => handleFaqEdit(faq)}>✏️ Edit</button>
-                <button className="delete-btn" onClick={() => handleFaqDelete(faq.id)}>🗑️ Delete</button>
+        {sortedFAQs.length > 0 ? (
+          sortedFAQs.map(faq => (
+            <div key={faq.id} className="faq-item">
+              <div className="faq-header">
+                <div className="faq-meta">
+                  <span className="faq-category">{faq.category}</span>
+                  {faq.priority && (
+                    <span className={`faq-priority priority-${faq.priority}`}>
+                      {faq.priority}
+                    </span>
+                  )}
+                  {faq.importance && (
+                    <span className={`faq-importance importance-${faq.importance}`}>
+                      {faq.importance}
+                    </span>
+                  )}
+                </div>
+                <div className="faq-actions">
+                  <button className="edit-btn" onClick={() => handleFaqEdit(faq)}>✏️ Edit</button>
+                  <button className="delete-btn" onClick={() => handleFaqDelete(faq.id)}>🗑️ Delete</button>
+                </div>
+              </div>
+              <div className="faq-content">
+                <h5>{faq.question}</h5>
+                <p>{faq.answer}</p>
+                {faq.tags && faq.tags.length > 0 && (
+                  <div className="faq-tags">
+                    {faq.tags.map((tag, index) => (
+                      <span key={index} className="faq-tag">{tag}</span>
+                    ))}
+                  </div>
+                )}
+                <div className="faq-footer">
+                  {faq.updatedAt && (
+                    <span className="faq-date">Updated: {new Date(faq.updatedAt).toLocaleDateString()}</span>
+                  )}
+                  {faq.viewCount && (
+                    <span className="faq-views">Views: {faq.viewCount}</span>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="faq-content">
-              <h5>{faq.question}</h5>
-              <p>{faq.answer}</p>
-            </div>
+          ))
+        ) : (
+          <div className="no-faqs">
+            <p>No FAQs found matching your search criteria.</p>
+            <button onClick={() => setSearchTerm('')} className="clear-search-btn">Clear Search</button>
           </div>
-        ))}
+        )}
       </div>
 
       <div className="add-faq">
