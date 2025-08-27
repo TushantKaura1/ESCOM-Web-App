@@ -1997,11 +1997,15 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
 
   const renderMainContent = () => {
     console.log('🔍 Rendering main content for tab:', activeTab);
+    console.log('🔍 Current user:', user);
+    console.log('🔍 Admin mode:', user?.role === 'admin');
     
     switch (activeTab) {
       case 'dashboard':
         console.log('📊 Rendering dashboard tab');
-        return renderDashboard();
+        const dashboardContent = renderDashboard();
+        console.log('📊 Dashboard content:', dashboardContent);
+        return dashboardContent;
       case 'users':
         console.log('👥 Rendering users tab');
         return renderUserManagement();

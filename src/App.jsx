@@ -66,15 +66,17 @@ function AppContent() {
           department: 'Coastal Monitoring',
           permissions: ['full_access', 'user_management', 'data_export', 'system_settings'],
           lastLogin: new Date().toISOString(),
-          joinDate: '2024-01-15',
           profileImage: '👑',
           bio: 'Lead Administrator for Citizen Scientist Coastal Monitoring Platform'
         };
+        console.log('🔧 Setting admin user:', adminUser);
         setUser(adminUser);
         setAdminMode(true);
         setCurrentView('dashboard');
         setShowAuth(false); // Close the auth modal
         console.log('✅ ADMIN LOGIN SUCCESSFUL!');
+        console.log('🔧 Current view set to:', 'dashboard');
+        console.log('🔧 Admin mode set to:', true);
         return true;
       }
 
@@ -269,12 +271,21 @@ function AppContent() {
   };
 
   const renderMainContent = () => {
+    console.log('🔍 App renderMainContent - currentView:', currentView);
+    console.log('🔍 App renderMainContent - user:', user);
+    console.log('🔍 App renderMainContent - adminMode:', adminMode);
+    
     switch (currentView) {
       case 'welcome':
+        console.log('🔍 Rendering welcome view');
         return renderWelcome();
       case 'dashboard':
-        return renderDashboard();
+        console.log('🔍 Rendering dashboard view');
+        const dashboardResult = renderDashboard();
+        console.log('🔍 Dashboard render result:', dashboardResult);
+        return dashboardResult;
       default:
+        console.log('🔍 Defaulting to welcome view');
         return renderWelcome();
     }
   };
