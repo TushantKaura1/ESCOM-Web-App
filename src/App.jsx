@@ -66,6 +66,7 @@ function AppContent() {
           department: 'Coastal Monitoring',
           permissions: ['full_access', 'user_management', 'data_export', 'system_settings'],
           lastLogin: new Date().toISOString(),
+          joinDate: '2024-01-15',
           profileImage: '👑',
           bio: 'Lead Administrator for Citizen Scientist Coastal Monitoring Platform'
         };

@@ -586,13 +586,13 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
   };
 
   // Search and filter functions
-  // const filteredFAQs = faqs.filter(faq => {
-  //   const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //                        faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //                        faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-  //   // const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
-  //   return matchesSearch; // && matchesCategory;
-  // });
+  const filteredFAQs = faqs.filter(faq => {
+    const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (faq.tags && faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())));
+    // const matchesCategory = filterCategory === 'all' || faq.category === filterCategory;
+    return matchesSearch; // && matchesCategory;
+  });
 
   const filteredUsers = users.filter(user => {
     return user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

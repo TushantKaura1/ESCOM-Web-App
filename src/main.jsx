@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
+import { DataProvider } from './contexts/DataContext.jsx';
 import './index.css';
 
 console.log('🚀 Starting ESCOM Citizen Scientist App...');
@@ -55,7 +56,9 @@ try {
   
   root.render(
     <React.StrictMode>
-      <App />
+      <DataProvider>
+        <App />
+      </DataProvider>
     </React.StrictMode>
   );
   
