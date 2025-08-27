@@ -403,22 +403,28 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
 
   const handleScheduleUpdate = (updateId, scheduledDate) => {
     console.log('📅 Scheduling update:', updateId, 'for:', scheduledDate);
-    setUpdates(updates.map(update => 
-      update.id === updateId 
-        ? { ...update, scheduledDate, status: 'scheduled', updatedAt: new Date().toISOString() }
-        : update
-    ));
-    console.log('✅ Update scheduled successfully');
+    const update = updates.find(u => u.id === updateId);
+    if (update) {
+      const updates = {
+        scheduledDate,
+        status: 'scheduled'
+      };
+      updateDailyUpdate(updateId, updates);
+      console.log('✅ Update scheduled successfully');
+    }
   };
 
   const handlePublishUpdate = (updateId) => {
     console.log('📢 Publishing update:', updateId);
-    setUpdates(updates.map(update => 
-      update.id === updateId 
-        ? { ...update, status: 'published', scheduledDate: '', updatedAt: new Date().toISOString() }
-        : update
-    ));
-    console.log('✅ Update published successfully');
+    const update = updates.find(u => u.id === updateId);
+    if (update) {
+      const updates = {
+        status: 'published',
+        scheduledDate: ''
+      };
+      updateDailyUpdate(updateId, updates);
+      console.log('✅ Update published successfully');
+    }
   };
 
   // const handleAddUpdateTag = (updateId, tag) => {
@@ -2096,10 +2102,13 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
 
         <div className="header-right">
+          {console.log('🔍 AdminDashboard - user prop:', user)}
+          {console.log('🔍 AdminDashboard - onLogout prop:', onLogout)}
           <Profile 
             user={user} 
             onLogout={onLogout} 
             onSectionChange={(section) => {
+              console.log('🔍 Profile onSectionChange called with:', section);
               if (section === 'welcome') {
                 onSectionChange('welcome');
               } else {

@@ -352,20 +352,18 @@
   pointer-events: none !important;
 }
 
-/* Debug styling to ensure visibility */
+/* Ensure proper visibility and positioning */
 .profile-dropdown-unique {
-  border: 3px solid #ff0000 !important;
+  z-index: 10000 !important;
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
   background: #ffffff !important;
   color: #000000 !important;
-}
-
-.profile-header-unique {
-  background: #667eea !important;
-  color: #ffffff !important;
-}
-
-.profile-actions-unique {
-  background: #f8fafc !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  min-width: 300px !important;
+  overflow: hidden !important;
 }
 
 /* Admin Profile Specific Styling */

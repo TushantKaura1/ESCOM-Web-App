@@ -36,6 +36,8 @@ const Profile = ({ user, onLogout, onSectionChange }) => {
 
   const toggleProfile = () => {
     console.log('🔄 Profile toggle clicked, current state:', isOpen, 'new state:', !isOpen);
+    console.log('🔄 User object:', user);
+    console.log('🔄 onSectionChange function:', onSectionChange);
     setIsOpen(!isOpen);
   };
 
