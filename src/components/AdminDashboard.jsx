@@ -2072,7 +2072,10 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     <div className="admin-panel">
       <div className="admin-header">
         <div className="header-left">
-          <button onClick={() => onLogout()} className="logout-btn">🚪 Logout</button>
+          <button onClick={() => onLogout()} className="logout-btn">
+            <span className="logout-icon">🚪</span>
+            <span className="logout-text">Logout</span>
+          </button>
           <h2>👑 Admin Panel</h2>
         </div>
         
@@ -2081,25 +2084,29 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
             className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveTab('dashboard')}
           >
-            📊 Dashboard
+            <span className="nav-icon">📊</span>
+            <span className="nav-text">Dashboard</span>
           </button>
           <button 
             className={`nav-btn ${activeTab === 'users' ? 'active' : ''}`}
             onClick={() => setActiveTab('users')}
           >
-            👥 Users
+            <span className="nav-icon">👥</span>
+            <span className="nav-text">Users</span>
           </button>
           <button 
             className={`nav-btn ${activeTab === 'faqs' ? 'active' : ''}`}
             onClick={() => setActiveTab('faqs')}
           >
-            ❓ FAQs
+            <span className="nav-icon">❓</span>
+            <span className="nav-text">FAQs</span>
           </button>
           <button 
             className={`nav-btn ${activeTab === 'updates' ? 'active' : ''}`}
             onClick={() => setActiveTab('updates')}
           >
-            📢 Updates
+            <span className="nav-icon">📢</span>
+            <span className="nav-text">Updates</span>
           </button>
         </div>
 

@@ -1903,6 +1903,44 @@ input:checked + .slider:before {
   }
 }
 
+/* Logout Button Styling */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.logout-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.logout-text {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Navigation Button Styling */
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.nav-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nav-text {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+
 /* Profile Button Styling */
 .profile-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1928,4 +1966,402 @@ input:checked + .slider:before {
 
 .profile-btn:active {
   transform: translateY(0);
+}
+
+/* ===== MOBILE OPTIMIZATION ===== */
+@media (max-width: 768px) {
+  /* Admin Panel Container */
+  .admin-panel {
+    padding: 10px;
+    min-height: 100vh;
+  }
+
+  /* Header Optimization */
+  .admin-header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    align-items: stretch;
+  }
+
+  .header-left {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .header-left h2 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .logout-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    border-radius: 20px;
+  }
+
+  /* Navigation Optimization */
+  .admin-nav {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .nav-btn {
+    padding: 10px 8px;
+    font-size: 12px;
+    border-radius: 8px;
+    min-height: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .nav-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .nav-text {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  /* Profile Button Mobile */
+  .profile-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    border-radius: 20px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  /* Content Area */
+  .admin-content {
+    padding: 10px;
+    margin-top: 15px;
+  }
+
+  /* Dashboard Cards */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .dashboard-card {
+    padding: 15px;
+    min-height: auto;
+  }
+
+  .dashboard-card h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .dashboard-card p {
+    font-size: 14px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  /* User Management */
+  .user-management {
+    padding: 15px;
+  }
+
+  .user-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .user-card {
+    padding: 15px;
+  }
+
+  .user-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .user-actions button {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  /* FAQ Management */
+  .faq-management {
+    padding: 15px;
+  }
+
+  .faq-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .sort-select {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .faq-categories {
+    margin: 15px 0;
+  }
+
+  .category-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .category-tab {
+    padding: 8px 12px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  .faq-item {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .faq-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .faq-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .faq-category,
+  .faq-priority,
+  .faq-importance {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .faq-actions {
+    flex-direction: column;
+    gap: 8px;
+    align-self: stretch;
+  }
+
+  .faq-actions button {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 6px;
+    width: 100%;
+  }
+
+  /* Updates Management */
+  .updates-management {
+    padding: 15px;
+  }
+
+  .update-item {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .update-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .update-actions {
+    flex-direction: column;
+    gap: 8px;
+    align-self: stretch;
+  }
+
+  .update-actions button {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 6px;
+    width: 100%;
+  }
+
+  /* Forms and Modals */
+  .modal {
+    width: 95%;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .form-label {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  /* Profile Section */
+  .admin-profile {
+    padding: 15px;
+  }
+
+  .profile-form {
+    padding: 15px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .form-group {
+    width: 100%;
+  }
+
+  /* Password Section */
+  .password-form {
+    padding: 15px;
+  }
+
+  /* Preferences Section */
+  .admin-preferences {
+    padding: 15px;
+  }
+
+  .preferences-section {
+    margin-bottom: 20px;
+  }
+
+  .toggle-switch {
+    width: 50px;
+    height: 26px;
+  }
+
+  .toggle-switch::after {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Loading and Error States */
+  .loading-state {
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .error-state {
+    padding: 20px;
+    text-align: center;
+  }
+}
+
+/* Extra Small Mobile Devices */
+@media (max-width: 480px) {
+  .admin-panel {
+    padding: 5px;
+  }
+
+  .admin-header {
+    padding: 10px;
+  }
+
+  .header-left h2 {
+    font-size: 18px;
+  }
+
+  .nav-btn {
+    padding: 8px 6px;
+    font-size: 11px;
+    min-height: 35px;
+  }
+
+  .nav-btn span {
+    font-size: 9px;
+  }
+
+  .admin-content {
+    padding: 5px;
+  }
+
+  .dashboard-card,
+  .user-card,
+  .faq-item,
+  .update-item {
+    padding: 12px;
+  }
+
+  .modal {
+    width: 98%;
+    padding: 15px;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .faq-actions button,
+  .update-actions button,
+  .user-actions button {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+
+  .category-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .faq-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+}
+
+/* Landscape Mobile Optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .admin-header {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .admin-nav {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .nav-btn {
+    min-height: 30px;
+    padding: 6px 4px;
+  }
+
+  .nav-btn span {
+    font-size: 8px;
+  }
 }
