@@ -5,7 +5,7 @@ import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import AuthSystem from './components/AuthSystem';
 import DailyUpdatesManager from './components/DailyUpdatesManager';
-import ConnectionStatus from './components/ConnectionStatus';
+
 import { DataProvider, useData } from './contexts/DataContext';
 import config from './config';
 import './App.css';
@@ -16,7 +16,7 @@ function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [connectionStatus, setConnectionStatus] = useState('checking');
+
   const [adminMode, setAdminMode] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -29,7 +29,7 @@ function AppContent() {
   const BUILD_TIMESTAMP = '2025-08-25T08:50:00Z';
   const FORCE_REBUILD = 'NETLIFY_REBUILD_REQUIRED_v3.1.0';
 
-  // Check backend connection on app start
+  // App initialization
   useEffect(() => {
     console.log('🚀 ENHANCED ADMIN & USER FEATURES DEPLOYED - v3.0.0');
     console.log('🔧 Complete authentication system');
@@ -37,27 +37,9 @@ function AppContent() {
     console.log('📢 Daily updates management');
     console.log('🔄 Real-time synchronization between admin and user');
     console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
-    checkBackendConnection();
   }, []);
 
-  const checkBackendConnection = async () => {
-    try {
-      setConnectionStatus('checking');
-      const response = await fetch(`${config.API_BASE_URL}/health`);
-      const data = await response.json();
-      
-      if (data.status === 'ok') {
-        setConnectionStatus('connected');
-        console.log('✅ Backend connected successfully');
-      } else {
-        setConnectionStatus('error');
-        console.error('❌ Backend health check failed');
-      }
-    } catch (error) {
-      setConnectionStatus('error');
-      console.error('❌ Backend connection failed:', error);
-    }
-  };
+
 
   const handleLogin = async (credentials) => {
     setLoading(true);
@@ -200,12 +182,7 @@ function AppContent() {
           </div>
         </div>
 
-        <div className="connection-status">
-          <span className={`status-indicator ${connectionStatus}`}>
-            {connectionStatus === 'connected' ? '🟢' : connectionStatus === 'checking' ? '🟡' : '🔴'}
-            {connectionStatus === 'connected' ? ' Connected' : connectionStatus === 'checking' ? ' Checking...' : ' Disconnected'}
-          </span>
-        </div>
+
 
         <div className="welcome-actions">
           <div className="action-group">
@@ -295,8 +272,7 @@ function AppContent() {
 
   return (
     <div className="App">
-      {/* Connection Status Component */}
-      <ConnectionStatus />
+
       
       {renderMainContent()}
 
