@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
-import Profile from './Profile';
 import './AdminDashboard.css';
 
 function AdminDashboard({ user, onLogout, onSectionChange }) {
@@ -401,16 +400,19 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     }
   };
 
-  const handleScheduleUpdate = (updateId, scheduledDate) => {
-    console.log('📅 Scheduling update:', updateId, 'for:', scheduledDate);
-    const update = updates.find(u => u.id === updateId);
-    if (update) {
-      const updates = {
-        scheduledDate,
-        status: 'scheduled'
-      };
-      updateDailyUpdate(updateId, updates);
-      console.log('✅ Update scheduled successfully');
+  const handleScheduleUpdate = (updateId) => {
+    console.log('📅 Rescheduling update:', updateId);
+    const newDate = prompt('Enter new scheduled date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (newDate) {
+      const update = updates.find(u => u.id === updateId);
+      if (update) {
+        const updateData = {
+          scheduledDate: newDate,
+          status: 'scheduled'
+        };
+        updateDailyUpdate(updateId, updateData);
+        console.log('✅ Update rescheduled successfully for:', newDate);
+      }
     }
   };
 
@@ -1642,7 +1644,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
                 <button onClick={() => handlePublishUpdate(update.id)} className="publish-btn">📢 Publish Now</button>
               )}
               {update.status === 'published' && (
-                <button onClick={() => handleScheduleUpdate(update.id, update.scheduledDate)} className="schedule-btn">📅 Reschedule</button>
+                <button onClick={() => handleScheduleUpdate(update.id)} className="schedule-btn">📅 Reschedule</button>
               )}
             </div>
           </div>
@@ -2102,20 +2104,13 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
 
         <div className="header-right">
-          {console.log('🔍 AdminDashboard - user prop:', user)}
-          {console.log('🔍 AdminDashboard - onLogout prop:', onLogout)}
-          <Profile 
-            user={user} 
-            onLogout={onLogout} 
-            onSectionChange={(section) => {
-              console.log('🔍 Profile onSectionChange called with:', section);
-              if (section === 'welcome') {
-                onSectionChange('welcome');
-              } else {
-                setActiveTab(section);
-              }
-            }} 
-          />
+          <button 
+            onClick={() => setActiveTab('profile')} 
+            className="profile-btn"
+            title="View Profile"
+          >
+            👤 {user?.name || 'Profile'}
+          </button>
         </div>
       </div>
 
