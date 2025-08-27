@@ -1,91 +1,20 @@
-# FORCE NETLIFY REBUILD - Updated configuration with proper build settings and no-cache headers
-# This file ensures Netlify builds from the correct directory and serves fresh content
+# Netlify configuration for whimsical-licorice-fa2bd7
 # Project: still testing CitizenScientistMiniApp copy 2
-# Build Date: $(date)
+# Email: efop77392@gmail.com
+# Site ID: cff17aec-4e8d-4600-a7fa-93dc30f0da69
 
 [build]
-  # Build command - this runs in the project root directory
-  command = "npm ci && npm run build"
-  # Publish directory - this is the output folder created by the build
+  command = "npm run build"
   publish = "dist"
-  # Base directory - ensure we're building from the current project
-  base = "."
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
-  NODE_ENV = "production"
-  # Force rebuild
-  FORCE_REBUILD = "true"
-  BUILD_TIMESTAMP = "2025-08-25T08:50:00Z"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# Force proper MIME types
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Content-Type = "application/javascript"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/*.css"
-  [headers.values]
-    Content-Type = "text/css"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/*.json"
-  [headers.values]
-    Content-Type = "application/json"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/*.svg"
-  [headers.values]
-    Content-Type = "image/svg+xml"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-# Specific files
-[[headers]]
-  for = "/sw.js"
-  [headers.values]
-    Content-Type = "application/javascript"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/manifest.json"
-  [headers.values]
-    Content-Type = "application/json"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/index.html"
-  [headers.values]
-    Content-Type = "text/html"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-# Build assets - NO CACHING for development
-[[headers]]
-  for = "/assets/*.js"
-  [headers.values]
-    Content-Type = "application/javascript"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/assets/*.css"
-  [headers.values]
-    Content-Type = "text/css"
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/assets/*.json"
-  [headers.values]
-    Content-Type = "application/json"
-    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Security headers
 [[headers]]
@@ -94,4 +23,3 @@
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"

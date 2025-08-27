@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Profile.css';
 
-const Profile = ({ user, onLogout, onClose }) => {
+const Profile = ({ user, onLogout, onSectionChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const profileRef = useRef(null);
 
@@ -42,6 +42,14 @@ const Profile = ({ user, onLogout, onClose }) => {
   const handleLogout = () => {
     console.log('🚪 Logout clicked');
     onLogout();
+    setIsOpen(false);
+  };
+
+  const handleSectionChange = (section) => {
+    console.log('🔄 Section change requested:', section);
+    if (onSectionChange) {
+      onSectionChange(section);
+    }
     setIsOpen(false);
   };
 
@@ -96,15 +104,34 @@ const Profile = ({ user, onLogout, onClose }) => {
           </div>
 
           <div className="profile-actions-unique">
-            <button className="profile-action-btn-unique" onClick={() => setIsOpen(false)}>
-              <span className="action-icon-unique">📋</span>
-              <span className="action-text-unique">View Profile</span>
+            <button 
+              className="profile-action-btn-unique" 
+              onClick={() => handleSectionChange('profile')}
+            >
+              <span className="action-icon-unique">👤</span>
+              <span className="action-text-unique">Edit Profile</span>
+              <span className="action-description-unique">Update your personal information</span>
             </button>
-            <button className="profile-action-btn-unique" onClick={() => setIsOpen(false)}>
+            <button 
+              className="profile-action-btn-unique" 
+              onClick={() => handleSectionChange('password')}
+            >
+              <span className="action-icon-unique">🔑</span>
+              <span className="action-text-unique">Change Password</span>
+              <span className="action-description-unique">Update your account password</span>
+            </button>
+            <button 
+              className="profile-action-btn-unique" 
+              onClick={() => handleSectionChange('preferences')}
+            >
               <span className="action-icon-unique">⚙️</span>
-              <span className="action-text-unique">Settings</span>
+              <span className="action-text-unique">Preferences</span>
+              <span className="action-description-unique">Customize your app settings</span>
             </button>
-            <button className="profile-action-btn-unique danger" onClick={handleLogout}>
+            <button 
+              className="profile-action-btn-unique danger" 
+              onClick={handleLogout}
+            >
               <span className="action-icon-unique">🚪</span>
               <span className="action-text-unique">Logout</span>
               <span className="action-description-unique">Sign out of your account</span>

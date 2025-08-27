@@ -5,6 +5,7 @@ import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import AuthSystem from './components/AuthSystem';
 import DailyUpdatesManager from './components/DailyUpdatesManager';
+import ConnectionStatus from './components/ConnectionStatus';
 import { DataProvider, useData } from './contexts/DataContext';
 import config from './config';
 import './App.css';
@@ -215,6 +216,7 @@ function AppContent() {
             >
               🔐 Login
             </button>
+            <p className="user-note">Existing users can login with their credentials</p>
           </div>
 
           <div className="action-group">
@@ -228,6 +230,17 @@ function AppContent() {
             <p className="admin-note">Admin credentials: admin@escom.com / admin123</p>
           </div>
 
+          <div className="info-section">
+            <h3>ℹ️ About the App</h3>
+            <p>This is a comprehensive coastal monitoring platform for citizen scientists. Features include:</p>
+            <ul>
+              <li>📊 Data collection and monitoring</li>
+              <li>❓ FAQ management system</li>
+              <li>📢 Daily updates and announcements</li>
+              <li>👤 User profile management</li>
+              <li>🔐 Secure authentication</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -282,6 +295,9 @@ function AppContent() {
 
   return (
     <div className="App">
+      {/* Connection Status Component */}
+      <ConnectionStatus />
+      
       {renderMainContent()}
 
       {/* Authentication Modal */}

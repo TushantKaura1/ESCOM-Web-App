@@ -62,14 +62,14 @@ export const DataProvider = ({ children }) => {
       if (savedFaqs && savedFaqs.length > 0) {
         setFaqs(savedFaqs);
       } else {
-        // Demo FAQ data
+        // Enhanced FAQ data with more realistic content
         const demoFaqs = [
           {
             id: 1,
             category: 'ESCOM Organization',
             subcategory: 'Getting Involved',
             question: 'How can I get involved with ESCOM?',
-            answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.',
+            answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection. We offer both online and in-person training opportunities.',
             priority: 'high',
             tags: ['getting-started', 'volunteer', 'training'],
             media: [],
@@ -84,7 +84,7 @@ export const DataProvider = ({ children }) => {
             category: 'Monitoring',
             subcategory: 'Equipment',
             question: 'What parameters do we monitor?',
-            answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.',
+            answer: 'We monitor water temperature, salinity, pH levels, turbidity, dissolved oxygen, and overall water quality using specialized equipment. Each parameter provides crucial insights into coastal ecosystem health.',
             priority: 'medium',
             tags: ['monitoring', 'equipment', 'parameters'],
             media: [],
@@ -92,6 +92,51 @@ export const DataProvider = ({ children }) => {
             viewCount: 89,
             createdAt: '2024-01-10',
             updatedAt: '2024-01-10',
+            status: 'active'
+          },
+          {
+            id: 3,
+            category: 'Data Collection',
+            subcategory: 'Best Practices',
+            question: 'How often should I collect data?',
+            answer: 'We recommend collecting data weekly during normal conditions and daily during extreme weather events. Consistent data collection helps identify patterns and trends in coastal health.',
+            priority: 'high',
+            tags: ['data-collection', 'frequency', 'best-practices'],
+            media: [],
+            importance: 'critical',
+            viewCount: 234,
+            createdAt: '2024-01-20',
+            updatedAt: '2024-01-20',
+            status: 'active'
+          },
+          {
+            id: 4,
+            category: 'Safety',
+            subcategory: 'Field Work',
+            question: 'What safety precautions should I take?',
+            answer: 'Always check weather conditions before monitoring, wear appropriate safety gear, work in pairs when possible, and avoid monitoring during severe weather. Your safety is our priority.',
+            priority: 'high',
+            tags: ['safety', 'field-work', 'weather'],
+            media: [],
+            importance: 'critical',
+            viewCount: 178,
+            createdAt: '2024-01-18',
+            updatedAt: '2024-01-18',
+            status: 'active'
+          },
+          {
+            id: 5,
+            category: 'Training',
+            subcategory: 'Certification',
+            question: 'How do I get certified for monitoring?',
+            answer: 'Complete our online training modules, attend a hands-on workshop, and pass the certification test. Certification is valid for 2 years and includes ongoing support.',
+            priority: 'medium',
+            tags: ['training', 'certification', 'workshop'],
+            media: [],
+            importance: 'normal',
+            viewCount: 145,
+            createdAt: '2024-01-22',
+            updatedAt: '2024-01-22',
             status: 'active'
           }
         ];
@@ -104,64 +149,131 @@ export const DataProvider = ({ children }) => {
       if (savedUpdates && savedUpdates.length > 0) {
         setUpdates(savedUpdates);
       } else {
-        // Demo updates data
+        // Enhanced updates with more realistic content
         const demoUpdates = [
           {
             id: 1,
-            title: 'New Water Quality Monitoring Protocol',
-            content: 'We have updated our water quality monitoring protocols to include additional parameters for better environmental assessment.',
-            type: 'protocol',
+            title: 'New Monitoring Equipment Available',
+            content: 'We have received new water quality monitoring equipment including advanced pH meters and turbidity sensors. Training sessions will be scheduled next week. Please contact your team leader to reserve your spot.',
+            type: 'announcement',
             priority: 'high',
-            tags: ['protocol', 'monitoring', 'water-quality'],
+            tags: ['equipment', 'training', 'monitoring'],
             media: [],
-            scheduledDate: '2024-01-20',
-            expirationDate: '2024-12-31',
-            autoExpire: true,
-            createdAt: '2024-01-20T10:00:00Z',
-            updatedAt: '2024-01-20T10:00:00Z',
-            author: 'Admin Team',
-            viewCount: 45,
-            status: 'active'
+            status: 'published',
+            createdAt: '2024-01-18',
+            viewCount: 234
+          },
+          {
+            id: 2,
+            title: 'Monthly Data Review Meeting',
+            content: 'Join us for our monthly data review meeting where we analyze trends and discuss findings. All citizen scientists welcome! We\'ll be reviewing January data and planning February monitoring activities.',
+            type: 'meeting',
+            priority: 'medium',
+            tags: ['meeting', 'data-review', 'collaboration'],
+            media: [],
+            status: 'published',
+            createdAt: '2024-01-20',
+            viewCount: 156
+          },
+          {
+            id: 3,
+            title: 'Weather Alert: Storm Approaching',
+            content: 'Heavy rainfall expected this weekend. Please avoid monitoring during severe weather conditions for safety. Data collection can resume once conditions improve.',
+            type: 'alert',
+            priority: 'high',
+            tags: ['weather', 'safety', 'alert'],
+            media: [],
+            status: 'published',
+            createdAt: '2024-01-21',
+            viewCount: 89
+          },
+          {
+            id: 4,
+            title: 'Coastal Cleanup Event',
+            content: 'Join our monthly coastal cleanup event this Saturday. We\'ll be cleaning up Beach Point A and collecting data on marine debris. Bring your monitoring equipment!',
+            type: 'event',
+            priority: 'medium',
+            tags: ['cleanup', 'event', 'volunteer'],
+            media: [],
+            status: 'published',
+            createdAt: '2024-01-23',
+            viewCount: 67
           }
         ];
         setUpdates(demoUpdates);
         saveToStorage('updates', demoUpdates);
       }
 
-      // Load Users
+      // Load Users with enhanced data
       const savedUsers = loadFromStorage('users');
       if (savedUsers && savedUsers.length > 0) {
         setUsers(savedUsers);
       } else {
-        // Demo users data
+        // Enhanced user data with realistic information
         const demoUsers = [
           {
             id: 1,
-            name: 'Lúcia Fernandes',
-            email: 'lucia@example.com',
-            username: 'lucia.fernandes',
-            team: 'Team Beta',
+            name: 'Dr. Maria Santos',
+            email: 'maria.santos@escom.org',
+            username: 'maria.santos',
+            role: 'admin',
+            team: 'Research Team',
             status: 'active',
-            role: 'citizen',
-            readings: 89,
-            accuracy: 94,
+            joinDate: '2023-06-15',
             lastActivity: '2 hours ago',
-            joinDate: '2024-01-15',
-            totalContributions: 156
+            totalReadings: 156,
+            accuracy: 98,
+            specializations: ['Marine Biology', 'Data Analysis'],
+            certifications: ['Advanced Monitoring', 'Safety Training'],
+            contributions: 234
           },
           {
             id: 2,
             name: 'Carlos Silva',
-            email: 'carlos@example.com',
+            email: 'carlos.silva@email.com',
             username: 'carlos.silva',
+            role: 'citizen',
             team: 'Team Alpha',
             status: 'active',
-            role: 'moderator',
-            readings: 67,
-            accuracy: 91,
-            lastActivity: '1 day ago',
             joinDate: '2024-01-10',
-            totalContributions: 98
+            lastActivity: '1 day ago',
+            totalReadings: 67,
+            accuracy: 91,
+            specializations: ['Water Quality'],
+            certifications: ['Basic Monitoring'],
+            contributions: 98
+          },
+          {
+            id: 3,
+            name: 'Ana Oliveira',
+            email: 'ana.oliveira@email.com',
+            username: 'ana.oliveira',
+            role: 'citizen',
+            team: 'Team Beta',
+            status: 'active',
+            joinDate: '2024-01-20',
+            lastActivity: '3 hours ago',
+            totalReadings: 78,
+            accuracy: 89,
+            specializations: ['Environmental Science'],
+            certifications: ['Basic Monitoring'],
+            contributions: 134
+          },
+          {
+            id: 4,
+            name: 'Lúcia Fernandes',
+            email: 'lucia.fernandes@email.com',
+            username: 'lucia.fernandes',
+            role: 'moderator',
+            team: 'Team Gamma',
+            status: 'active',
+            joinDate: '2024-01-15',
+            lastActivity: '2 hours ago',
+            totalReadings: 89,
+            accuracy: 94,
+            specializations: ['Oceanography'],
+            certifications: ['Advanced Monitoring', 'Safety Training'],
+            contributions: 156
           }
         ];
         setUsers(demoUsers);
@@ -173,13 +285,24 @@ export const DataProvider = ({ children }) => {
       if (savedStats && Object.keys(savedStats).length > 0) {
         setSystemStats(savedStats);
       } else {
+        // Enhanced system statistics
         const demoStats = {
-          totalUsers: 12,
-          activeUsers: 8,
-          totalReadings: 567,
-          averageAccuracy: 91.3,
-          newThisMonth: 3,
-          systemHealth: 'Excellent'
+          totalUsers: 24,
+          activeUsers: 21,
+          totalReadings: 1247,
+          averageAccuracy: 94.2,
+          newThisMonth: 7,
+          systemHealth: 'Excellent',
+          totalFAQs: 5,
+          totalUpdates: 4,
+          pendingApprovals: 0,
+          monthlyGrowth: 12.5,
+          dataQuality: 'High',
+          systemUptime: 99.8,
+          lastBackup: '2024-01-25T10:00:00Z',
+          databaseSize: '2.3 GB',
+          activeTeams: 4,
+          totalContributions: 3456
         };
         setSystemStats(demoStats);
         saveToStorage('systemStats', demoStats);
@@ -189,12 +312,42 @@ export const DataProvider = ({ children }) => {
       const savedNotifications = loadFromStorage('notifications');
       if (savedNotifications && savedNotifications.length > 0) {
         setNotifications(savedNotifications);
+      } else {
+        // Enhanced notifications
+        const demoNotifications = [
+          {
+            id: 1,
+            type: 'info',
+            title: 'Welcome to ESCOM!',
+            message: 'Thank you for joining our coastal monitoring community. Complete your profile to get started.',
+            timestamp: '2024-01-25T09:00:00Z',
+            read: false
+          },
+          {
+            id: 2,
+            type: 'success',
+            title: 'Data Submission Successful',
+            message: 'Your water quality readings have been recorded. Great work!',
+            timestamp: '2024-01-24T15:30:00Z',
+            read: true
+          },
+          {
+            id: 3,
+            type: 'warning',
+            title: 'Equipment Maintenance Due',
+            message: 'Your pH meter is due for calibration. Schedule maintenance within the next week.',
+            timestamp: '2024-01-23T11:00:00Z',
+            read: false
+          }
+        ];
+        setNotifications(demoNotifications);
+        saveToStorage('notifications', demoNotifications);
       }
 
-      console.log('✅ All initial data loaded successfully');
+      setIsLoading(false);
+      console.log('✅ Initial data loaded successfully');
     } catch (error) {
       console.error('❌ Error loading initial data:', error);
-    } finally {
       setIsLoading(false);
     }
   };

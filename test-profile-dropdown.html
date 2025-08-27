@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Dropdown Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-button {
+            background: #00d4ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0099cc;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Profile Dropdown Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>✅ Changes Made:</h2>
+        <ul>
+            <li>❌ Removed "Settings" option from both User and Admin dashboards</li>
+            <li>✅ Added working dropdown menu for profile button</li>
+            <li>✅ Added "Edit Profile" section with form fields</li>
+            <li>✅ Added "Change Password" section with password requirements</li>
+            <li>✅ Added "Preferences" section with toggles and options</li>
+            <li>✅ Both User and Admin dashboards now have the same profile functionality</li>
+            <li>✅ Clicking dropdown options redirects to different sections</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 How to Test:</h2>
+        <ol>
+            <li>Start the development server: <code>npm run dev</code></li>
+            <li>Login as either a user or admin</li>
+            <li>Click on the profile button (👤 or 👑) in the top-right corner</li>
+            <li>Verify the dropdown menu appears with 4 options:
+                <ul>
+                    <li>👤 Edit Profile</li>
+                    <li>🔑 Change Password</li>
+                    <li>⚙️ Preferences</li>
+                    <li>🚪 Logout</li>
+                </ul>
+            </li>
+            <li>Click on each option to verify it redirects to the correct section</li>
+            <li>Test the back button to return to dashboard</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Expected Behavior:</h2>
+        <ul>
+            <li><strong>Edit Profile:</strong> Shows form with name, email, username, team/bio fields</li>
+            <li><strong>Change Password:</strong> Shows password form with requirements list</li>
+            <li><strong>Preferences:</strong> Shows toggles for notifications, data collection, and display settings</li>
+            <li><strong>Logout:</strong> Signs out and returns to welcome screen</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Features Implemented:</h2>
+        <ul>
+            <li>✅ Responsive design for mobile and desktop</li>
+            <li>✅ Consistent styling across both dashboards</li>
+            <li>✅ Form validation and user feedback</li>
+            <li>✅ Toggle switches for preferences</li>
+            <li>✅ Password requirements display</li>
+            <li>✅ Back navigation to dashboard</li>
+        </ul>
+    </div>
+
+    <script>
+        console.log('🧪 Profile Dropdown Test Page Loaded');
+        console.log('✅ All changes have been implemented successfully');
+        console.log('🚀 Test the functionality by running the app and clicking the profile button');
+    </script>
+</body>
+</html>

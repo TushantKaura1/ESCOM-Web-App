@@ -1703,6 +1703,216 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     </div>
   );
 
+  const renderProfile = () => (
+    <div className="admin-profile">
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>👤 Edit Profile</h3>
+      </div>
+      
+      <div className="profile-form">
+        <h4>Personal Information</h4>
+        <form className="profile-form-content">
+          <div className="form-row">
+            <div className="form-group">
+              <label>Full Name</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                defaultValue={user?.name || ''}
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <input 
+                type="email" 
+                className="form-input" 
+                defaultValue={user?.email || ''}
+                placeholder="Enter your email"
+                disabled
+              />
+            </div>
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Username</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                defaultValue={user?.username || ''}
+                placeholder="Enter your username"
+              />
+            </div>
+            <div className="form-group">
+              <label>Role</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                defaultValue={user?.role || 'admin'}
+                disabled
+              />
+            </div>
+          </div>
+          
+          <div className="form-group">
+            <label>Bio</label>
+            <textarea 
+              className="form-input" 
+              placeholder="Tell us about yourself and your role in the organization..."
+              rows="4"
+            ></textarea>
+          </div>
+          
+          <button type="submit" className="submit-btn">💾 Save Changes</button>
+        </form>
+      </div>
+    </div>
+  );
+
+  const renderPassword = () => (
+    <div className="admin-password">
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>🔑 Change Password</h3>
+      </div>
+      
+      <div className="password-form">
+        <h4>Update Your Password</h4>
+        <form className="password-form-content">
+          <div className="form-group">
+            <label>Current Password</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              placeholder="Enter your current password"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>New Password</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              placeholder="Enter your new password"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Confirm New Password</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              placeholder="Confirm your new password"
+              required
+            />
+          </div>
+          
+          <div className="password-requirements">
+            <h5>Password Requirements:</h5>
+            <ul>
+              <li>At least 8 characters long</li>
+              <li>Contains uppercase and lowercase letters</li>
+              <li>Contains at least one number</li>
+              <li>Contains at least one special character</li>
+            </ul>
+          </div>
+          
+          <button type="submit" className="submit-btn">🔑 Update Password</button>
+        </form>
+      </div>
+    </div>
+  );
+
+  const renderPreferences = () => (
+    <div className="admin-preferences">
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>⚙️ Preferences</h3>
+      </div>
+      
+      <div className="preferences-content">
+        <div className="preferences-section">
+          <h4>Notification Settings</h4>
+          <div className="preference-item">
+            <span className="preference-label">Email Notifications</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">In-App Notifications</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">SMS Alerts (Urgent Only)</span>
+            <label className="toggle">
+              <input type="checkbox" />
+              <span className="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div className="preferences-section">
+          <h4>Admin Preferences</h4>
+          <div className="preference-item">
+            <span className="preference-label">Auto-approve New Users</span>
+            <label className="toggle">
+              <input type="checkbox" />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">Data Export Notifications</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">System Health Alerts</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div className="preferences-section">
+          <h4>Display Settings</h4>
+          <div className="preference-item">
+            <span className="preference-label">Theme</span>
+            <select className="form-input">
+              <option value="light">Light Theme</option>
+              <option value="dark">Dark Theme</option>
+              <option value="auto">Auto (System)</option>
+            </select>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">Language</span>
+            <select className="form-input">
+              <option value="en">English</option>
+              <option value="pt">Portuguese</option>
+              <option value="es">Spanish</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="preferences-actions">
+          <button className="save-btn">💾 Save Preferences</button>
+          <button className="reset-btn">🔄 Reset to Default</button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderMainContent = () => {
     console.log('🔍 Rendering main content for tab:', activeTab);
     
@@ -1713,9 +1923,15 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
       case 'users':
         console.log('👥 Rendering users tab');
         return renderUserManagement();
-      case 'settings':
-        console.log('⚙️ Rendering settings tab');
-        return renderSystemSettings();
+      case 'profile':
+        console.log('👤 Rendering profile tab');
+        return renderProfile();
+      case 'password':
+        console.log('🔑 Rendering password tab');
+        return renderPassword();
+      case 'preferences':
+        console.log('⚙️ Rendering preferences tab');
+        return renderPreferences();
       case 'faqs':
         console.log('❓ Rendering FAQs tab');
         return renderFAQManagement();
@@ -1750,12 +1966,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
             👥 Users
           </button>
           <button 
-            className={`nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
-          >
-            ⚙️ Settings
-          </button>
-          <button 
             className={`nav-btn ${activeTab === 'faqs' ? 'active' : ''}`}
             onClick={() => setActiveTab('faqs')}
           >
@@ -1770,7 +1980,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
 
         <div className="header-right">
-          <Profile user={user} onLogout={onLogout} />
+          <Profile user={user} onLogout={onLogout} onSectionChange={setActiveTab} />
         </div>
       </div>
 

@@ -20,6 +20,8 @@ services:
         value: citiscience
       - key: MONGODB_URI
         sync: false
+      - key: CORS_ORIGIN
+        value: "*"
     healthCheckPath: /health
     autoDeploy: true
     buildFilter:

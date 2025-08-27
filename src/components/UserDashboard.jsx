@@ -12,10 +12,12 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     salinity: '',
     ph: '',
     turbidity: '',
+    dissolvedOxygen: '',
     location: '',
     notes: '',
     weather: 'sunny',
-    timeOfDay: 'morning'
+    timeOfDay: 'morning',
+    equipment: 'pH-2000, Salinity-Refractometer'
   });
 
   // const [learningResources, setLearningResources] = useState([]);
@@ -30,14 +32,14 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
   }, [user]);
 
   const loadUserData = async () => {
-    // Load demo data for now
+    // Load enhanced demo data for better user experience
     setFaqs([
       { 
         id: 1, 
         category: 'ESCOM Organization', 
         subcategory: 'Getting Involved',
         question: 'How can I get involved with ESCOM?', 
-        answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection.',
+        answer: 'You can get involved by joining our coastal monitoring program, participating in training sessions, and contributing to data collection. We offer both online and in-person training opportunities.',
         priority: 'high',
         tags: ['getting-started', 'volunteer', 'training'],
         media: ['https://example.com/image1.jpg'],
@@ -50,13 +52,26 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         category: 'Monitoring', 
         subcategory: 'Equipment',
         question: 'What parameters do we monitor?', 
-        answer: 'We monitor water temperature, salinity, pH levels, and overall water quality using specialized equipment.',
+        answer: 'We monitor water temperature, salinity, pH levels, turbidity, dissolved oxygen, and overall water quality using specialized equipment. Each parameter provides crucial insights into coastal ecosystem health.',
         priority: 'medium',
         tags: ['monitoring', 'equipment', 'parameters'],
         media: [],
         importance: 'normal',
         viewCount: 89,
         createdAt: '2024-01-10'
+      },
+      { 
+        id: 3, 
+        category: 'Safety', 
+        subcategory: 'Field Work',
+        question: 'What safety precautions should I take?', 
+        answer: 'Always check weather conditions before monitoring, wear appropriate safety gear, work in pairs when possible, and avoid monitoring during severe weather. Your safety is our priority.',
+        priority: 'high',
+        tags: ['safety', 'field-work', 'weather'],
+        media: [],
+        importance: 'critical',
+        viewCount: 178,
+        createdAt: '2024-01-18'
       }
     ]);
 
@@ -64,7 +79,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
       {
         id: 1,
         title: 'New Monitoring Equipment Available',
-        content: 'We have received new water quality monitoring equipment. Training sessions will be scheduled next week.',
+        content: 'We have received new water quality monitoring equipment including advanced pH meters and turbidity sensors. Training sessions will be scheduled next week. Please contact your team leader to reserve your spot.',
         type: 'announcement',
         priority: 'high',
         tags: ['equipment', 'training', 'monitoring'],
@@ -76,7 +91,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
       {
         id: 2,
         title: 'Monthly Data Review Meeting',
-        content: 'Join us for our monthly data review meeting where we analyze trends and discuss findings. All citizen scientists welcome!',
+        content: 'Join us for our monthly data review meeting where we analyze trends and discuss findings. All citizen scientists welcome! We\'ll be reviewing January data and planning February monitoring activities.',
         type: 'meeting',
         priority: 'medium',
         tags: ['meeting', 'data-review', 'collaboration'],
@@ -88,7 +103,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
       {
         id: 3,
         title: 'Weather Alert: Storm Approaching',
-        content: 'Heavy rainfall expected this weekend. Please avoid monitoring during severe weather conditions for safety.',
+        content: 'Heavy rainfall expected this weekend. Please avoid monitoring during severe weather conditions for safety. Data collection can resume once conditions improve.',
         type: 'alert',
         priority: 'high',
         tags: ['weather', 'safety', 'alert'],
@@ -96,9 +111,22 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         status: 'published',
         createdAt: '2024-01-21',
         viewCount: 89
+      },
+      {
+        id: 4,
+        title: 'Coastal Cleanup Event',
+        content: 'Join our monthly coastal cleanup event this Saturday. We\'ll be cleaning up Beach Point A and collecting data on marine debris. Bring your monitoring equipment!',
+        type: 'event',
+        priority: 'medium',
+        tags: ['cleanup', 'event', 'volunteer'],
+        media: [],
+        status: 'published',
+        createdAt: '2024-01-23',
+        viewCount: 67
       }
     ]);
 
+    // Enhanced monitoring readings with realistic data
     setReadings([
       {
         id: 1,
@@ -106,12 +134,15 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         salinity: 35.2,
         ph: 8.1,
         turbidity: 2.3,
+        dissolvedOxygen: 7.8,
         location: 'Beach Point A',
-        notes: 'Clear water, good conditions',
+        notes: 'Clear water, excellent conditions. No visible pollution. Marine life activity normal.',
         weather: 'sunny',
         timeOfDay: 'morning',
         timestamp: '2024-01-20T08:00:00Z',
-        quality: 'excellent'
+        quality: 'excellent',
+        equipment: 'pH-2000, Salinity-Refractometer',
+        observer: user?.name || 'Citizen Scientist'
       },
       {
         id: 2,
@@ -119,12 +150,15 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         salinity: 34.8,
         ph: 8.0,
         turbidity: 3.1,
+        dissolvedOxygen: 7.5,
         location: 'Beach Point B',
-        notes: 'Slight cloudiness, normal readings',
+        notes: 'Slight cloudiness, normal readings. Small amount of seaweed present.',
         weather: 'partly-cloudy',
         timeOfDay: 'afternoon',
         timestamp: '2024-01-19T14:00:00Z',
-        quality: 'good'
+        quality: 'good',
+        equipment: 'pH-2000, Salinity-Refractometer',
+        observer: user?.name || 'Citizen Scientist'
       },
       {
         id: 3,
@@ -132,12 +166,15 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         salinity: 35.5,
         ph: 8.2,
         turbidity: 1.8,
+        dissolvedOxygen: 8.1,
         location: 'Beach Point C',
-        notes: 'Excellent water clarity, perfect for monitoring',
+        notes: 'Excellent water clarity, perfect for monitoring. No visible contaminants.',
         weather: 'clear',
         timeOfDay: 'evening',
         timestamp: '2024-01-18T18:00:00Z',
-        quality: 'excellent'
+        quality: 'excellent',
+        equipment: 'pH-2000, Salinity-Refractometer',
+        observer: user?.name || 'Citizen Scientist'
       },
       {
         id: 4,
@@ -145,12 +182,15 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         salinity: 34.9,
         ph: 7.9,
         turbidity: 4.2,
+        dissolvedOxygen: 7.2,
         location: 'Beach Point D',
-        notes: 'Higher turbidity due to recent rainfall',
+        notes: 'Higher turbidity due to recent rainfall. Water still safe for monitoring.',
         weather: 'rainy',
         timeOfDay: 'morning',
         timestamp: '2024-01-17T09:00:00Z',
-        quality: 'fair'
+        quality: 'fair',
+        equipment: 'pH-2000, Salinity-Refractometer',
+        observer: user?.name || 'Citizen Scientist'
       },
       {
         id: 5,
@@ -158,12 +198,15 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         salinity: 35.1,
         ph: 8.0,
         turbidity: 2.9,
+        dissolvedOxygen: 7.6,
         location: 'Beach Point A',
-        notes: 'Stable conditions, consistent with previous readings',
+        notes: 'Stable conditions, consistent with previous readings. Good for baseline data.',
         weather: 'partly-cloudy',
         timeOfDay: 'afternoon',
         timestamp: '2024-01-16T15:00:00Z',
-        quality: 'good'
+        quality: 'good',
+        equipment: 'pH-2000, Salinity-Refractometer',
+        observer: user?.name || 'Citizen Scientist'
       }
     ]);
 
@@ -237,10 +280,12 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
       salinity: '',
       ph: '',
       turbidity: '',
+      dissolvedOxygen: '',
       location: '',
       notes: '',
       weather: 'sunny',
-      timeOfDay: 'morning'
+      timeOfDay: 'morning',
+      equipment: 'pH-2000, Salinity-Refractometer'
     });
     
     console.log('✅ New reading submitted:', reading);
@@ -251,27 +296,33 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     const sal = parseFloat(reading.salinity);
     const ph = parseFloat(reading.ph);
     const turb = parseFloat(reading.turbidity);
+    const do2 = parseFloat(reading.dissolvedOxygen);
     
     let score = 0;
     
     // Temperature quality (ideal range: 15-25°C)
-    if (temp >= 15 && temp <= 25) score += 25;
+    if (temp >= 15 && temp <= 25) score += 20;
     else if (temp >= 10 && temp <= 30) score += 15;
     else score += 5;
     
     // Salinity quality (ideal range: 30-40 ppt)
-    if (sal >= 30 && sal <= 40) score += 25;
+    if (sal >= 30 && sal <= 40) score += 20;
     else if (sal >= 25 && sal <= 45) score += 15;
     else score += 5;
     
     // pH quality (ideal range: 7.5-8.5)
-    if (ph >= 7.5 && ph <= 8.5) score += 25;
+    if (ph >= 7.5 && ph <= 8.5) score += 20;
     else if (ph >= 7.0 && ph <= 9.0) score += 15;
     else score += 5;
     
     // Turbidity quality (lower is better, ideal < 5 NTU)
-    if (turb < 5) score += 25;
+    if (turb < 5) score += 20;
     else if (turb < 10) score += 15;
+    else score += 5;
+    
+    // Dissolved Oxygen quality (higher is better, ideal > 6 mg/L)
+    if (do2 > 6) score += 20;
+    else if (do2 > 4) score += 15;
     else score += 5;
     
     if (score >= 90) return 'excellent';
@@ -500,18 +551,73 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
               />
             </div>
             <div className="form-group">
-              <label>Overall Quality</label>
+              <label>Dissolved Oxygen (mg/L)</label>
+              <input 
+                type="number" 
+                step="0.1" 
+                className="form-input" 
+                placeholder="7.5"
+                value={newReading.dissolvedOxygen}
+                onChange={(e) => setNewReading({...newReading, dissolvedOxygen: e.target.value})}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Weather Conditions</label>
               <select 
                 className="form-input"
-                value={newReading.quality}
-                onChange={(e) => setNewReading({...newReading, quality: e.target.value})}
+                value={newReading.weather}
+                onChange={(e) => setNewReading({...newReading, weather: e.target.value})}
               >
-                <option>Excellent</option>
-                <option>Good</option>
-                <option>Fair</option>
-                <option>Poor</option>
+                <option value="sunny">☀️ Sunny</option>
+                <option value="partly-cloudy">⛅ Partly Cloudy</option>
+                <option value="cloudy">☁️ Cloudy</option>
+                <option value="rainy">🌧️ Rainy</option>
+                <option value="stormy">⛈️ Stormy</option>
+                <option value="clear">🌙 Clear</option>
               </select>
             </div>
+            <div className="form-group">
+              <label>Time of Day</label>
+              <select 
+                className="form-input"
+                value={newReading.timeOfDay}
+                onChange={(e) => setNewReading({...newReading, timeOfDay: e.target.value})}
+              >
+                <option value="morning">🌅 Morning (6AM-12PM)</option>
+                <option value="afternoon">☀️ Afternoon (12PM-6PM)</option>
+                <option value="evening">🌆 Evening (6PM-12AM)</option>
+                <option value="night">🌙 Night (12AM-6AM)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="form-group">
+            <label>Equipment Used</label>
+            <input 
+              type="text" 
+              className="form-input" 
+              placeholder="pH-2000, Salinity-Refractometer"
+              value={newReading.equipment}
+              onChange={(e) => setNewReading({...newReading, equipment: e.target.value})}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Overall Quality</label>
+            <select 
+              className="form-input"
+              value={newReading.quality}
+              onChange={(e) => setNewReading({...newReading, quality: e.target.value})}
+            >
+              <option>Excellent</option>
+              <option>Good</option>
+              <option>Fair</option>
+              <option>Poor</option>
+            </select>
           </div>
           
           <div className="form-group">
@@ -551,9 +657,31 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
                   <span className="value">{reading.ph}</span>
                 </div>
                 <div className="data-point">
+                  <span className="label">Turbidity:</span>
+                  <span className="value">{reading.turbidity} NTU</span>
+                </div>
+                <div className="data-point">
+                  <span className="label">Dissolved Oxygen:</span>
+                  <span className="value">{reading.dissolvedOxygen} mg/L</span>
+                </div>
+                <div className="data-point">
                   <span className="label">Location:</span>
                   <span className="value">{reading.location}</span>
                 </div>
+                <div className="data-point">
+                  <span className="label">Weather:</span>
+                  <span className="value">{reading.weather}</span>
+                </div>
+                <div className="data-point">
+                  <span className="label">Time:</span>
+                  <span className="value">{reading.timeOfDay}</span>
+                </div>
+                {reading.equipment && (
+                  <div className="data-point">
+                    <span className="label">Equipment:</span>
+                    <span className="value">{reading.equipment}</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -641,7 +769,214 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     </div>
   );
 
+  const renderProfile = () => (
+    <div className="user-profile">
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>👤 Edit Profile</h3>
+      </div>
+      
+      <div className="profile-form">
+        <h4>Personal Information</h4>
+        <form className="profile-form-content">
+          <div className="form-row">
+            <div className="form-group">
+              <label>Full Name</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                defaultValue={user?.name || ''}
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <input 
+                type="email" 
+                className="form-input" 
+                defaultValue={user?.email || ''}
+                placeholder="Enter your email"
+                disabled
+              />
+            </div>
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Username</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                defaultValue={user?.username || ''}
+                placeholder="Enter your username"
+              />
+            </div>
+            <div className="form-group">
+              <label>Team</label>
+              <select className="form-input">
+                <option value="Team Alpha">Team Alpha</option>
+                <option value="Team Beta">Team Beta</option>
+                <option value="Team Gamma">Team Gamma</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="form-group">
+            <label>Bio</label>
+            <textarea 
+              className="form-input" 
+              placeholder="Tell us about yourself and your interest in coastal monitoring..."
+              rows="4"
+            ></textarea>
+          </div>
+          
+          <button type="submit" className="submit-btn">💾 Save Changes</button>
+        </form>
+      </div>
+    </div>
+  );
 
+  const renderPassword = () => (
+    <div className="user-password">
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>🔑 Change Password</h3>
+      </div>
+      
+      <div className="password-form">
+        <h4>Update Your Password</h4>
+        <form className="password-form-content">
+          <div className="form-group">
+            <label>Current Password</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              placeholder="Enter your current password"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>New Password</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              placeholder="Enter your new password"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Confirm New Password</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              placeholder="Confirm your new password"
+              required
+            />
+          </div>
+          
+          <div className="password-requirements">
+            <h5>Password Requirements:</h5>
+            <ul>
+              <li>At least 8 characters long</li>
+              <li>Contains uppercase and lowercase letters</li>
+              <li>Contains at least one number</li>
+              <li>Contains at least one special character</li>
+            </ul>
+          </div>
+          
+          <button type="submit" className="submit-btn">🔑 Update Password</button>
+        </form>
+      </div>
+    </div>
+  );
+
+  const renderPreferences = () => (
+    <div className="user-preferences">
+      <div className="section-header">
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
+        <h3>⚙️ Preferences</h3>
+      </div>
+      
+      <div className="preferences-content">
+        <div className="preferences-section">
+          <h4>Notification Settings</h4>
+          <div className="preference-item">
+            <span className="preference-label">Email Notifications</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">In-App Notifications</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">SMS Alerts (Urgent Only)</span>
+            <label className="toggle">
+              <input type="checkbox" />
+              <span className="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div className="preferences-section">
+          <h4>Data Collection Preferences</h4>
+          <div className="preference-item">
+            <span className="preference-label">Auto-save Drafts</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">Location Services</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">Data Sharing for Research</span>
+            <label className="toggle">
+              <input type="checkbox" defaultChecked />
+              <span className="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div className="preferences-section">
+          <h4>Display Settings</h4>
+          <div className="preference-item">
+            <span className="preference-label">Theme</span>
+            <select className="form-input">
+              <option value="light">Light Theme</option>
+              <option value="dark">Dark Theme</option>
+              <option value="auto">Auto (System)</option>
+            </select>
+          </div>
+          <div className="preference-item">
+            <span className="preference-label">Language</span>
+            <select className="form-input">
+              <option value="en">English</option>
+              <option value="pt">Portuguese</option>
+              <option value="es">Spanish</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="preferences-actions">
+          <button className="save-btn">💾 Save Preferences</button>
+          <button className="reset-btn">🔄 Reset to Default</button>
+        </div>
+      </div>
+    </div>
+  );
 
   const renderContent = () => {
     switch (activeTab) {
@@ -653,6 +988,12 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         return renderFAQs();
       case 'updates':
         return renderUpdates();
+      case 'profile':
+        return renderProfile();
+      case 'password':
+        return renderPassword();
+      case 'preferences':
+        return renderPreferences();
       default:
         return renderDashboard();
     }
@@ -667,7 +1008,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         </div>
         
         <div className="header-right">
-          <Profile user={user} onLogout={onLogout} />
+          <Profile user={user} onLogout={onLogout} onSectionChange={setActiveTab} />
         </div>
       </div>
 
@@ -694,9 +1035,8 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           className={`nav-btn ${activeTab === 'updates' ? 'active' : ''}`}
           onClick={() => setActiveTab('updates')}
         >
-          📢 Updates
+          �� Updates
         </button>
-
       </div>
 
       <div className="dashboard-content">
