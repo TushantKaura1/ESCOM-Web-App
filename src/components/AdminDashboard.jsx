@@ -1329,12 +1329,12 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
   const renderFAQManagement = () => (
     <div className="faq-management">
       <div className="section-header">
-        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-        <button onClick={() => onLogout()} className="logout-btn">🚪 Logout</button>
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
         <h3>❓ FAQ Management</h3>
+        <button onClick={() => setShowAddFaq(true)} className="add-btn">➕ Add FAQ</button>
       </div>
       
-      {/* Search and Filter Controls */}
+      {/* Simplified Search and Filter */}
       <div className="faq-controls">
         <div className="search-section">
           <input
@@ -1356,26 +1356,23 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
             <option value="category">Sort by Category</option>
             <option value="question">Sort by Question</option>
             <option value="priority">Sort by Priority</option>
-            <option value="importance">Sort by Importance</option>
-            <option value="views">Sort by Views</option>
           </select>
         </div>
       </div>
 
       <div className="faq-categories">
-        <h4>FAQ Categories</h4>
         <div className="category-tabs">
           <button 
             className={`category-tab ${filterCategory === 'all' ? 'active' : ''}`}
             onClick={() => setFilterCategory('all')}
           >
-            All Categories
+            All
           </button>
           <button 
             className={`category-tab ${filterCategory === 'ESCOM Organization' ? 'active' : ''}`}
             onClick={() => setFilterCategory('ESCOM Organization')}
           >
-            ESCOM Organization
+            Organization
           </button>
           <button 
             className={`category-tab ${filterCategory === 'Monitoring' ? 'active' : ''}`}
@@ -1395,69 +1392,34 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
           >
             Data
           </button>
-          <button 
-            className={`category-tab ${filterCategory === 'Partners' ? 'active' : ''}`}
-            onClick={() => setFilterCategory('Partners')}
-          >
-            Partners
-          </button>
-        </div>
-      </div>
-
-      <div className="faq-stats">
-        <div className="stat-item">
-          <span className="stat-label">Total FAQs:</span>
-          <span className="stat-value">{faqs.length}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Filtered:</span>
-          <span className="stat-value">{sortedFAQs.length}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Sorting by:</span>
-          <span className="stat-value">{sortBy}</span>
         </div>
       </div>
 
       <div className="faq-list">
         {sortedFAQs.length > 0 ? (
           sortedFAQs.map(faq => (
-            <div key={faq.id} className="faq-item">
+            <div key={faq.id} className="faq-card">
               <div className="faq-header">
                 <div className="faq-meta">
                   <span className="faq-category">{faq.category}</span>
                   {faq.priority && (
-                    <span className={`faq-priority priority-${faq.priority}`}>
+                    <span className={`priority-badge ${faq.priority}`}>
                       {faq.priority}
-                    </span>
-                  )}
-                  {faq.importance && (
-                    <span className={`faq-importance importance-${faq.importance}`}>
-                      {faq.importance}
                     </span>
                   )}
                 </div>
                 <div className="faq-actions">
-                  <button className="edit-btn" onClick={() => handleFaqEdit(faq)}>✏️ Edit</button>
-                  <button className="delete-btn" onClick={() => handleFaqDelete(faq.id)}>🗑️ Delete</button>
+                  <button className="action-btn edit" onClick={() => handleFaqEdit(faq)}>✏️</button>
+                  <button className="action-btn delete" onClick={() => handleFaqDelete(faq.id)}>🗑️</button>
                 </div>
               </div>
               <div className="faq-content">
                 <h5>{faq.question}</h5>
                 <p>{faq.answer}</p>
-                {faq.tags && faq.tags.length > 0 && (
-                  <div className="faq-tags">
-                    {faq.tags.map((tag, index) => (
-                      <span key={index} className="faq-tag">{tag}</span>
-                    ))}
-                  </div>
-                )}
                 <div className="faq-footer">
-                  {faq.updatedAt && (
-                    <span className="faq-date">Updated: {new Date(faq.updatedAt).toLocaleDateString()}</span>
-                  )}
+                  <span className="faq-date">{new Date(faq.createdAt).toLocaleDateString()}</span>
                   {faq.viewCount && (
-                    <span className="faq-views">Views: {faq.viewCount}</span>
+                    <span className="faq-views">👁️ {faq.viewCount}</span>
                   )}
                 </div>
               </div>
@@ -1471,52 +1433,53 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         )}
       </div>
 
-      <div className="add-faq">
-        <button onClick={() => setShowAddFaq(true)} className="add-btn">➕ Add New Question</button>
-      </div>
-
       {/* Add FAQ Modal */}
       {showAddFaq && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Add New FAQ</h3>
-            <div className="form-group">
-              <label>Category:</label>
-              <select 
-                value={newFaq.category}
-                onChange={(e) => setNewFaq({...newFaq, category: e.target.value})}
-                className="form-input"
-              >
-                <option>ESCOM Organization</option>
-                <option>Monitoring</option>
-                <option>Training</option>
-                <option>Data</option>
-                <option>Partners</option>
-              </select>
+            <div className="modal-header">
+              <h3>Add New FAQ</h3>
+              <button onClick={() => setShowAddFaq(false)} className="close-btn">×</button>
             </div>
-            <div className="form-group">
-              <label>Question:</label>
-              <input 
-                type="text" 
-                value={newFaq.question}
-                onChange={(e) => setNewFaq({...newFaq, question: e.target.value})}
-                className="form-input"
-                placeholder="Enter your question..."
-              />
-            </div>
-            <div className="form-group">
-              <label>Answer:</label>
-              <textarea 
-                value={newFaq.answer}
-                onChange={(e) => setNewFaq({...newFaq, answer: e.target.value})}
-                className="form-input"
-                placeholder="Enter the answer..."
-                rows="4"
-              />
+            <div className="modal-content">
+              <div className="form-group">
+                <label>Category</label>
+                <select 
+                  value={newFaq.category}
+                  onChange={(e) => setNewFaq({...newFaq, category: e.target.value})}
+                  className="form-input"
+                >
+                  <option value="">Select category...</option>
+                  <option value="ESCOM Organization">Organization</option>
+                  <option value="Monitoring">Monitoring</option>
+                  <option value="Training">Training</option>
+                  <option value="Data">Data</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Question</label>
+                <input 
+                  type="text" 
+                  value={newFaq.question}
+                  onChange={(e) => setNewFaq({...newFaq, question: e.target.value})}
+                  className="form-input"
+                  placeholder="Enter your question..."
+                />
+              </div>
+              <div className="form-group">
+                <label>Answer</label>
+                <textarea 
+                  value={newFaq.answer}
+                  onChange={(e) => setNewFaq({...newFaq, answer: e.target.value})}
+                  className="form-input"
+                  placeholder="Enter the answer..."
+                  rows="4"
+                />
+              </div>
             </div>
             <div className="modal-actions">
-              <button onClick={handleAddFaq} className="save-btn">💾 Add FAQ</button>
-              <button onClick={() => setShowAddFaq(false)} className="cancel-btn">❌ Cancel</button>
+              <button onClick={handleAddFaq} className="btn primary">💾 Add FAQ</button>
+              <button onClick={() => setShowAddFaq(false)} className="btn secondary">Cancel</button>
             </div>
           </div>
         </div>
@@ -1526,42 +1489,46 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
       {editingFaq && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Edit FAQ</h3>
-            <div className="form-group">
-              <label>Category:</label>
-              <select 
-                value={editingFaq.category}
-                onChange={(e) => setEditingFaq({...editingFaq, category: e.target.value})}
-                className="form-input"
-              >
-                <option>ESCOM Organization</option>
-                <option>Monitoring</option>
-                <option>Training</option>
-                <option>Data</option>
-                <option>Partners</option>
-              </select>
+            <div className="modal-header">
+              <h3>Edit FAQ</h3>
+              <button onClick={() => setEditingFaq(null)} className="close-btn">×</button>
             </div>
-            <div className="form-group">
-              <label>Question:</label>
-              <input 
-                type="text" 
-                value={editingFaq.question}
-                onChange={(e) => setEditingFaq({...editingFaq, question: e.target.value})}
-                className="form-input"
-              />
-            </div>
-            <div className="form-group">
-              <label>Answer:</label>
-              <textarea 
-                value={editingFaq.answer}
-                onChange={(e) => setEditingFaq({...editingFaq, answer: e.target.value})}
-                className="form-input"
-                rows="4"
-              />
+            <div className="modal-content">
+              <div className="form-group">
+                <label>Category</label>
+                <select 
+                  value={editingFaq.category}
+                  onChange={(e) => setEditingFaq({...editingFaq, category: e.target.value})}
+                  className="form-input"
+                >
+                  <option value="ESCOM Organization">Organization</option>
+                  <option value="Monitoring">Monitoring</option>
+                  <option value="Training">Training</option>
+                  <option value="Data">Data</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Question</label>
+                <input 
+                  type="text" 
+                  value={editingFaq.question}
+                  onChange={(e) => setEditingFaq({...editingFaq, question: e.target.value})}
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>Answer</label>
+                <textarea 
+                  value={editingFaq.answer}
+                  onChange={(e) => setEditingFaq({...editingFaq, answer: e.target.value})}
+                  className="form-input"
+                  rows="4"
+                />
+              </div>
             </div>
             <div className="modal-actions">
-              <button onClick={handleFaqSave} className="save-btn">💾 Save Changes</button>
-              <button onClick={() => setEditingFaq(null)} className="cancel-btn">❌ Cancel</button>
+              <button onClick={handleFaqSave} className="btn primary">💾 Save Changes</button>
+              <button onClick={() => setEditingFaq(null)} className="btn secondary">Cancel</button>
             </div>
           </div>
         </div>

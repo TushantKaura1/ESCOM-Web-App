@@ -415,47 +415,48 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
   const renderDashboard = () => (
     <div className="user-overview">
       <div className="welcome-section">
-        <h3>🌊 Welcome back, {user?.firstName || 'Citizen Scientist'}!</h3>
+        <h3>🌊 Welcome back, {user?.name || 'Citizen Scientist'}!</h3>
         <p>Ready to contribute to coastal monitoring today?</p>
       </div>
 
       <div className="quick-stats">
         <div className="stat-card">
-          <h4>Total Readings</h4>
-          <div className="stat-value">{readings.length}</div>
-          <div className="stat-label">This month</div>
+          <div className="stat-icon">📊</div>
+          <div className="stat-content">
+            <div className="stat-value">{readings.length}</div>
+            <div className="stat-label">Total Readings</div>
+          </div>
         </div>
         <div className="stat-card">
-          <h4>Accuracy</h4>
-          <div className="stat-value">94%</div>
-          <div className="stat-label">Data quality</div>
+          <div className="stat-icon">⭐</div>
+          <div className="stat-content">
+            <div className="stat-value">94%</div>
+            <div className="stat-label">Data Quality</div>
+          </div>
         </div>
         <div className="stat-card">
-          <h4>Streak</h4>
-          <div className="stat-value">5</div>
-          <div className="stat-label">Days active</div>
-        </div>
-        <div className="stat-card">
-          <h4>Team Rank</h4>
-          <div className="stat-value">#3</div>
-          <div className="stat-label">Team Alpha</div>
+          <div className="stat-icon">🔥</div>
+          <div className="stat-content">
+            <div className="stat-value">5</div>
+            <div className="stat-label">Day Streak</div>
+          </div>
         </div>
       </div>
 
       <div className="quick-actions">
         <h4>Quick Actions</h4>
-        <div className="action-buttons">
-          <button onClick={() => setActiveTab('monitoring')} className="action-btn primary">
-            📊 Submit Reading
+        <div className="action-grid">
+          <button onClick={() => setActiveTab('monitoring')} className="action-card primary">
+            <div className="action-icon">📊</div>
+            <div className="action-text">Submit Reading</div>
           </button>
-          <button onClick={() => setActiveTab('faqs')} className="action-btn">
-            ❓ View FAQs
+          <button onClick={() => setActiveTab('faqs')} className="action-card">
+            <div className="action-icon">❓</div>
+            <div className="action-text">View FAQs</div>
           </button>
-          <button onClick={() => setActiveTab('updates')} className="action-btn">
-            📢 Check Updates
-          </button>
-          <button onClick={() => setActiveTab('bot')} className="action-btn">
-            🤖 Bot Helper
+          <button onClick={() => setActiveTab('updates')} className="action-card">
+            <div className="action-icon">📢</div>
+            <div className="action-text">Check Updates</div>
           </button>
         </div>
       </div>
@@ -465,10 +466,12 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         <div className="activity-list">
           {readings.slice(0, 3).map(reading => (
             <div key={reading.id} className="activity-item">
-            <span className="activity-icon">📊</span>
-              <span className="activity-text">Submitted water quality reading at {reading.location}</span>
-              <span className="activity-time">{reading.date}</span>
-          </div>
+              <div className="activity-icon">📊</div>
+              <div className="activity-content">
+                <div className="activity-text">Submitted reading at {reading.location}</div>
+                <div className="activity-time">{new Date(reading.timestamp).toLocaleDateString()}</div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -478,159 +481,120 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
   const renderMonitoring = () => (
     <div className="monitoring">
       <div className="section-header">
-        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-      <h3>📊 Monitoring Dashboard</h3>
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
+        <h3>📊 Submit Reading</h3>
       </div>
       
       <div className="monitoring-form">
-        <h4>Submit New Reading</h4>
         <form className="reading-form" onSubmit={handleSubmitReading}>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Location</label>
-              <select 
-                className="form-input"
-                value={newReading.location}
-                onChange={(e) => setNewReading({...newReading, location: e.target.value})}
-              >
-                <option>Beach Point A</option>
-                <option>Beach Point B</option>
-                <option>Harbor Entrance</option>
-                <option>Coastal Lagoon</option>
-              </select>
+          <div className="form-section">
+            <h4>📍 Location & Conditions</h4>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Location</label>
+                <select 
+                  className="form-input"
+                  value={newReading.location}
+                  onChange={(e) => setNewReading({...newReading, location: e.target.value})}
+                  required
+                >
+                  <option value="">Select location...</option>
+                  <option value="Beach Point A">Beach Point A</option>
+                  <option value="Beach Point B">Beach Point B</option>
+                  <option value="Harbor Entrance">Harbor Entrance</option>
+                  <option value="Coastal Lagoon">Coastal Lagoon</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Weather</label>
+                <select 
+                  className="form-input"
+                  value={newReading.weather}
+                  onChange={(e) => setNewReading({...newReading, weather: e.target.value})}
+                >
+                  <option value="sunny">☀️ Sunny</option>
+                  <option value="partly-cloudy">⛅ Partly Cloudy</option>
+                  <option value="cloudy">☁️ Cloudy</option>
+                  <option value="rainy">🌧️ Rainy</option>
+                </select>
+              </div>
             </div>
-            <div className="form-group">
-              <label>Date & Time</label>
-              <input 
-                type="datetime-local" 
-                className="form-input"
-                value={newReading.dateTime}
-                onChange={(e) => setNewReading({...newReading, dateTime: e.target.value})}
-              />
+          </div>
+
+          <div className="form-section">
+            <h4>🌊 Water Quality Measurements</h4>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Temperature (°C)</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  className="form-input" 
+                  placeholder="18.5"
+                  value={newReading.temperature}
+                  onChange={(e) => setNewReading({...newReading, temperature: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Salinity (ppt)</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  className="form-input" 
+                  placeholder="32.1"
+                  value={newReading.salinity}
+                  onChange={(e) => setNewReading({...newReading, salinity: e.target.value})}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>pH Level</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  className="form-input" 
+                  placeholder="7.8"
+                  value={newReading.ph}
+                  onChange={(e) => setNewReading({...newReading, ph: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Dissolved Oxygen (mg/L)</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  className="form-input" 
+                  placeholder="7.5"
+                  value={newReading.dissolvedOxygen}
+                  onChange={(e) => setNewReading({...newReading, dissolvedOxygen: e.target.value})}
+                />
+              </div>
             </div>
           </div>
           
-          <div className="form-row">
+          <div className="form-section">
+            <h4>📝 Additional Information</h4>
             <div className="form-group">
-              <label>Water Temperature (°C)</label>
-              <input 
-                type="number" 
-                step="0.1" 
+              <label>Notes (Optional)</label>
+              <textarea 
                 className="form-input" 
-                placeholder="18.5"
-                value={newReading.temperature}
-                onChange={(e) => setNewReading({...newReading, temperature: e.target.value})}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Salinity (ppt)</label>
-              <input 
-                type="number" 
-                step="0.1" 
-                className="form-input" 
-                placeholder="32.1"
-                value={newReading.salinity}
-                onChange={(e) => setNewReading({...newReading, salinity: e.target.value})}
-                required
-              />
+                placeholder="Any observations or special conditions..."
+                value={newReading.notes}
+                onChange={(e) => setNewReading({...newReading, notes: e.target.value})}
+                rows="3"
+              ></textarea>
             </div>
           </div>
           
-          <div className="form-row">
-            <div className="form-group">
-              <label>pH Level</label>
-              <input 
-                type="number" 
-                step="0.1" 
-                className="form-input" 
-                placeholder="7.8"
-                value={newReading.ph}
-                onChange={(e) => setNewReading({...newReading, ph: e.target.value})}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Dissolved Oxygen (mg/L)</label>
-              <input 
-                type="number" 
-                step="0.1" 
-                className="form-input" 
-                placeholder="7.5"
-                value={newReading.dissolvedOxygen}
-                onChange={(e) => setNewReading({...newReading, dissolvedOxygen: e.target.value})}
-                required
-              />
-            </div>
+          <div className="form-actions">
+            <button type="submit" className="submit-btn primary">📊 Submit Reading</button>
+            <button type="button" onClick={() => setActiveTab('dashboard')} className="cancel-btn">Cancel</button>
           </div>
-          
-          <div className="form-row">
-            <div className="form-group">
-              <label>Weather Conditions</label>
-              <select 
-                className="form-input"
-                value={newReading.weather}
-                onChange={(e) => setNewReading({...newReading, weather: e.target.value})}
-              >
-                <option value="sunny">☀️ Sunny</option>
-                <option value="partly-cloudy">⛅ Partly Cloudy</option>
-                <option value="cloudy">☁️ Cloudy</option>
-                <option value="rainy">🌧️ Rainy</option>
-                <option value="stormy">⛈️ Stormy</option>
-                <option value="clear">🌙 Clear</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Time of Day</label>
-              <select 
-                className="form-input"
-                value={newReading.timeOfDay}
-                onChange={(e) => setNewReading({...newReading, timeOfDay: e.target.value})}
-              >
-                <option value="morning">🌅 Morning (6AM-12PM)</option>
-                <option value="afternoon">☀️ Afternoon (12PM-6PM)</option>
-                <option value="evening">🌆 Evening (6PM-12AM)</option>
-                <option value="night">🌙 Night (12AM-6AM)</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label>Equipment Used</label>
-            <input 
-              type="text" 
-              className="form-input" 
-              placeholder="pH-2000, Salinity-Refractometer"
-              value={newReading.equipment}
-              onChange={(e) => setNewReading({...newReading, equipment: e.target.value})}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Overall Quality</label>
-            <select 
-              className="form-input"
-              value={newReading.quality}
-              onChange={(e) => setNewReading({...newReading, quality: e.target.value})}
-            >
-              <option>Excellent</option>
-              <option>Good</option>
-              <option>Fair</option>
-              <option>Poor</option>
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label>Notes</label>
-            <textarea 
-              className="form-input" 
-              placeholder="Any observations or special conditions..."
-              value={newReading.notes}
-              onChange={(e) => setNewReading({...newReading, notes: e.target.value})}
-            ></textarea>
-          </div>
-          
-          <button type="submit" className="submit-btn">📊 Submit Reading</button>
         </form>
       </div>
 
@@ -693,24 +657,31 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
   const renderFAQs = () => (
     <div className="user-faqs">
       <div className="section-header">
-        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-      <h3>❓ Frequently Asked Questions</h3>
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
+        <h3>❓ Help Center</h3>
       </div>
       
+      <div className="faq-search">
+        <input
+          type="text"
+          placeholder="Search FAQs..."
+          className="search-input"
+        />
+      </div>
+
       <div className="faq-categories">
         <div className="category-tabs">
           <button className="category-tab active">All</button>
-          <button className="category-tab">ESCOM Organization</button>
+          <button className="category-tab">Getting Started</button>
           <button className="category-tab">Monitoring</button>
-          <button className="category-tab">Training</button>
-          <button className="category-tab">Data</button>
+          <button className="category-tab">Safety</button>
         </div>
       </div>
 
       <div className="faq-list">
         {faqs.map(faq => (
-          <div key={faq.id} className="faq-item">
-            <div className="faq-question">
+          <div key={faq.id} className="faq-card">
+            <div className="faq-header">
               <h4>{faq.question}</h4>
               <span className="faq-category">{faq.category}</span>
             </div>
@@ -720,16 +691,14 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           </div>
         ))}
       </div>
-
-
     </div>
   );
 
   const renderUpdates = () => (
     <div className="user-updates">
       <div className="section-header">
-        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-      <h3>📢 Latest Updates</h3>
+        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
+        <h3>📢 Latest Updates</h3>
       </div>
       
       <div className="updates-list">
@@ -741,30 +710,10 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
             </div>
             <p className="update-content">{update.content}</p>
             <div className="update-footer">
-              <span className="update-date">{update.date}</span>
-              <button className="read-more-btn">Read More</button>
+              <span className="update-date">{new Date(update.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="updates-subscription">
-        <h4>Stay Updated</h4>
-        <p>Get notified about important updates and announcements</p>
-        <div className="subscription-options">
-          <label className="checkbox">
-            <input type="checkbox" defaultChecked />
-            <span>Email notifications</span>
-          </label>
-          <label className="checkbox">
-            <input type="checkbox" defaultChecked />
-            <span>In-app notifications</span>
-          </label>
-          <label className="checkbox">
-            <input type="checkbox" />
-            <span>SMS alerts (urgent only)</span>
-          </label>
-        </div>
       </div>
     </div>
   );
@@ -1017,19 +966,22 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('dashboard')}
         >
-          📊 Dashboard
+          <span className="nav-icon">🏠</span>
+          <span className="nav-text">Home</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'monitoring' ? 'active' : ''}`}
           onClick={() => setActiveTab('monitoring')}
         >
-          📊 Monitoring
+          <span className="nav-icon">📊</span>
+          <span className="nav-text">Submit</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'faqs' ? 'active' : ''}`}
           onClick={() => setActiveTab('faqs')}
         >
-          ❓ FAQs
+          <span className="nav-icon">❓</span>
+          <span className="nav-text">Help</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'updates' ? 'active' : ''}`}
