@@ -4,12 +4,12 @@ import UserDashboard from './components/UserDashboard';
 import AuthSystem from './components/AuthSystem';
 import DailyUpdatesManager from './components/DailyUpdatesManager';
 
-import { DataProvider, useData } from './contexts/DataContext';
+import { useData } from './contexts/DataContext';
 import config from './config';
 import './App.css';
 
 function AppContent() {
-  const { users, addUser } = useData();
+  const { users, addUser, isLoading } = useData();
   const [currentView, setCurrentView] = useState('welcome');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -237,10 +237,56 @@ function AppContent() {
     }
   };
 
+  console.log('🔍 App component rendering...');
+  console.log('🔍 currentView:', currentView);
+  console.log('🔍 adminMode:', adminMode);
+  console.log('🔍 user:', user);
+  console.log('🔍 isLoading:', isLoading);
+
+  // Show loading screen while DataContext is loading
+  if (isLoading) {
+    return (
+      <div className="App" style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        flexDirection: 'column'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          padding: '40px',
+          borderRadius: '20px',
+          textAlign: 'center',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <h1 style={{ marginBottom: '20px', fontSize: '2rem' }}>🌊 ESCOM Assistant</h1>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '3px solid rgba(255, 255, 255, 0.3)',
+            borderTop: '3px solid #00d4ff',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <p>Loading application data...</p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
-
-      
       {renderMainContent()}
 
       {/* Authentication Modal */}
@@ -285,11 +331,7 @@ function AppContent() {
 }
 
 function App() {
-  return (
-    <DataProvider>
-      <AppContent />
-    </DataProvider>
-  );
+  return <AppContent />;
 }
 
 export default App;

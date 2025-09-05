@@ -55,6 +55,7 @@ export const DataProvider = ({ children }) => {
   const loadInitialData = () => {
     setIsLoading(true);
     console.log('🔄 Loading initial data...');
+    console.log('🔍 DataContext: Starting data load...');
 
     try {
       // Load FAQs
@@ -346,6 +347,7 @@ export const DataProvider = ({ children }) => {
 
       setIsLoading(false);
       console.log('✅ Initial data loaded successfully');
+      console.log('🔍 DataContext: Data load completed, isLoading set to false');
     } catch (error) {
       console.error('❌ Error loading initial data:', error);
       setIsLoading(false);
