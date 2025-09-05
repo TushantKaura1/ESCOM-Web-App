@@ -53,6 +53,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     team: 'Team Alpha',
     status: 'active'
   });
+  const [showPasswordGenerator, setShowPasswordGenerator] = useState(false);
   const [newUpdate, setNewUpdate] = useState({
     title: '',
     content: '',
@@ -497,18 +498,31 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
 
   const handleRoleChange = (userId, newRole) => {
     console.log('👑 Changing role for user:', userId, 'to:', newRole);
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, role: newRole, lastUpdated: new Date().toISOString() } : user
-    ));
-    console.log('✅ Role changed successfully');
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      updateUser(userId, { ...user, role: newRole, lastUpdated: new Date().toISOString() });
+      console.log('✅ Role changed successfully');
+    }
   };
 
   const handleStatusChange = (userId, newStatus) => {
     console.log('📊 Changing status for user:', userId, 'to:', newStatus);
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, status: newStatus, lastUpdated: new Date().toISOString() } : user
-    ));
-    console.log('✅ Status changed successfully');
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      updateUser(userId, { ...user, status: newStatus, lastUpdated: new Date().toISOString() });
+      console.log('✅ Status changed successfully');
+    }
+  };
+
+  const generatePassword = () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    setNewUser({...newUser, password: password});
+    setShowPasswordGenerator(false);
   };
 
   const handleAddUser = () => {
@@ -850,7 +864,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
             </div>
             <div className="user-actions">
               <button className="edit-btn" onClick={() => handleUserEdit(user)}>✏️ Edit</button>
-              <button className="view-btn">👁️ View</button>
               <button className="password-btn" onClick={() => handlePasswordReset(user.id)}>🔑 Reset Password</button>
               <button className="role-btn" onClick={() => handleRoleChange(user.id, user.role === 'admin' ? 'citizen' : 'admin')}>
                 {user.role === 'admin' ? '👤 Make Citizen' : '👑 Make Admin'}
@@ -901,13 +914,22 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
             </div>
             <div className="form-group">
               <label>Password:</label>
-              <input 
-                type="password" 
-                value={newUser.password}
-                onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                className="form-input"
-                placeholder="Enter password..."
-              />
+              <div className="password-input-group">
+                <input 
+                  type="password" 
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  className="form-input"
+                  placeholder="Enter password..."
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPasswordGenerator(true)}
+                  className="generate-password-btn"
+                >
+                  🎲 Generate
+                </button>
+              </div>
             </div>
             <div className="form-group">
               <label>Role:</label>
@@ -948,6 +970,20 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
             <div className="modal-actions">
               <button onClick={handleAddUser} className="save-btn">💾 Add User</button>
               <button onClick={() => setShowAddUser(false)} className="cancel-btn">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Generator Modal */}
+      {showPasswordGenerator && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>🎲 Generate Password</h3>
+            <p>This will generate a secure 12-character password with letters, numbers, and special characters.</p>
+            <div className="modal-actions">
+              <button onClick={generatePassword} className="save-btn">🎲 Generate & Use</button>
+              <button onClick={() => setShowPasswordGenerator(false)} className="cancel-btn">❌ Cancel</button>
             </div>
           </div>
         </div>
