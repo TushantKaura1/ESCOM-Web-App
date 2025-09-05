@@ -24,6 +24,15 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     exportData,
     importData
   } = useData();
+
+  // Debug FAQ data loading
+  useEffect(() => {
+    console.log('🔍 AdminDashboard FAQ Debug:');
+    console.log('🔍 FAQs from DataContext:', faqs);
+    console.log('🔍 FAQs length:', faqs?.length || 0);
+    console.log('🔍 FAQs type:', typeof faqs);
+    console.log('🔍 FAQs is array:', Array.isArray(faqs));
+  }, [faqs]);
   
   const [activeTab, setActiveTab] = useState('dashboard');
   const [editingFaq, setEditingFaq] = useState(null);
@@ -1198,7 +1207,16 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     </div>
   );
 
-  const renderFAQManagement = () => (
+  const renderFAQManagement = () => {
+    console.log('🔍 FAQ Management Debug:');
+    console.log('🔍 FAQs array:', faqs);
+    console.log('🔍 FAQs length:', faqs.length);
+    console.log('🔍 Filtered FAQs:', filteredFAQs);
+    console.log('🔍 Sorted FAQs:', sortedFAQs);
+    console.log('🔍 Search term:', searchTerm);
+    console.log('🔍 Filter category:', filterCategory);
+    
+    return (
     <div className="faq-management">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
@@ -1406,7 +1424,8 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
       )}
     </div>
-  );
+    );
+  };
 
   const renderUpdatesManagement = () => (
     <div className="updates-management">

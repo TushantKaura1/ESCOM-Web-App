@@ -60,9 +60,12 @@ export const DataProvider = ({ children }) => {
     try {
       // Load FAQs
       const savedFaqs = loadFromStorage('faqs');
+      console.log('🔍 DataContext: Loading FAQs from storage:', savedFaqs);
       if (savedFaqs && savedFaqs.length > 0) {
+        console.log('🔍 DataContext: Setting FAQs from storage:', savedFaqs);
         setFaqs(savedFaqs);
       } else {
+        console.log('🔍 DataContext: No saved FAQs, loading demo data');
         // Enhanced FAQ data with more realistic content
         const demoFaqs = [
           {
@@ -141,6 +144,7 @@ export const DataProvider = ({ children }) => {
             status: 'active'
           }
         ];
+        console.log('🔍 DataContext: Setting demo FAQs:', demoFaqs);
         setFaqs(demoFaqs);
         saveToStorage('faqs', demoFaqs);
       }
