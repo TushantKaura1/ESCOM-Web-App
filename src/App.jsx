@@ -137,7 +137,10 @@ function AppContent() {
     <div className="welcome-screen">
       <div className="welcome-content">
         <div className="app-header">
-          <h1>🌊 ESCOM Citizen Scientist Assistant</h1>
+          <div className="main-logo">
+            <img src="/escom-logo.png" alt="ESCOM Logo" className="main-logo-image" />
+            <h1>ESCOM Citizen Scientist Assistant</h1>
+          </div>
         </div>
 
 
@@ -165,17 +168,6 @@ function AppContent() {
             <p className="admin-note">Admin credentials: admin@escom.com / admin123</p>
           </div>
 
-          <div className="info-section">
-            <h3>About the App</h3>
-            <p>This is a comprehensive coastal monitoring platform for citizen scientists. Features include:</p>
-            <ul>
-              <li>Data collection and monitoring</li>
-              <li>FAQ management system</li>
-              <li>Daily updates and announcements</li>
-              <li>User profile management</li>
-              <li>Secure authentication</li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>
@@ -263,7 +255,10 @@ function AppContent() {
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.2)'
         }}>
-          <h1 style={{ marginBottom: '20px', fontSize: '2rem' }}>🌊 ESCOM Assistant</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+            <img src="/escom-logo.png" alt="ESCOM Logo" style={{ height: '40px', width: 'auto' }} />
+            <h1 style={{ fontSize: '2rem', margin: 0 }}>ESCOM Assistant</h1>
+          </div>
           <div style={{
             width: '50px',
             height: '50px',
