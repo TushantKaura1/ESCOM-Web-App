@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Simple Test</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌊 ESCOM Assistant - Simple Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+  </style>
 </head>
-<body style="background: black; color: white; text-align: center; padding: 50px;">
-    <h1 style="color: green;">✅ SIMPLE TEST PAGE</h1>
-    <p>If you can see this, basic HTML is working!</p>
-    <p>Time: <span id="time"></span></p>
-    <script>
-        document.getElementById('time').textContent = new Date().toLocaleString();
-        console.log('✅ Simple page loaded successfully!');
-    </script>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main-simple.jsx"></script>
 </body>
 </html>

@@ -62,8 +62,21 @@
 <body>
   <div id="root"></div>
   
-  <!-- Service Worker Registration for PWA -->
+  <!-- Service Worker Registration for PWA - DISABLED FOR DEBUGGING -->
   <script>
+    // Error handling for debugging
+    window.addEventListener('error', function(e) {
+      console.error('🚨 JavaScript Error:', e.error);
+      console.error('🚨 Error details:', e.filename, e.lineno, e.colno);
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('🚨 Unhandled Promise Rejection:', e.reason);
+    });
+    
+    // Temporarily disabled service worker to fix loading issues
+    console.log('🔧 Service Worker disabled for debugging');
+    /*
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js?v=2')
@@ -75,6 +88,7 @@
           });
       });
     }
+    */
   </script>
 </body>
 </html>
