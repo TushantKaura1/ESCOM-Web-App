@@ -696,7 +696,6 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     <div className="user-dashboard">
       <div className="dashboard-header">
         <div className="header-left">
-          <button onClick={() => onSectionChange('welcome')} className="back-btn">← Back to Welcome</button>
           <h2>🌊 Citizen Scientist Dashboard</h2>
         </div>
         
