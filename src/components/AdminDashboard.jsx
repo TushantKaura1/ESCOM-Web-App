@@ -71,14 +71,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
   const [sortBy, setSortBy] = useState('date');
   // const [viewMode, setViewMode] = useState('grid'); // grid or list - commented out for now
 
-  const [settings, setSettings] = useState({
-    notifications: true,
-    autoBackup: true,
-    dataRetention: '2 years',
-    privacyMode: false,
-    maintenanceMode: false,
-    debugMode: false
-  });
 
   const [reports, setReports] = useState([
     { id: 1, name: 'Monthly Activity Report', status: 'Completed', date: '2024-01-20', type: 'Monthly Activity' },
@@ -491,7 +483,9 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
   const handlePasswordReset = (userId) => {
     console.log('🔑 Resetting password for user:', userId);
     const newPassword = Math.random().toString(36).slice(-8);
-    if (window.confirm(`New password: ${newPassword}\n\nCopy this password and inform the user.`)) {
+    const user = users.find(u => u.id === userId);
+    if (user && window.confirm(`New password: ${newPassword}\n\nCopy this password and inform the user.`)) {
+      updateUser(userId, { ...user, password: newPassword, lastUpdated: new Date().toISOString() });
       console.log('✅ Password reset successfully');
     }
   };
@@ -545,23 +539,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     }
   };
 
-  const handleSettingsSave = () => {
-    console.log('💾 Settings saved:', settings);
-    // Here you would typically save to backend
-            console.log('Settings saved successfully!');
-  };
-
-  const handleSettingsReset = () => {
-    setSettings({
-      notifications: true,
-      autoBackup: true,
-      dataRetention: '2 years',
-      privacyMode: false,
-      maintenanceMode: false,
-      debugMode: false
-    });
-    console.log('🔄 Settings reset to default');
-  };
 
   const generateReport = (type) => {
     const newReport = {
@@ -749,9 +726,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
           </button>
           <button onClick={() => setActiveTab('updates')} className="action-btn">
             📢 Manage Updates
-          </button>
-          <button onClick={() => setActiveTab('settings')} className="action-btn">
-            ⚙️ System Settings
           </button>
         </div>
       </div>
@@ -1165,144 +1139,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     </div>
   );
 
-  const renderSystemSettings = () => (
-    <div className="system-settings">
-      <div className="section-header">
-        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back to Dashboard</button>
-      <h3>⚙️ System Settings</h3>
-      </div>
-      
-      <div className="settings-section">
-        <h4>Notification Settings</h4>
-        <div className="setting-item">
-          <span className="setting-label">🔔 Notifications</span>
-          <label className="toggle">
-            <input 
-              type="checkbox" 
-              checked={settings.notifications}
-              onChange={(e) => setSettings({...settings, notifications: e.target.checked})}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">Auto Backup</span>
-          <label className="toggle">
-            <input 
-              type="checkbox" 
-              checked={settings.autoBackup}
-              onChange={(e) => setSettings({...settings, autoBackup: e.target.checked})}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">Privacy Mode</span>
-          <label className="toggle">
-            <input 
-              type="checkbox" 
-              checked={settings.privacyMode}
-              onChange={(e) => setSettings({...settings, privacyMode: e.target.checked})}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">Maintenance Mode</span>
-          <label className="toggle">
-            <input 
-              type="checkbox" 
-              checked={settings.maintenanceMode}
-              onChange={(e) => setSettings({...settings, maintenanceMode: e.target.checked})}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">Debug Mode</span>
-          <label className="toggle">
-            <input 
-              type="checkbox" 
-              checked={settings.debugMode}
-              onChange={(e) => setSettings({...settings, debugMode: e.target.checked})}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">Data Retention</span>
-          <select 
-            value={settings.dataRetention}
-            onChange={(e) => setSettings({...settings, dataRetention: e.target.value})}
-            className="setting-select"
-          >
-            <option value="1 year">1 year</option>
-            <option value="2 years">2 years</option>
-            <option value="5 years">5 years</option>
-            <option value="10 years">10 years</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="settings-section">
-        <h4>Data Management</h4>
-        <div className="setting-item">
-          <span className="setting-label">📊 Data Export</span>
-          <button onClick={exportData} className="action-btn">📥 Export All Data</button>
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">📁 Data Import</span>
-          <input 
-            type="file" 
-            accept=".json"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  try {
-                    const data = JSON.parse(event.target.result);
-                    if (window.confirm('Are you sure you want to import this data? This will replace all current data.')) {
-                      importData(data);
-                    }
-                  } catch (error) {
-                    alert('Invalid data file. Please select a valid JSON backup file.');
-                  }
-                };
-                reader.readAsText(file);
-              }
-            }}
-            className="file-input"
-          />
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">🔄 Force Sync</span>
-          <button onClick={forceSync} className={`action-btn ${isSyncing ? 'syncing' : ''}`}>
-            {isSyncing ? '🔄 Syncing...' : '🔄 Sync Now'}
-          </button>
-        </div>
-        <div className="setting-item">
-          <span className="setting-label">🗑️ Clear All Data</span>
-          <button 
-            onClick={() => {
-              if (window.confirm('⚠️ WARNING: This will delete ALL data including FAQs, updates, and users. This action cannot be undone. Are you sure?')) {
-                localStorage.clear();
-                window.location.reload();
-              }
-            }} 
-            className="action-btn danger"
-          >
-            🗑️ Clear All Data
-          </button>
-        </div>
-      </div>
-
-      <div className="settings-actions">
-        <button onClick={handleSettingsSave} className="save-btn">💾 Save Settings</button>
-        <button onClick={handleSettingsReset} className="reset-btn">🔄 Reset to Default</button>
-      </div>
-    </div>
-  );
 
   const renderReports = () => (
     <div className="reports">
