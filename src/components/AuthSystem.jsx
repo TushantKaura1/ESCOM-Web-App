@@ -55,7 +55,10 @@ const AuthSystem = ({ onLogin, onClose }) => {
     <div className="auth-overlay">
       <div className="auth-modal">
         <div className="auth-header">
-          <h2>🔐 Login</h2>
+          <div className="auth-logo">
+            <img src="/escom-logo.png" alt="ESCOM Logo" className="logo-image" />
+            <h2>Login</h2>
+          </div>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 

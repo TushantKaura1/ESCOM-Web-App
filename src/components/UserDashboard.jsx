@@ -696,7 +696,10 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     <div className="user-dashboard">
       <div className="dashboard-header">
         <div className="header-left">
-          <h2>🌊 Citizen Scientist Dashboard</h2>
+          <div className="dashboard-logo">
+            <img src="/escom-logo.png" alt="ESCOM Logo" className="logo-image" />
+            <h2>Citizen Scientist Dashboard</h2>
+          </div>
         </div>
         
         <div className="header-right">
