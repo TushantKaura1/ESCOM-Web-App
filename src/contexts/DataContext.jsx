@@ -357,9 +357,15 @@ export const DataProvider = ({ children }) => {
   // Centralized data update functions that sync everywhere
   const updateFaq = (faqId, updates) => {
     try {
+      console.log('🔄 Updating FAQ:', faqId, 'with data:', updates);
+      console.log('🔄 Current FAQs before update:', faqs);
+      
       const updatedFaqs = faqs.map(faq => 
         faq.id === faqId ? { ...faq, ...updates, updatedAt: new Date().toISOString() } : faq
       );
+      
+      console.log('🔄 Updated FAQs after update:', updatedFaqs);
+      
       setFaqs(updatedFaqs);
       saveToStorage('faqs', updatedFaqs);
       
@@ -430,11 +436,17 @@ export const DataProvider = ({ children }) => {
 
 
 
-  const updateDailyUpdate = (updateId, updates) => {
+  const updateDailyUpdate = (updateId, updateData) => {
     try {
+      console.log('🔄 Updating daily update:', updateId, 'with data:', updateData);
+      console.log('🔄 Current updates before update:', updates);
+      
       const updatedUpdates = updates.map(update => 
-        update.id === updateId ? { ...update, ...updates, updatedAt: new Date().toISOString() } : update
+        update.id === updateId ? { ...update, ...updateData, updatedAt: new Date().toISOString() } : update
       );
+      
+      console.log('🔄 Updated updates after update:', updatedUpdates);
+      
       setUpdates(updatedUpdates);
       saveToStorage('updates', updatedUpdates);
       
@@ -442,7 +454,7 @@ export const DataProvider = ({ children }) => {
       addNotification({
         id: Date.now(),
         type: 'update-modify',
-        message: `Update "${updates.title || 'modified'}" has been updated`,
+        message: `Update "${updateData.title || 'modified'}" has been updated`,
         timestamp: new Date().toISOString(),
         read: false
       });
@@ -505,9 +517,15 @@ export const DataProvider = ({ children }) => {
 
   const updateUser = (userId, updates) => {
     try {
+      console.log('🔄 Updating user:', userId, 'with data:', updates);
+      console.log('🔄 Current users before update:', users);
+      
       const updatedUsers = users.map(user => 
         user.id === userId ? { ...user, ...updates, lastUpdated: new Date().toISOString() } : user
       );
+      
+      console.log('🔄 Updated users after update:', updatedUsers);
+      
       setUsers(updatedUsers);
       saveToStorage('users', updatedUsers);
       
