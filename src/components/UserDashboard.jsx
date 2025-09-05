@@ -20,11 +20,13 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     equipment: 'pH-2000, Salinity-Refractometer'
   });
 
-  // const [learningResources, setLearningResources] = useState([]);
-  // const [communityPosts, setCommunityPosts] = useState([]);
-  // const [searchTerm, setSearchTerm] = useState('');
-  // const [filterCategory, setFilterCategory] = useState('all');
-  // const [viewMode, setViewMode] = useState('grid');
+  // Enhanced state for better functionality
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState(null);
 
   useEffect(() => {
     console.log('🌊 UserDashboard component mounted for user:', user);
@@ -257,38 +259,95 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     // ]);
   };
 
-  const handleSubmitReading = (e) => {
+  const validateForm = () => {
+    const errors = {};
+    
+    // Required field validation
+    if (!newReading.temperature || isNaN(parseFloat(newReading.temperature))) {
+      errors.temperature = 'Temperature is required and must be a valid number';
+    } else if (parseFloat(newReading.temperature) < -5 || parseFloat(newReading.temperature) > 50) {
+      errors.temperature = 'Temperature must be between -5°C and 50°C';
+    }
+    
+    if (!newReading.salinity || isNaN(parseFloat(newReading.salinity))) {
+      errors.salinity = 'Salinity is required and must be a valid number';
+    } else if (parseFloat(newReading.salinity) < 0 || parseFloat(newReading.salinity) > 50) {
+      errors.salinity = 'Salinity must be between 0 and 50 ppt';
+    }
+    
+    if (!newReading.ph || isNaN(parseFloat(newReading.ph))) {
+      errors.ph = 'pH is required and must be a valid number';
+    } else if (parseFloat(newReading.ph) < 0 || parseFloat(newReading.ph) > 14) {
+      errors.ph = 'pH must be between 0 and 14';
+    }
+    
+    if (!newReading.turbidity || isNaN(parseFloat(newReading.turbidity))) {
+      errors.turbidity = 'Turbidity is required and must be a valid number';
+    } else if (parseFloat(newReading.turbidity) < 0) {
+      errors.turbidity = 'Turbidity must be a positive number';
+    }
+    
+    if (newReading.dissolvedOxygen && (isNaN(parseFloat(newReading.dissolvedOxygen)) || parseFloat(newReading.dissolvedOxygen) < 0)) {
+      errors.dissolvedOxygen = 'Dissolved Oxygen must be a valid positive number';
+    }
+    
+    if (!newReading.location) {
+      errors.location = 'Location is required';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmitReading = async (e) => {
     e.preventDefault();
     
-    if (!newReading.temperature || !newReading.salinity || !newReading.ph || !newReading.turbidity) {
-              console.log('Please fill in all required fields');
+    if (!validateForm()) {
+      console.log('❌ Form validation failed:', formErrors);
       return;
     }
-
-    const reading = {
-      id: Date.now(),
-      ...newReading,
-      timestamp: new Date().toISOString(),
-      quality: calculateQuality(newReading),
-      userId: user.id,
-      userName: user.name
-    };
     
-    setReadings([reading, ...readings]);
-    setNewReading({
-      temperature: '',
-      salinity: '',
-      ph: '',
-      turbidity: '',
-      dissolvedOxygen: '',
-      location: '',
-      notes: '',
-      weather: 'sunny',
-      timeOfDay: 'morning',
-      equipment: 'pH-2000, Salinity-Refractometer'
-    });
+    setIsSubmitting(true);
     
-    console.log('✅ New reading submitted:', reading);
+    try {
+      const reading = {
+        id: Date.now(),
+        ...newReading,
+        temperature: parseFloat(newReading.temperature),
+        salinity: parseFloat(newReading.salinity),
+        ph: parseFloat(newReading.ph),
+        turbidity: parseFloat(newReading.turbidity),
+        dissolvedOxygen: newReading.dissolvedOxygen ? parseFloat(newReading.dissolvedOxygen) : null,
+        timestamp: new Date().toISOString(),
+        quality: calculateQuality(newReading),
+        userId: user.id,
+        userName: user.name
+      };
+      
+      setReadings([reading, ...readings]);
+      setNewReading({
+        temperature: '',
+        salinity: '',
+        ph: '',
+        turbidity: '',
+        dissolvedOxygen: '',
+        location: '',
+        notes: '',
+        weather: 'sunny',
+        timeOfDay: 'morning',
+        equipment: 'pH-2000, Salinity-Refractometer'
+      });
+      
+      setFormErrors({});
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+      
+      console.log('✅ New reading submitted:', reading);
+    } catch (error) {
+      console.error('❌ Error submitting reading:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculateQuality = (reading) => {
@@ -485,17 +544,32 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         <h3>📊 Submit Reading</h3>
       </div>
       
+      {showSuccessMessage && (
+        <div className="success-message">
+          <div className="success-icon">✅</div>
+          <div className="success-text">
+            <h4>Reading Submitted Successfully!</h4>
+            <p>Your water quality data has been recorded and will be reviewed by our team.</p>
+          </div>
+        </div>
+      )}
+      
       <div className="monitoring-form">
         <form className="reading-form" onSubmit={handleSubmitReading}>
           <div className="form-section">
             <h4>📍 Location & Conditions</h4>
             <div className="form-row">
               <div className="form-group">
-                <label>Location</label>
+                <label>Location *</label>
                 <select 
-                  className="form-input"
+                  className={`form-input ${formErrors.location ? 'error' : ''}`}
                   value={newReading.location}
-                  onChange={(e) => setNewReading({...newReading, location: e.target.value})}
+                  onChange={(e) => {
+                    setNewReading({...newReading, location: e.target.value});
+                    if (formErrors.location) {
+                      setFormErrors({...formErrors, location: ''});
+                    }
+                  }}
                   required
                 >
                   <option value="">Select location...</option>
@@ -504,6 +578,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
                   <option value="Harbor Entrance">Harbor Entrance</option>
                   <option value="Coastal Lagoon">Coastal Lagoon</option>
                 </select>
+                {formErrors.location && <span className="error-message">{formErrors.location}</span>}
               </div>
               <div className="form-group">
                 <label>Weather</label>
@@ -525,54 +600,108 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
             <h4>🌊 Water Quality Measurements</h4>
             <div className="form-row">
               <div className="form-group">
-                <label>Temperature (°C)</label>
+                <label>Temperature (°C) *</label>
                 <input 
                   type="number" 
                   step="0.1" 
-                  className="form-input" 
+                  min="-5"
+                  max="50"
+                  className={`form-input ${formErrors.temperature ? 'error' : ''}`}
                   placeholder="18.5"
                   value={newReading.temperature}
-                  onChange={(e) => setNewReading({...newReading, temperature: e.target.value})}
+                  onChange={(e) => {
+                    setNewReading({...newReading, temperature: e.target.value});
+                    if (formErrors.temperature) {
+                      setFormErrors({...formErrors, temperature: ''});
+                    }
+                  }}
                   required
                 />
+                {formErrors.temperature && <span className="error-message">{formErrors.temperature}</span>}
               </div>
               <div className="form-group">
-                <label>Salinity (ppt)</label>
+                <label>Salinity (ppt) *</label>
                 <input 
                   type="number" 
                   step="0.1" 
-                  className="form-input" 
+                  min="0"
+                  max="50"
+                  className={`form-input ${formErrors.salinity ? 'error' : ''}`}
                   placeholder="32.1"
                   value={newReading.salinity}
-                  onChange={(e) => setNewReading({...newReading, salinity: e.target.value})}
+                  onChange={(e) => {
+                    setNewReading({...newReading, salinity: e.target.value});
+                    if (formErrors.salinity) {
+                      setFormErrors({...formErrors, salinity: ''});
+                    }
+                  }}
                   required
                 />
+                {formErrors.salinity && <span className="error-message">{formErrors.salinity}</span>}
               </div>
             </div>
             
             <div className="form-row">
               <div className="form-group">
-                <label>pH Level</label>
+                <label>pH Level *</label>
                 <input 
                   type="number" 
                   step="0.1" 
-                  className="form-input" 
+                  min="0"
+                  max="14"
+                  className={`form-input ${formErrors.ph ? 'error' : ''}`}
                   placeholder="7.8"
                   value={newReading.ph}
-                  onChange={(e) => setNewReading({...newReading, ph: e.target.value})}
+                  onChange={(e) => {
+                    setNewReading({...newReading, ph: e.target.value});
+                    if (formErrors.ph) {
+                      setFormErrors({...formErrors, ph: ''});
+                    }
+                  }}
                   required
                 />
+                {formErrors.ph && <span className="error-message">{formErrors.ph}</span>}
               </div>
+              <div className="form-group">
+                <label>Turbidity (NTU) *</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  min="0"
+                  className={`form-input ${formErrors.turbidity ? 'error' : ''}`}
+                  placeholder="2.3"
+                  value={newReading.turbidity}
+                  onChange={(e) => {
+                    setNewReading({...newReading, turbidity: e.target.value});
+                    if (formErrors.turbidity) {
+                      setFormErrors({...formErrors, turbidity: ''});
+                    }
+                  }}
+                  required
+                />
+                {formErrors.turbidity && <span className="error-message">{formErrors.turbidity}</span>}
+              </div>
+            </div>
+            
+            <div className="form-row">
               <div className="form-group">
                 <label>Dissolved Oxygen (mg/L)</label>
                 <input 
                   type="number" 
                   step="0.1" 
-                  className="form-input" 
+                  min="0"
+                  className={`form-input ${formErrors.dissolvedOxygen ? 'error' : ''}`}
                   placeholder="7.5"
                   value={newReading.dissolvedOxygen}
-                  onChange={(e) => setNewReading({...newReading, dissolvedOxygen: e.target.value})}
+                  onChange={(e) => {
+                    setNewReading({...newReading, dissolvedOxygen: e.target.value});
+                    if (formErrors.dissolvedOxygen) {
+                      setFormErrors({...formErrors, dissolvedOxygen: ''});
+                    }
+                  }}
                 />
+                {formErrors.dissolvedOxygen && <span className="error-message">{formErrors.dissolvedOxygen}</span>}
+                <small className="field-help">Optional - Leave blank if not measured</small>
               </div>
             </div>
           </div>
@@ -592,67 +721,111 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           </div>
           
           <div className="form-actions">
-            <button type="submit" className="submit-btn primary">📊 Submit Reading</button>
+            <button 
+              type="submit" 
+              className={`submit-btn primary ${isSubmitting ? 'loading' : ''}`}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="loading-spinner"></span>
+                  Submitting...
+                </>
+              ) : (
+                '📊 Submit Reading'
+              )}
+            </button>
             <button type="button" onClick={() => setActiveTab('dashboard')} className="cancel-btn">Cancel</button>
           </div>
         </form>
       </div>
 
       <div className="monitoring-history">
-        <h4>Recent Readings</h4>
+        <h4>Recent Readings ({readings.length})</h4>
         <div className="readings-list">
-          {readings.map(reading => (
-            <div key={reading.id} className="reading-card">
-              <div className="reading-header">
-                <span className="reading-date">{reading.date}</span>
-                <span className={`quality-badge ${reading.quality}`}>{reading.quality}</span>
-              </div>
-              <div className="reading-data">
-                <div className="data-point">
-                  <span className="label">Temperature:</span>
-                  <span className="value">{reading.temperature}°C</span>
-                </div>
-                <div className="data-point">
-                  <span className="label">Salinity:</span>
-                  <span className="value">{reading.salinity} ppt</span>
-                </div>
-                <div className="data-point">
-                  <span className="label">pH:</span>
-                  <span className="value">{reading.ph}</span>
-                </div>
-                <div className="data-point">
-                  <span className="label">Turbidity:</span>
-                  <span className="value">{reading.turbidity} NTU</span>
-                </div>
-                <div className="data-point">
-                  <span className="label">Dissolved Oxygen:</span>
-                  <span className="value">{reading.dissolvedOxygen} mg/L</span>
-                </div>
-                <div className="data-point">
-                  <span className="label">Location:</span>
-                  <span className="value">{reading.location}</span>
-                </div>
-                <div className="data-point">
-                  <span className="label">Weather:</span>
-                  <span className="value">{reading.weather}</span>
-                </div>
-                <div className="data-point">
-                  <span className="label">Time:</span>
-                  <span className="value">{reading.timeOfDay}</span>
-                </div>
-                {reading.equipment && (
-                  <div className="data-point">
-                    <span className="label">Equipment:</span>
-                    <span className="value">{reading.equipment}</span>
-                  </div>
-                )}
-              </div>
+          {readings.length === 0 ? (
+            <div className="no-readings">
+              <div className="no-readings-icon">📊</div>
+              <h4>No readings yet</h4>
+              <p>Submit your first water quality reading to get started!</p>
             </div>
-          ))}
+          ) : (
+            readings.slice(0, 5).map(reading => (
+              <div key={reading.id} className="reading-card">
+                <div className="reading-header">
+                  <span className="reading-date">
+                    {new Date(reading.timestamp).toLocaleDateString()} at {new Date(reading.timestamp).toLocaleTimeString()}
+                  </span>
+                  <span className={`quality-badge ${reading.quality}`}>
+                    {reading.quality.charAt(0).toUpperCase() + reading.quality.slice(1)}
+                  </span>
+                </div>
+                <div className="reading-data">
+                  <div className="data-grid">
+                    <div className="data-point">
+                      <span className="label">🌡️ Temperature:</span>
+                      <span className="value">{reading.temperature}°C</span>
+                    </div>
+                    <div className="data-point">
+                      <span className="label">🧂 Salinity:</span>
+                      <span className="value">{reading.salinity} ppt</span>
+                    </div>
+                    <div className="data-point">
+                      <span className="label">⚗️ pH:</span>
+                      <span className="value">{reading.ph}</span>
+                    </div>
+                    <div className="data-point">
+                      <span className="label">🌊 Turbidity:</span>
+                      <span className="value">{reading.turbidity} NTU</span>
+                    </div>
+                    {reading.dissolvedOxygen && (
+                      <div className="data-point">
+                        <span className="label">💨 Dissolved Oxygen:</span>
+                        <span className="value">{reading.dissolvedOxygen} mg/L</span>
+                      </div>
+                    )}
+                    <div className="data-point">
+                      <span className="label">📍 Location:</span>
+                      <span className="value">{reading.location}</span>
+                    </div>
+                    <div className="data-point">
+                      <span className="label">🌤️ Weather:</span>
+                      <span className="value">{reading.weather}</span>
+                    </div>
+                    <div className="data-point">
+                      <span className="label">⏰ Time:</span>
+                      <span className="value">{reading.timeOfDay}</span>
+                    </div>
+                  </div>
+                  {reading.notes && (
+                    <div className="reading-notes">
+                      <span className="label">📝 Notes:</span>
+                      <p>{reading.notes}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
   );
+
+  const filteredFAQs = faqs.filter(faq => {
+    const matchesSearch = searchTerm === '' || 
+      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = filterCategory === 'all' || 
+      faq.category.toLowerCase().includes(filterCategory.toLowerCase());
+    
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleFaqToggle = (faqId) => {
+    setExpandedFaq(expandedFaq === faqId ? null : faqId);
+  };
 
   const renderFAQs = () => (
     <div className="user-faqs">
@@ -666,30 +839,76 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           type="text"
           placeholder="Search FAQs..."
           className="search-input"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
       <div className="faq-categories">
         <div className="category-tabs">
-          <button className="category-tab active">All</button>
-          <button className="category-tab">Getting Started</button>
-          <button className="category-tab">Monitoring</button>
-          <button className="category-tab">Safety</button>
+          <button 
+            className={`category-tab ${filterCategory === 'all' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('all')}
+          >
+            All ({faqs.length})
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'escom organization' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('escom organization')}
+          >
+            Organization ({faqs.filter(f => f.category.toLowerCase().includes('escom')).length})
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'monitoring' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('monitoring')}
+          >
+            Monitoring ({faqs.filter(f => f.category.toLowerCase().includes('monitoring')).length})
+          </button>
+          <button 
+            className={`category-tab ${filterCategory === 'safety' ? 'active' : ''}`}
+            onClick={() => setFilterCategory('safety')}
+          >
+            Safety ({faqs.filter(f => f.category.toLowerCase().includes('safety')).length})
+          </button>
         </div>
       </div>
 
+      <div className="faq-stats">
+        <p>Showing {filteredFAQs.length} of {faqs.length} FAQs</p>
+      </div>
+
       <div className="faq-list">
-        {faqs.map(faq => (
-          <div key={faq.id} className="faq-card">
-            <div className="faq-header">
-              <h4>{faq.question}</h4>
-              <span className="faq-category">{faq.category}</span>
-            </div>
-            <div className="faq-answer">
-              <p>{faq.answer}</p>
-            </div>
+        {filteredFAQs.length === 0 ? (
+          <div className="no-results">
+            <div className="no-results-icon">🔍</div>
+            <h4>No FAQs found</h4>
+            <p>Try adjusting your search terms or category filter</p>
           </div>
-        ))}
+        ) : (
+          filteredFAQs.map(faq => (
+            <div key={faq.id} className={`faq-card ${expandedFaq === faq.id ? 'expanded' : ''}`}>
+              <div className="faq-header" onClick={() => handleFaqToggle(faq.id)}>
+                <h4>{faq.question}</h4>
+                <div className="faq-meta">
+                  <span className="faq-category">{faq.category}</span>
+                  <span className="faq-toggle">{expandedFaq === faq.id ? '−' : '+'}</span>
+                </div>
+              </div>
+              {expandedFaq === faq.id && (
+                <div className="faq-answer">
+                  <p>{faq.answer}</p>
+                  {faq.tags && faq.tags.length > 0 && (
+                    <div className="faq-tags">
+                      {faq.tags.map((tag, index) => (
+                        <span key={index} className="faq-tag">#{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
