@@ -1,11 +1,11 @@
 // Simple Service Worker for ESCOM Citizen Scientist App
-const CACHE_NAME = 'escom-citizen-scientist-v1';
+const CACHE_NAME = 'escom-citizen-scientist-v2';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/src/main.jsx',
-  '/src/App.jsx',
-  '/src/App.css'
+  '/assets/index-Cfv9MAob.js',
+  '/assets/index-C2q5d6Xa.css',
+  '/assets/vite-DcBtz0py.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -19,6 +19,13 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Skip caching for JavaScript and CSS files to avoid stale content
+  if (event.request.url.includes('/assets/') && 
+      (event.request.url.endsWith('.js') || event.request.url.endsWith('.css'))) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
