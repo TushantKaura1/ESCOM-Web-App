@@ -312,7 +312,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         <div className="action-grid">
           <button onClick={() => setActiveTab('faqs')} className="action-card primary">
             <div className="action-icon">❓</div>
-            <div className="action-text">View FAQs</div>
+            <div className="action-text">View FAQ</div>
           </button>
           <button onClick={() => setActiveTab('updates')} className="action-card">
             <div className="action-icon">📢</div>
@@ -358,7 +358,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     <div className="user-faqs">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
-        <h3>❓ Help Center</h3>
+        <h3>❓ FAQ</h3>
       </div>
       
       <div className="faq-search">
@@ -718,7 +718,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           onClick={() => setActiveTab('faqs')}
         >
           <span className="nav-icon">❓</span>
-          <span className="nav-text">Help</span>
+          <span className="nav-text">FAQ</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'updates' ? 'active' : ''}`}

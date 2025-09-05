@@ -1995,13 +1995,10 @@ input:checked + .slider:before {
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 15px;
-  transition: all 0.3s ease;
 }
 
 .faq-card:hover {
   background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .faq-card.expanded {
@@ -2044,7 +2041,6 @@ input:checked + .slider:before {
   font-size: 18px;
   font-weight: bold;
   color: #00d4ff;
-  transition: transform 0.3s ease;
   background: rgba(0, 212, 255, 0.1);
   width: 30px;
   height: 30px;
@@ -2056,7 +2052,6 @@ input:checked + .slider:before {
 }
 
 .faq-card.expanded .faq-toggle {
-  transform: rotate(45deg);
   background: rgba(0, 212, 255, 0.2);
 }
 
@@ -2087,12 +2082,10 @@ input:checked + .slider:before {
   border-radius: 12px;
   font-size: 12px;
   border: 1px solid rgba(0, 212, 255, 0.3);
-  transition: all 0.3s ease;
 }
 
 .faq-tag:hover {
   background: rgba(0, 212, 255, 0.3);
-  transform: translateY(-1px);
 }
 
 .no-results {
