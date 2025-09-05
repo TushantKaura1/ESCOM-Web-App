@@ -7,25 +7,9 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
   const [faqs, setFaqs] = useState([]);
   const [updates, setUpdates] = useState([]);
   const [readings, setReadings] = useState([]);
-  const [newReading, setNewReading] = useState({
-    temperature: '',
-    salinity: '',
-    ph: '',
-    turbidity: '',
-    dissolvedOxygen: '',
-    location: '',
-    notes: '',
-    weather: 'sunny',
-    timeOfDay: 'morning',
-    equipment: 'pH-2000, Salinity-Refractometer'
-  });
-
   // Enhanced state for better functionality
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState(null);
 
   useEffect(() => {
@@ -259,187 +243,8 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     // ]);
   };
 
-  const validateForm = () => {
-    const errors = {};
-    
-    // Required field validation
-    if (!newReading.temperature || isNaN(parseFloat(newReading.temperature))) {
-      errors.temperature = 'Temperature is required and must be a valid number';
-    } else if (parseFloat(newReading.temperature) < -5 || parseFloat(newReading.temperature) > 50) {
-      errors.temperature = 'Temperature must be between -5°C and 50°C';
-    }
-    
-    if (!newReading.salinity || isNaN(parseFloat(newReading.salinity))) {
-      errors.salinity = 'Salinity is required and must be a valid number';
-    } else if (parseFloat(newReading.salinity) < 0 || parseFloat(newReading.salinity) > 50) {
-      errors.salinity = 'Salinity must be between 0 and 50 ppt';
-    }
-    
-    if (!newReading.ph || isNaN(parseFloat(newReading.ph))) {
-      errors.ph = 'pH is required and must be a valid number';
-    } else if (parseFloat(newReading.ph) < 0 || parseFloat(newReading.ph) > 14) {
-      errors.ph = 'pH must be between 0 and 14';
-    }
-    
-    if (!newReading.turbidity || isNaN(parseFloat(newReading.turbidity))) {
-      errors.turbidity = 'Turbidity is required and must be a valid number';
-    } else if (parseFloat(newReading.turbidity) < 0) {
-      errors.turbidity = 'Turbidity must be a positive number';
-    }
-    
-    if (newReading.dissolvedOxygen && (isNaN(parseFloat(newReading.dissolvedOxygen)) || parseFloat(newReading.dissolvedOxygen) < 0)) {
-      errors.dissolvedOxygen = 'Dissolved Oxygen must be a valid positive number';
-    }
-    
-    if (!newReading.location) {
-      errors.location = 'Location is required';
-    }
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
 
-  const handleSubmitReading = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      console.log('❌ Form validation failed:', formErrors);
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      const reading = {
-        id: Date.now(),
-        ...newReading,
-        temperature: parseFloat(newReading.temperature),
-        salinity: parseFloat(newReading.salinity),
-        ph: parseFloat(newReading.ph),
-        turbidity: parseFloat(newReading.turbidity),
-        dissolvedOxygen: newReading.dissolvedOxygen ? parseFloat(newReading.dissolvedOxygen) : null,
-        timestamp: new Date().toISOString(),
-        quality: calculateQuality(newReading),
-        userId: user.id,
-        userName: user.name
-      };
-      
-      setReadings([reading, ...readings]);
-      setNewReading({
-        temperature: '',
-        salinity: '',
-        ph: '',
-        turbidity: '',
-        dissolvedOxygen: '',
-        location: '',
-        notes: '',
-        weather: 'sunny',
-        timeOfDay: 'morning',
-        equipment: 'pH-2000, Salinity-Refractometer'
-      });
-      
-      setFormErrors({});
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 3000);
-      
-      console.log('✅ New reading submitted:', reading);
-    } catch (error) {
-      console.error('❌ Error submitting reading:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
-  const calculateQuality = (reading) => {
-    const temp = parseFloat(reading.temperature);
-    const sal = parseFloat(reading.salinity);
-    const ph = parseFloat(reading.ph);
-    const turb = parseFloat(reading.turbidity);
-    const do2 = parseFloat(reading.dissolvedOxygen);
-    
-    let score = 0;
-    
-    // Temperature quality (ideal range: 15-25°C)
-    if (temp >= 15 && temp <= 25) score += 20;
-    else if (temp >= 10 && temp <= 30) score += 15;
-    else score += 5;
-    
-    // Salinity quality (ideal range: 30-40 ppt)
-    if (sal >= 30 && sal <= 40) score += 20;
-    else if (sal >= 25 && sal <= 45) score += 15;
-    else score += 5;
-    
-    // pH quality (ideal range: 7.5-8.5)
-    if (ph >= 7.5 && ph <= 8.5) score += 20;
-    else if (ph >= 7.0 && ph <= 9.0) score += 15;
-    else score += 5;
-    
-    // Turbidity quality (lower is better, ideal < 5 NTU)
-    if (turb < 5) score += 20;
-    else if (turb < 10) score += 15;
-    else score += 5;
-    
-    // Dissolved Oxygen quality (higher is better, ideal > 6 mg/L)
-    if (do2 > 6) score += 20;
-    else if (do2 > 4) score += 15;
-    else score += 5;
-    
-    if (score >= 90) return 'excellent';
-    else if (score >= 70) return 'good';
-    else if (score >= 50) return 'fair';
-    else return 'poor';
-  };
-
-  const handleBotMessage = () => {
-    if (!botHelper.currentMessage.trim()) return;
-    
-    const userMessage = botHelper.currentMessage;
-    const botResponse = getBotResponse(userMessage);
-    
-    const newMessage = {
-      id: Date.now(),
-      type: 'user',
-      content: userMessage,
-      timestamp: new Date().toISOString()
-    };
-    
-    const botMessage = {
-      id: Date.now() + 1,
-      type: 'bot',
-      content: botResponse,
-      timestamp: new Date().toISOString()
-    };
-    
-    setBotHelper({
-      ...botHelper,
-      messages: [...botHelper.messages, newMessage, botMessage],
-      currentMessage: ''
-    });
-  };
-
-  const getBotResponse = (message) => {
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('temperature') || lowerMessage.includes('temp')) {
-      return 'Water temperature should be measured at a depth of 30cm below the surface. Ideal range is 15-25°C. Use a calibrated thermometer for accurate readings.';
-    } else if (lowerMessage.includes('salinity') || lowerMessage.includes('salt')) {
-      return 'Salinity measures the salt content in water. Use a refractometer or conductivity meter. Normal ocean salinity is 30-40 ppt (parts per thousand).';
-    } else if (lowerMessage.includes('ph') || lowerMessage.includes('acidity')) {
-      return 'pH measures water acidity. Use pH strips or a pH meter. Ocean water typically has a pH of 7.5-8.5. Calibrate your equipment regularly.';
-    } else if (lowerMessage.includes('turbidity') || lowerMessage.includes('clarity')) {
-      return 'Turbidity measures water clarity. Use a Secchi disk or turbidity meter. Lower values indicate clearer water. Aim for readings below 5 NTU.';
-    } else if (lowerMessage.includes('calibrate') || lowerMessage.includes('calibration')) {
-      return 'Calibrate your equipment monthly using the calibration kit provided. Follow the step-by-step guide in your training manual. Contact your team leader if you need help.';
-    } else if (lowerMessage.includes('location') || lowerMessage.includes('where')) {
-      return 'Choose consistent monitoring locations marked with GPS coordinates. Use permanent markers or landmarks for easy identification. Record exact coordinates in your data.';
-    } else if (lowerMessage.includes('weather') || lowerMessage.includes('conditions')) {
-      return 'Record weather conditions during monitoring: temperature, wind speed, precipitation, and cloud cover. These factors can affect water quality readings.';
-    } else if (lowerMessage.includes('frequency') || lowerMessage.includes('how often')) {
-      return 'Submit data monthly, or more frequently during extreme weather events. Always submit within 24 hours of collection for best data quality.';
-    } else {
-      return 'I can help with monitoring questions about temperature, salinity, pH, turbidity, equipment calibration, locations, weather conditions, and data submission frequency. What would you like to know?';
-    }
-  };
 
   // const handleLikePost = (postId) => {
   //   setCommunityPosts(communityPosts.map(post => 
@@ -482,34 +287,30 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         <div className="stat-card">
           <div className="stat-icon">📊</div>
           <div className="stat-content">
-            <div className="stat-value">{readings.length}</div>
+          <div className="stat-value">{readings.length}</div>
             <div className="stat-label">Total Readings</div>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">⭐</div>
           <div className="stat-content">
-            <div className="stat-value">94%</div>
+          <div className="stat-value">94%</div>
             <div className="stat-label">Data Quality</div>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">🔥</div>
           <div className="stat-content">
-            <div className="stat-value">5</div>
+          <div className="stat-value">5</div>
             <div className="stat-label">Day Streak</div>
-          </div>
+        </div>
         </div>
       </div>
 
       <div className="quick-actions">
         <h4>Quick Actions</h4>
         <div className="action-grid">
-          <button onClick={() => setActiveTab('monitoring')} className="action-card primary">
-            <div className="action-icon">📊</div>
-            <div className="action-text">Submit Reading</div>
-          </button>
-          <button onClick={() => setActiveTab('faqs')} className="action-card">
+          <button onClick={() => setActiveTab('faqs')} className="action-card primary">
             <div className="action-icon">❓</div>
             <div className="action-text">View FAQs</div>
           </button>
@@ -537,280 +338,6 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     </div>
   );
 
-  const renderMonitoring = () => (
-    <div className="monitoring">
-      <div className="section-header">
-        <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
-        <h3>📊 Submit Reading</h3>
-      </div>
-      
-      {showSuccessMessage && (
-        <div className="success-message">
-          <div className="success-icon">✅</div>
-          <div className="success-text">
-            <h4>Reading Submitted Successfully!</h4>
-            <p>Your water quality data has been recorded and will be reviewed by our team.</p>
-          </div>
-        </div>
-      )}
-      
-      <div className="monitoring-form">
-        <form className="reading-form" onSubmit={handleSubmitReading}>
-          <div className="form-section">
-            <h4>📍 Location & Conditions</h4>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Location *</label>
-                <select 
-                  className={`form-input ${formErrors.location ? 'error' : ''}`}
-                  value={newReading.location}
-                  onChange={(e) => {
-                    setNewReading({...newReading, location: e.target.value});
-                    if (formErrors.location) {
-                      setFormErrors({...formErrors, location: ''});
-                    }
-                  }}
-                  required
-                >
-                  <option value="">Select location...</option>
-                  <option value="Beach Point A">Beach Point A</option>
-                  <option value="Beach Point B">Beach Point B</option>
-                  <option value="Harbor Entrance">Harbor Entrance</option>
-                  <option value="Coastal Lagoon">Coastal Lagoon</option>
-                </select>
-                {formErrors.location && <span className="error-message">{formErrors.location}</span>}
-              </div>
-              <div className="form-group">
-                <label>Weather</label>
-                <select 
-                  className="form-input"
-                  value={newReading.weather}
-                  onChange={(e) => setNewReading({...newReading, weather: e.target.value})}
-                >
-                  <option value="sunny">☀️ Sunny</option>
-                  <option value="partly-cloudy">⛅ Partly Cloudy</option>
-                  <option value="cloudy">☁️ Cloudy</option>
-                  <option value="rainy">🌧️ Rainy</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h4>🌊 Water Quality Measurements</h4>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Temperature (°C) *</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  min="-5"
-                  max="50"
-                  className={`form-input ${formErrors.temperature ? 'error' : ''}`}
-                  placeholder="18.5"
-                  value={newReading.temperature}
-                  onChange={(e) => {
-                    setNewReading({...newReading, temperature: e.target.value});
-                    if (formErrors.temperature) {
-                      setFormErrors({...formErrors, temperature: ''});
-                    }
-                  }}
-                  required
-                />
-                {formErrors.temperature && <span className="error-message">{formErrors.temperature}</span>}
-              </div>
-              <div className="form-group">
-                <label>Salinity (ppt) *</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  min="0"
-                  max="50"
-                  className={`form-input ${formErrors.salinity ? 'error' : ''}`}
-                  placeholder="32.1"
-                  value={newReading.salinity}
-                  onChange={(e) => {
-                    setNewReading({...newReading, salinity: e.target.value});
-                    if (formErrors.salinity) {
-                      setFormErrors({...formErrors, salinity: ''});
-                    }
-                  }}
-                  required
-                />
-                {formErrors.salinity && <span className="error-message">{formErrors.salinity}</span>}
-              </div>
-            </div>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label>pH Level *</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  min="0"
-                  max="14"
-                  className={`form-input ${formErrors.ph ? 'error' : ''}`}
-                  placeholder="7.8"
-                  value={newReading.ph}
-                  onChange={(e) => {
-                    setNewReading({...newReading, ph: e.target.value});
-                    if (formErrors.ph) {
-                      setFormErrors({...formErrors, ph: ''});
-                    }
-                  }}
-                  required
-                />
-                {formErrors.ph && <span className="error-message">{formErrors.ph}</span>}
-              </div>
-              <div className="form-group">
-                <label>Turbidity (NTU) *</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  min="0"
-                  className={`form-input ${formErrors.turbidity ? 'error' : ''}`}
-                  placeholder="2.3"
-                  value={newReading.turbidity}
-                  onChange={(e) => {
-                    setNewReading({...newReading, turbidity: e.target.value});
-                    if (formErrors.turbidity) {
-                      setFormErrors({...formErrors, turbidity: ''});
-                    }
-                  }}
-                  required
-                />
-                {formErrors.turbidity && <span className="error-message">{formErrors.turbidity}</span>}
-              </div>
-            </div>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label>Dissolved Oxygen (mg/L)</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  min="0"
-                  className={`form-input ${formErrors.dissolvedOxygen ? 'error' : ''}`}
-                  placeholder="7.5"
-                  value={newReading.dissolvedOxygen}
-                  onChange={(e) => {
-                    setNewReading({...newReading, dissolvedOxygen: e.target.value});
-                    if (formErrors.dissolvedOxygen) {
-                      setFormErrors({...formErrors, dissolvedOxygen: ''});
-                    }
-                  }}
-                />
-                {formErrors.dissolvedOxygen && <span className="error-message">{formErrors.dissolvedOxygen}</span>}
-                <small className="field-help">Optional - Leave blank if not measured</small>
-              </div>
-            </div>
-          </div>
-          
-          <div className="form-section">
-            <h4>📝 Additional Information</h4>
-            <div className="form-group">
-              <label>Notes (Optional)</label>
-              <textarea 
-                className="form-input" 
-                placeholder="Any observations or special conditions..."
-                value={newReading.notes}
-                onChange={(e) => setNewReading({...newReading, notes: e.target.value})}
-                rows="3"
-              ></textarea>
-            </div>
-          </div>
-          
-          <div className="form-actions">
-            <button 
-              type="submit" 
-              className={`submit-btn primary ${isSubmitting ? 'loading' : ''}`}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="loading-spinner"></span>
-                  Submitting...
-                </>
-              ) : (
-                '📊 Submit Reading'
-              )}
-            </button>
-            <button type="button" onClick={() => setActiveTab('dashboard')} className="cancel-btn">Cancel</button>
-          </div>
-        </form>
-      </div>
-
-      <div className="monitoring-history">
-        <h4>Recent Readings ({readings.length})</h4>
-        <div className="readings-list">
-          {readings.length === 0 ? (
-            <div className="no-readings">
-              <div className="no-readings-icon">📊</div>
-              <h4>No readings yet</h4>
-              <p>Submit your first water quality reading to get started!</p>
-            </div>
-          ) : (
-            readings.slice(0, 5).map(reading => (
-              <div key={reading.id} className="reading-card">
-                <div className="reading-header">
-                  <span className="reading-date">
-                    {new Date(reading.timestamp).toLocaleDateString()} at {new Date(reading.timestamp).toLocaleTimeString()}
-                  </span>
-                  <span className={`quality-badge ${reading.quality}`}>
-                    {reading.quality.charAt(0).toUpperCase() + reading.quality.slice(1)}
-                  </span>
-                </div>
-                <div className="reading-data">
-                  <div className="data-grid">
-                    <div className="data-point">
-                      <span className="label">🌡️ Temperature:</span>
-                      <span className="value">{reading.temperature}°C</span>
-                    </div>
-                    <div className="data-point">
-                      <span className="label">🧂 Salinity:</span>
-                      <span className="value">{reading.salinity} ppt</span>
-                    </div>
-                    <div className="data-point">
-                      <span className="label">⚗️ pH:</span>
-                      <span className="value">{reading.ph}</span>
-                    </div>
-                    <div className="data-point">
-                      <span className="label">🌊 Turbidity:</span>
-                      <span className="value">{reading.turbidity} NTU</span>
-                    </div>
-                    {reading.dissolvedOxygen && (
-                      <div className="data-point">
-                        <span className="label">💨 Dissolved Oxygen:</span>
-                        <span className="value">{reading.dissolvedOxygen} mg/L</span>
-                      </div>
-                    )}
-                    <div className="data-point">
-                      <span className="label">📍 Location:</span>
-                      <span className="value">{reading.location}</span>
-                    </div>
-                    <div className="data-point">
-                      <span className="label">🌤️ Weather:</span>
-                      <span className="value">{reading.weather}</span>
-                    </div>
-                    <div className="data-point">
-                      <span className="label">⏰ Time:</span>
-                      <span className="value">{reading.timeOfDay}</span>
-                    </div>
-                  </div>
-                  {reading.notes && (
-                    <div className="reading-notes">
-                      <span className="label">📝 Notes:</span>
-                      <p>{reading.notes}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
 
   const filteredFAQs = faqs.filter(faq => {
     const matchesSearch = searchTerm === '' || 
@@ -843,7 +370,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-
+      
       <div className="faq-categories">
         <div className="category-tabs">
           <button 
@@ -888,25 +415,25 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           filteredFAQs.map(faq => (
             <div key={faq.id} className={`faq-card ${expandedFaq === faq.id ? 'expanded' : ''}`}>
               <div className="faq-header" onClick={() => handleFaqToggle(faq.id)}>
-                <h4>{faq.question}</h4>
+              <h4>{faq.question}</h4>
                 <div className="faq-meta">
-                  <span className="faq-category">{faq.category}</span>
+              <span className="faq-category">{faq.category}</span>
                   <span className="faq-toggle">{expandedFaq === faq.id ? '−' : '+'}</span>
-                </div>
+            </div>
               </div>
               {expandedFaq === faq.id && (
-                <div className="faq-answer">
-                  <p>{faq.answer}</p>
+            <div className="faq-answer">
+              <p>{faq.answer}</p>
                   {faq.tags && faq.tags.length > 0 && (
                     <div className="faq-tags">
                       {faq.tags.map((tag, index) => (
                         <span key={index} className="faq-tag">#{tag}</span>
                       ))}
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
+                  )}
+          </div>
+              )}
+      </div>
           ))
         )}
       </div>
@@ -917,7 +444,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     <div className="user-updates">
       <div className="section-header">
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
-        <h3>📢 Latest Updates</h3>
+      <h3>📢 Latest Updates</h3>
       </div>
       
       <div className="updates-list">
@@ -1073,25 +600,25 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           <div className="preference-item">
             <span className="preference-label">Email Notifications</span>
             <label className="toggle">
-              <input type="checkbox" defaultChecked />
+            <input type="checkbox" defaultChecked />
               <span className="slider"></span>
-            </label>
+          </label>
           </div>
           <div className="preference-item">
             <span className="preference-label">In-App Notifications</span>
             <label className="toggle">
-              <input type="checkbox" defaultChecked />
+            <input type="checkbox" defaultChecked />
               <span className="slider"></span>
-            </label>
+          </label>
           </div>
           <div className="preference-item">
             <span className="preference-label">SMS Alerts (Urgent Only)</span>
             <label className="toggle">
-              <input type="checkbox" />
+            <input type="checkbox" />
               <span className="slider"></span>
-            </label>
-          </div>
+          </label>
         </div>
+      </div>
 
         <div className="preferences-section">
           <h4>Data Collection Preferences</h4>
@@ -1101,7 +628,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
               <input type="checkbox" defaultChecked />
               <span className="slider"></span>
             </label>
-          </div>
+    </div>
           <div className="preference-item">
             <span className="preference-label">Location Services</span>
             <label className="toggle">
@@ -1150,8 +677,6 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     switch (activeTab) {
       case 'dashboard':
         return renderDashboard();
-      case 'monitoring':
-        return renderMonitoring();
       case 'faqs':
         return renderFAQs();
       case 'updates':
@@ -1187,13 +712,6 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         >
           <span className="nav-icon">🏠</span>
           <span className="nav-text">Home</span>
-        </button>
-        <button 
-          className={`nav-btn ${activeTab === 'monitoring' ? 'active' : ''}`}
-          onClick={() => setActiveTab('monitoring')}
-        >
-          <span className="nav-icon">📊</span>
-          <span className="nav-text">Submit</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'faqs' ? 'active' : ''}`}
