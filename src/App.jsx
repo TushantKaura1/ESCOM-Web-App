@@ -186,48 +186,42 @@ function AppContent() {
       <div className="welcome-content">
         <div className="app-header">
           <h1>🌊 ESCOM Citizen Scientist Assistant</h1>
-          <p className="app-subtitle">Join the coastal monitoring community and contribute to environmental research</p>
-          <div className="version-info">
-            <span>Version {APP_VERSION}</span>
-            <span>Built: {new Date(BUILD_TIMESTAMP).toLocaleDateString()}</span>
-            <span style={{color: '#00d4aa'}}>🚀 ENHANCED v3.0.0 DEPLOYED!</span>
-          </div>
         </div>
 
 
 
         <div className="welcome-actions">
           <div className="action-group">
-            <h3>🔐 User Access</h3>
+            <h3>User Access</h3>
             <button 
               className="action-btn primary"
               onClick={() => openAuth('login')}
             >
-              🔐 Login
+              Login
             </button>
             <p className="user-note">Existing users can login with their credentials</p>
           </div>
 
           <div className="action-group">
-            <h3>👑 Admin Access</h3>
+            <h3>Admin Access</h3>
             <button 
               className="action-btn admin"
               onClick={() => openAuth('login')}
             >
-              👑 Admin Login
+              Admin Login
             </button>
             <p className="admin-note">Admin credentials: admin@escom.com / admin123</p>
           </div>
 
           <div className="info-section">
-            <h3>ℹ️ About the App</h3>
+            <h3>About the App</h3>
             <p>This is a comprehensive coastal monitoring platform for citizen scientists. Features include:</p>
             <ul>
-              <li>📊 Data collection and monitoring</li>
-              <li>❓ FAQ management system</li>
-              <li>📢 Daily updates and announcements</li>
-              <li>👤 User profile management</li>
-              <li>🔐 Secure authentication</li>
+              <li>Data collection and monitoring</li>
+              <li>FAQ management system</li>
+              <li>Daily updates and announcements</li>
+              <li>User profile management</li>
+              <li>Secure authentication</li>
             </ul>
           </div>
         </div>
@@ -332,7 +326,7 @@ function AppContent() {
       {/* Error Display */}
       {error && (
         <div className="error-toast">
-          <span>❌ {error}</span>
+          <span>{error}</span>
           <button onClick={() => setError(null)}>×</button>
         </div>
       )}
