@@ -1,0 +1,12 @@
+# Force cache busting for JavaScript files
+/assets/index-Cfv9MAob.js /assets/index-DMVYgaT8.js 200
+/assets/index-BV_D_9ia.js /assets/index-DMVYgaT8.js 200
+/assets/index-CYKQ4khJ.js /assets/index-DMVYgaT8.js 200
+/assets/index-zKSyklWM.js /assets/index-DMVYgaT8.js 200
+/assets/index-COV9rKcy.js /assets/index-DMVYgaT8.js 200
+
+# Force cache busting for CSS files
+/assets/index-C2q5d6Xa.css /assets/index-DfnLvlKg.css 200
+
+# Fallback for any missing assets
+/* /index.html 200

@@ -59,14 +59,40 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="module" src="/src/main.jsx?v=2"></script>
+  <script type="module" src="/src/main.jsx?v=3"></script>
   
   <!-- Service Worker Registration for PWA - DISABLED FOR DEBUGGING -->
   <script>
+    // Clear all caches and force fresh load
+    console.log('🧹 Clearing all caches...');
+    
+    // Clear service worker caches
+    if ('caches' in window) {
+      caches.keys().then((cacheNames) => {
+        cacheNames.forEach((cacheName) => {
+          console.log('🗑️ Deleting cache:', cacheName);
+          caches.delete(cacheName);
+        });
+      });
+    }
+    
+    // Clear localStorage and sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    console.log('✅ Storage cleared');
+    
     // Error handling for debugging
     window.addEventListener('error', function(e) {
       console.error('🚨 JavaScript Error:', e.error);
       console.error('🚨 Error details:', e.filename, e.lineno, e.colno);
+      
+      // If it's a syntax error, try to reload
+      if (e.error && e.error.message && e.error.message.includes('Unexpected token')) {
+        console.log('🔄 Syntax error detected, reloading page...');
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 1000);
+      }
     });
     
     window.addEventListener('unhandledrejection', function(e) {
