@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Login from './components/Login';
-import Signup from './components/Signup';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import AuthSystem from './components/AuthSystem';
@@ -19,7 +17,6 @@ function AppContent() {
 
   const [adminMode, setAdminMode] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
   const [showDailyUpdates, setShowDailyUpdates] = useState(false);
   const [currentSection, setCurrentSection] = useState('dashboard');
   
@@ -114,50 +111,6 @@ function AppContent() {
     }
   };
 
-  const handleSignup = async (userData) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      console.log('🚀 SIGNUP ATTEMPT STARTED');
-      console.log('📤 Sending signup data:', { ...userData, password: '***' });
-      console.log('🔄 FORCE REBUILD:', FORCE_REBUILD);
-
-      // Check if user already exists
-      const existingUser = users.find(u => u.email === userData.email);
-      if (existingUser) {
-        setError('User with this email already exists.');
-        return false;
-      }
-
-      // Create new user with password
-      const newUser = {
-        name: userData.name,
-        email: userData.email,
-        username: userData.email.split('@')[0], // Generate username from email
-        password: userData.password, // Store password for demo purposes
-        role: userData.role || 'citizen',
-        team: `Team ${userData.team}`, // Ensure proper team format
-        status: 'active'
-      };
-
-      // Add user to centralized system
-      addUser(newUser);
-
-      setUser(newUser);
-      setAdminMode(newUser.role === 'admin');
-      setCurrentView('dashboard');
-      setShowAuth(false); // Close the auth modal
-      console.log('✅ SIGNUP SUCCESSFUL!', newUser);
-      return true;
-    } catch (error) {
-      console.error('💥 SIGNUP ERROR:', error);
-      setError('Signup failed. Please try again.');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogout = () => {
     setUser(null);
@@ -167,8 +120,7 @@ function AppContent() {
     console.log('👋 User logged out');
   };
 
-  const openAuth = (mode) => {
-    setAuthMode(mode);
+  const openAuth = () => {
     setShowAuth(true);
   };
 
@@ -195,7 +147,7 @@ function AppContent() {
             <h3>User Access</h3>
             <button 
               className="action-btn primary"
-              onClick={() => openAuth('login')}
+              onClick={() => openAuth()}
             >
               Login
             </button>
@@ -206,7 +158,7 @@ function AppContent() {
             <h3>Admin Access</h3>
             <button 
               className="action-btn admin"
-              onClick={() => openAuth('login')}
+              onClick={() => openAuth()}
             >
               Admin Login
             </button>
@@ -294,9 +246,7 @@ function AppContent() {
       {/* Authentication Modal */}
       {showAuth && (
         <AuthSystem
-          mode={authMode}
           onLogin={handleLogin}
-          onSignup={handleSignup}
           onClose={closeAuth}
         />
       )}
