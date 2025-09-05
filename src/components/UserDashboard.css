@@ -30,6 +30,55 @@
   justify-content: flex-end;
   position: relative;
   z-index: 9999;
+  gap: 15px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.header-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.header-action-btn.logout-btn {
+  background: rgba(244, 67, 54, 0.2);
+  border-color: rgba(244, 67, 54, 0.3);
+  color: #ff6b6b;
+}
+
+.header-action-btn.logout-btn:hover {
+  background: rgba(244, 67, 54, 0.3);
+  border-color: rgba(244, 67, 54, 0.5);
+  color: #ff5252;
+}
+
+.action-icon {
+  font-size: 16px;
+}
+
+.action-text {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .back-btn {
@@ -1518,6 +1567,26 @@ input:checked + .slider:before {
     flex-direction: column;
     gap: 15px;
     text-align: center;
+  }
+
+  .header-right {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-action-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 13px;
   }
 
   .dashboard-header h2 {

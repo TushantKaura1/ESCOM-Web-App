@@ -696,11 +696,27 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     <div className="user-dashboard">
       <div className="dashboard-header">
         <div className="header-left">
-          <button onClick={() => onSectionChange('welcome')} className="back-btn">← Back</button>
+          <button onClick={() => onSectionChange('welcome')} className="back-btn">← Back to Welcome</button>
           <h2>🌊 Citizen Scientist Dashboard</h2>
         </div>
         
         <div className="header-right">
+          <div className="header-actions">
+            <button 
+              onClick={() => setActiveTab('dashboard')} 
+              className="header-action-btn"
+            >
+              <span className="action-icon">🏠</span>
+              <span className="action-text">Dashboard</span>
+            </button>
+            <button 
+              onClick={onLogout} 
+              className="header-action-btn logout-btn"
+            >
+              <span className="action-icon">🚪</span>
+              <span className="action-text">Logout</span>
+            </button>
+          </div>
           <Profile user={user} onLogout={onLogout} onSectionChange={setActiveTab} />
         </div>
       </div>
