@@ -1265,6 +1265,93 @@ input:checked + .slider:before {
   box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
 }
 
+.action-btn.delete {
+  background: linear-gradient(45deg, #ff4757, #ff3742);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.delete:hover:not(:disabled) {
+  background: linear-gradient(45deg, #ff3742, #ff2f3a);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+}
+
+.action-btn.delete:disabled {
+  background: linear-gradient(45deg, #666, #555);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.action-btn.edit {
+  background: linear-gradient(45deg, #00d4aa, #00b894);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.action-btn.edit:hover {
+  background: linear-gradient(45deg, #00b894, #00a085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 212, 170, 0.4);
+}
+
+/* Success and Error Messages */
+.success-message {
+  background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), rgba(0, 212, 170, 0.05));
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  color: #00d4aa;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin: 15px 0;
+  font-weight: 600;
+  animation: slideIn 0.3s ease;
+}
+
+.error-message {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin: 15px 0;
+  font-weight: 600;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .action-btn.syncing {
   background: linear-gradient(45deg, #ff6b6b, #ee5a24);
   animation: pulse 1.5s infinite;

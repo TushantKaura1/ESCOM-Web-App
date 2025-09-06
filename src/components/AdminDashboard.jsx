@@ -47,6 +47,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
   const [showAddUpdate, setShowAddUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [newFaq, setNewFaq] = useState({ 
     category: 'ESCOM Organization', 
     subcategory: 'General',
@@ -289,11 +290,36 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     }
   };
 
-  const handleFaqDelete = (faqId) => {
+  const handleFaqDelete = async (faqId) => {
     console.log('🗑️ Deleting FAQ:', faqId);
-    if (window.confirm('Are you sure you want to delete this FAQ? This action cannot be undone.')) {
-      setFaqs(faqs.filter(faq => faq.id !== faqId));
-      console.log('✅ FAQ deleted successfully');
+    
+    // Find the FAQ to get its details for confirmation
+    const faqToDelete = faqs.find(faq => faq.id === faqId);
+    if (!faqToDelete) {
+      console.error('❌ FAQ not found:', faqId);
+      return;
+    }
+    
+    const confirmMessage = `Are you sure you want to delete this FAQ?\n\n"${faqToDelete.question}"\n\nThis action cannot be undone.`;
+    
+    if (window.confirm(confirmMessage)) {
+      setLoading(true);
+      try {
+        console.log('🗑️ Calling deleteFaq from DataContext...');
+        await deleteFaq(faqId);
+        console.log('✅ FAQ deleted successfully from database');
+        
+        // Show success message
+        setError(null);
+        setSuccessMessage('FAQ deleted successfully!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+        // The DataContext will automatically refresh the FAQs list
+      } catch (error) {
+        console.error('❌ Error deleting FAQ:', error);
+        setError('Failed to delete FAQ. Please try again.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -1231,6 +1257,18 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         <button onClick={() => setShowAddFaq(true)} className="add-btn">➕ Add FAQ</button>
       </div>
       
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <div className="success-message">
+          ✅ {successMessage}
+        </div>
+      )}
+      {error && (
+        <div className="error-message">
+          ❌ {error}
+        </div>
+      )}
+      
       {/* Simplified Search and Filter */}
       <div className="faq-controls">
         <div className="search-section">
@@ -1306,8 +1344,21 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
                   )}
                 </div>
                 <div className="faq-actions">
-                  <button className="action-btn edit" onClick={() => handleFaqEdit(faq)}>✏️</button>
-                  <button className="action-btn delete" onClick={() => handleFaqDelete(faq.id)}>🗑️</button>
+                  <button 
+                    className="action-btn edit" 
+                    onClick={() => handleFaqEdit(faq)}
+                    title="Edit FAQ"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    className="action-btn delete" 
+                    onClick={() => handleFaqDelete(faq.id)}
+                    disabled={loading}
+                    title="Delete FAQ"
+                  >
+                    {loading ? '⏳' : '🗑️'}
+                  </button>
                 </div>
               </div>
               <div className="faq-content">
