@@ -8,15 +8,15 @@
 
 body { 
   font-family: 'Inter', sans-serif; 
-  background: #eef2f5; 
-  color: #1f2937; 
+  background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%); 
+  color: #ffffff; 
 }
 
 .app-container { 
   position: relative; 
   max-width: 480px; 
   margin: 0 auto; 
-  background: #fff; 
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); 
   min-height: 100vh; 
   padding-bottom: 60px; 
 }
@@ -28,21 +28,22 @@ body {
 .title { 
   font-size: 1.8rem; 
   font-weight: 600; 
-  color: #0b3d91; 
+  color: #00d4aa; 
   margin-bottom: 8px; 
 }
 
 .subtitle { 
   font-size: 1rem; 
-  color: #4b5563; 
+  color: #cccccc; 
   margin-bottom: 16px; 
 }
 
 .card { 
-  background: #fff; 
+  background: rgba(255, 255, 255, 0.05); 
   border-radius: 12px; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
   padding: 16px; 
+  border: 1px solid rgba(255, 255, 255, 0.1); 
 }
 
 .form-group { 
@@ -58,9 +59,11 @@ body {
 .input { 
   width: 100%; 
   padding: 10px; 
-  border: 1px solid #d1d5db; 
+  border: 1px solid rgba(255, 255, 255, 0.2); 
   border-radius: 8px; 
   font-size: 1rem; 
+  background: rgba(255, 255, 255, 0.05); 
+  color: #ffffff; 
 }
 
 .bottom-nav { 
@@ -70,22 +73,23 @@ body {
   transform: translateX(-50%); 
   width: 100%; 
   max-width: 480px; 
-  background: #fff; 
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.1); 
+  background: rgba(0, 0, 0, 0.8); 
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.3); 
   display: flex; 
+  backdrop-filter: blur(10px); 
 }
 
 .nav-item { 
   flex: 1; 
   text-align: center; 
   padding: 10px 0; 
-  color: #6b7280; 
+  color: #cccccc; 
   font-size: 0.75rem; 
   text-decoration: none; 
 }
 
 .nav-item.active { 
-  color: #0b3d91; 
+  color: #00d4aa; 
 }
 
 .nav-item span { 
@@ -100,20 +104,20 @@ body {
 }
 
 .faq-button { 
-  background: #fff; 
-  border: 1px solid #d1d5db; 
+  background: rgba(255, 255, 255, 0.05); 
+  border: 1px solid rgba(255, 255, 255, 0.2); 
   border-radius: 10px; 
   padding: 14px; 
   text-align: left; 
   font-size: 1rem; 
-  color: #1f2937; 
+  color: #ffffff; 
   cursor: pointer; 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
   transition: background 0.2s; 
 }
 
 .faq-button:hover { 
-  background: #f0f4f8; 
+  background: rgba(255, 255, 255, 0.1); 
 }
 
 .faq-header { 
@@ -125,7 +129,7 @@ body {
 .back-icon { 
   cursor: pointer; 
   margin-right: 8px; 
-  color: #0b3d91; 
+  color: #00d4aa; 
 }
 
 .faq-list { 
@@ -135,20 +139,21 @@ body {
 }
 
 .faq-card { 
-  background: #fff; 
+  background: rgba(255, 255, 255, 0.05); 
   border-radius: 10px; 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
   padding: 12px 16px; 
+  border: 1px solid rgba(255, 255, 255, 0.1); 
 }
 
 .faq-card h3 { 
   font-weight: 600; 
-  color: #0b3d91; 
+  color: #00d4aa; 
   margin-bottom: 6px; 
 }
 
 .faq-card p { 
-  color: #4b5563; 
+  color: #cccccc; 
 }
 
 .card-grid { 
@@ -158,18 +163,19 @@ body {
 }
 
 .member-card { 
-  background: #fff; 
+  background: rgba(255, 255, 255, 0.05); 
   border-radius: 10px; 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
   padding: 12px; 
   display: flex; 
   align-items: center; 
   gap: 12px; 
+  border: 1px solid rgba(255, 255, 255, 0.1); 
 }
 
 .avatar { 
-  background: #0b3d91; 
-  color: #fff; 
+  background: #00d4aa; 
+  color: #000; 
   width: 40px; 
   height: 40px; 
   border-radius: 50%; 
@@ -181,8 +187,8 @@ body {
 
 .chat-btn { 
   margin-left: auto; 
-  background: #0b3d91; 
-  color: #fff; 
+  background: #00d4aa; 
+  color: #000; 
   border: none; 
   padding: 6px 12px; 
   border-radius: 8px; 
@@ -191,7 +197,7 @@ body {
 }
 
 .chat-btn:hover { 
-  background: #092f6f; 
+  background: #00b894; 
 }
 
 @media (max-width: 480px) { 

@@ -727,7 +727,7 @@
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: #ffffff;
+  background-color: #00d4aa;
   transition: 0.4s;
   border-radius: 50%;
 }
@@ -1619,7 +1619,7 @@ input:checked + .slider:before {
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: #ffffff;
+  background-color: #00d4aa;
   transition: 0.3s;
   border-radius: 50%;
 }
