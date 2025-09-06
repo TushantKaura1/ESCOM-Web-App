@@ -9,7 +9,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
   const [readings, setReadings] = useState([]);
   
   // Get data from DataContext instead of local state
-  const { faqs, updates, isLoading, refreshData, forceSync } = useData();
+  const { faqs, updates, isLoading, refreshData } = useData();
   
   // Enhanced state for better functionality
   const [searchTerm, setSearchTerm] = useState('');
@@ -238,18 +238,6 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
           <div className="welcome-text">
             <h1>Welcome back, {user.name}! 👋</h1>
             <p className="welcome-subtitle">Ready to make a difference in coastal monitoring?</p>
-          </div>
-          <div className="welcome-actions">
-            <button 
-              onClick={() => {
-                console.log('🔄 Manual refresh triggered');
-                forceSync();
-              }} 
-              className="refresh-btn"
-            >
-              <span className="refresh-icon">🔄</span>
-              <span>Sync Data</span>
-            </button>
           </div>
       </div>
       

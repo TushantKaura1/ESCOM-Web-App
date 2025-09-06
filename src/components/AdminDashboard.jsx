@@ -18,9 +18,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     addUser, 
     updateUser, 
     deleteUser,
-    forceSync,
-    isSyncing,
-    lastSync,
     exportData,
     importData
   } = useData();
@@ -704,21 +701,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
           <h3>📊 System Overview</h3>
           <p>Welcome to the ESCOM Citizen Scientist Admin Dashboard</p>
         </div>
-        <div className="sync-status">
-          <button 
-            onClick={forceSync} 
-            className={`sync-btn ${isSyncing ? 'syncing' : ''}`}
-            disabled={isSyncing}
-            title="Force data synchronization"
-          >
-            {isSyncing ? '🔄 Syncing...' : '🔄 Sync'}
-          </button>
-          {lastSync && (
-            <span className="last-sync">
-              Last sync: {new Date(lastSync).toLocaleTimeString()}
-            </span>
-          )}
-        </div>
       </div>
 
       <div className="stats-grid">
@@ -754,28 +736,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
       </div>
       
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <button 
-          onClick={() => {
-            console.log('🔄 Admin manual refresh triggered');
-            forceSync();
-          }} 
-          style={{
-            background: '#00d4aa',
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            marginRight: '10px'
-          }}
-        >
-          🔄 Refresh Data
-        </button>
-        <span style={{ fontSize: '12px', color: '#ccc' }}>
-          Last sync: {lastSync ? new Date(lastSync).toLocaleTimeString() : 'Never'}
-        </span>
-      </div>
 
       <div className="quick-actions">
         <h3>Quick Actions</h3>
