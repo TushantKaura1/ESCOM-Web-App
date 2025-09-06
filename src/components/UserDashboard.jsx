@@ -296,27 +296,6 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         </button>
       </div>
 
-      <div className="recent-readings">
-        <h3>Recent Readings</h3>
-        <div className="readings-list">
-          {readings.slice(0, 3).map(reading => (
-            <div key={reading.id} className="reading-card">
-              <div className="reading-header">
-                <span className="reading-location">{reading.location}</span>
-                <span className="reading-date">{reading.date}</span>
-              </div>
-              <div className="reading-data">
-                <span>Temp: {reading.temperature}°C</span>
-                <span>pH: {reading.ph}</span>
-                <span>Salinity: {reading.salinity}</span>
-              </div>
-              <div className={`quality-badge ${reading.quality}`}>
-                {reading.quality}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 
