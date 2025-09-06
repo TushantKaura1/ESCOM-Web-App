@@ -42,6 +42,7 @@ export const DataProvider = ({ children }) => {
 
     try {
       // Initialize database schema
+      console.log('🔄 Initializing database schema...');
       await initializeDatabase();
       console.log('✅ Database initialized successfully');
 
@@ -49,32 +50,36 @@ export const DataProvider = ({ children }) => {
       console.log('🔍 DataContext: Loading FAQs from live database...');
       const liveFaqs = await faqOperations.getAll();
       console.log('🔍 DataContext: Live FAQs loaded:', liveFaqs);
-      setFaqs(liveFaqs);
+      console.log('🔍 DataContext: FAQ count:', liveFaqs ? liveFaqs.length : 'undefined');
+      setFaqs(liveFaqs || []);
 
       // Load Updates from live database
       console.log('🔍 DataContext: Loading updates from live database...');
       const liveUpdates = await updateOperations.getAll();
       console.log('🔍 DataContext: Live updates loaded:', liveUpdates);
-      setUpdates(liveUpdates);
+      console.log('🔍 DataContext: Updates count:', liveUpdates ? liveUpdates.length : 'undefined');
+      setUpdates(liveUpdates || []);
 
       // Load Users from live database
       console.log('🔍 DataContext: Loading users from live database...');
       const liveUsers = await userOperations.getAll();
       console.log('🔍 DataContext: Live users loaded:', liveUsers);
-      setUsers(liveUsers);
+      console.log('🔍 DataContext: Users count:', liveUsers ? liveUsers.length : 'undefined');
+      setUsers(liveUsers || []);
 
       // Load Notifications from live database
       console.log('🔍 DataContext: Loading notifications from live database...');
       const liveNotifications = await notificationOperations.getByUserId(null); // Get all notifications
       console.log('🔍 DataContext: Live notifications loaded:', liveNotifications);
-      setNotifications(liveNotifications);
+      console.log('🔍 DataContext: Notifications count:', liveNotifications ? liveNotifications.length : 'undefined');
+      setNotifications(liveNotifications || []);
 
       // Set system stats
       setSystemStats({
-        totalUsers: liveUsers.length,
-        activeUsers: liveUsers.filter(u => u.status === 'active').length,
-        totalFaqs: liveFaqs.length,
-        totalUpdates: liveUpdates.length,
+        totalUsers: (liveUsers || []).length,
+        activeUsers: (liveUsers || []).filter(u => u.status === 'active').length,
+        totalFaqs: (liveFaqs || []).length,
+        totalUpdates: (liveUpdates || []).length,
         pendingApprovals: 0,
         dataQuality: 'excellent',
         systemHealth: 'operational'
@@ -82,8 +87,11 @@ export const DataProvider = ({ children }) => {
 
       setLastSync(new Date().toISOString());
       console.log('✅ All live data loaded successfully');
+      console.log('📊 Final data counts - FAQs:', (liveFaqs || []).length, 'Updates:', (liveUpdates || []).length, 'Users:', (liveUsers || []).length);
     } catch (error) {
       console.error('❌ Error loading live data:', error);
+      console.error('❌ Error details:', error.message);
+      console.error('❌ Error stack:', error.stack);
       // Fallback to demo data if database fails
       console.log('🔄 Falling back to demo data...');
       loadDemoData();
@@ -183,11 +191,8 @@ export const DataProvider = ({ children }) => {
       const updatedFaq = await faqOperations.update(faqId, updates);
       console.log('🔄 Updated FAQ from database:', updatedFaq);
       
-      // Update local state
-      const updatedFaqs = faqs.map(faq => 
-        faq.id === faqId ? { ...faq, ...updates, updatedAt: new Date().toISOString() } : faq
-      );
-      setFaqs(updatedFaqs);
+      // Refresh FAQs from database to ensure sync
+      await refreshData('faqs');
       
       // Trigger sync notification
       addNotification({
@@ -210,7 +215,8 @@ export const DataProvider = ({ children }) => {
       const faqWithId = await faqOperations.create(newFaq);
       console.log('🔄 FAQ created in database:', faqWithId);
       
-      setFaqs(prev => [faqWithId, ...prev]);
+      // Refresh FAQs from database to ensure sync
+      await refreshData('faqs');
       
       // Trigger sync notification
       addNotification({
@@ -232,7 +238,8 @@ export const DataProvider = ({ children }) => {
       console.log('🔄 Deleting FAQ:', faqId);
       await faqOperations.delete(faqId);
       
-      setFaqs(prev => prev.filter(faq => faq.id !== faqId));
+      // Refresh FAQs from database to ensure sync
+      await refreshData('faqs');
       
       // Trigger sync notification
       addNotification({
@@ -257,11 +264,8 @@ export const DataProvider = ({ children }) => {
       const updatedUpdate = await updateOperations.update(updateId, updateData);
       console.log('🔄 Updated update from database:', updatedUpdate);
       
-      // Update local state
-      const updatedUpdates = updates.map(update => 
-        update.id === updateId ? { ...update, ...updateData, updatedAt: new Date().toISOString() } : update
-      );
-      setUpdates(updatedUpdates);
+      // Refresh updates from database to ensure sync
+      await refreshData('updates');
       
       // Trigger sync notification
       addNotification({
@@ -284,7 +288,8 @@ export const DataProvider = ({ children }) => {
       const updateWithId = await updateOperations.create(newUpdate);
       console.log('🔄 Update created in database:', updateWithId);
       
-      setUpdates(prev => [updateWithId, ...prev]);
+      // Refresh updates from database to ensure sync
+      await refreshData('updates');
       
       // Trigger sync notification
       addNotification({
@@ -306,7 +311,8 @@ export const DataProvider = ({ children }) => {
       console.log('🔄 Deleting daily update:', updateId);
       await updateOperations.delete(updateId);
       
-      setUpdates(prev => prev.filter(update => update.id !== updateId));
+      // Refresh updates from database to ensure sync
+      await refreshData('updates');
       
       // Trigger sync notification
       addNotification({
@@ -458,6 +464,42 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  // Function to refresh specific data from database
+  const refreshData = async (dataType) => {
+    try {
+      console.log(`🔄 Refreshing ${dataType} from database...`);
+      
+      switch (dataType) {
+        case 'faqs':
+          const freshFaqs = await faqOperations.getAll();
+          console.log('🔄 Fresh FAQs loaded:', freshFaqs);
+          setFaqs(freshFaqs || []);
+          break;
+        case 'updates':
+          const freshUpdates = await updateOperations.getAll();
+          console.log('🔄 Fresh updates loaded:', freshUpdates);
+          setUpdates(freshUpdates || []);
+          break;
+        case 'users':
+          const freshUsers = await userOperations.getAll();
+          console.log('🔄 Fresh users loaded:', freshUsers);
+          setUsers(freshUsers || []);
+          break;
+        case 'notifications':
+          const freshNotifications = await notificationOperations.getByUserId(null);
+          console.log('🔄 Fresh notifications loaded:', freshNotifications);
+          setNotifications(freshNotifications || []);
+          break;
+        default:
+          await loadInitialData();
+      }
+      
+      console.log(`✅ ${dataType} refreshed successfully`);
+    } catch (error) {
+      console.error(`❌ Error refreshing ${dataType}:`, error);
+    }
+  };
+
   const exportData = () => {
     const data = {
       faqs,
@@ -520,6 +562,7 @@ export const DataProvider = ({ children }) => {
     
     // Sync operations
     forceSync,
+    refreshData,
     
     // Data management
     exportData,
