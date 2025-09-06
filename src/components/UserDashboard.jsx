@@ -258,29 +258,6 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         </div>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">📊</div>
-          <div className="stat-value">{readings.length}</div>
-          <div className="stat-label">Total Readings</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🎯</div>
-          <div className="stat-value">94.2%</div>
-          <div className="stat-label">Accuracy</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🔥</div>
-          <div className="stat-value">12</div>
-          <div className="stat-label">Day Streak</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🏆</div>
-          <div className="stat-value">156</div>
-          <div className="stat-label">Contributions</div>
-        </div>
-      </div>
-
       <div className="action-grid">
         <button onClick={() => setActiveTab('faqs')} className="action-card primary">
           <div className="action-icon">❓</div>
