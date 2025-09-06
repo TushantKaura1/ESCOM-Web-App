@@ -32,7 +32,11 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
     console.log('🔍 FAQs length:', faqs?.length || 0);
     console.log('🔍 FAQs type:', typeof faqs);
     console.log('🔍 FAQs is array:', Array.isArray(faqs));
-  }, [faqs]);
+    console.log('🔍 Updates from DataContext:', updates);
+    console.log('🔍 Updates length:', updates?.length || 0);
+    console.log('🔍 Updates type:', typeof updates);
+    console.log('🔍 Updates is array:', Array.isArray(updates));
+  }, [faqs, updates]);
   
   const [activeTab, setActiveTab] = useState('dashboard');
   const [editingFaq, setEditingFaq] = useState(null);
@@ -722,6 +726,29 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
           <div className="stat-value">{systemStats.systemHealth || 'Excellent'}</div>
           <div className="stat-label">Status</div>
         </div>
+      </div>
+      
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <button 
+          onClick={() => {
+            console.log('🔄 Admin manual refresh triggered');
+            forceSync();
+          }} 
+          style={{
+            background: '#00d4aa',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            marginRight: '10px'
+          }}
+        >
+          🔄 Refresh Data
+        </button>
+        <span style={{ fontSize: '12px', color: '#ccc' }}>
+          Last sync: {lastSync ? new Date(lastSync).toLocaleTimeString() : 'Never'}
+        </span>
       </div>
 
       <div className="quick-actions">

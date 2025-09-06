@@ -576,7 +576,9 @@ export const DataProvider = ({ children }) => {
     updatesCount: updates?.length || 0,
     usersCount: users?.length || 0,
     isLoading,
-    lastSync
+    lastSync,
+    faqs: faqs,
+    updates: updates
   });
 
   return (

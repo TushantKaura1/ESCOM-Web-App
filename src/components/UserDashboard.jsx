@@ -8,7 +8,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
   const [readings, setReadings] = useState([]);
   
   // Get data from DataContext instead of local state
-  const { faqs, updates, isLoading } = useData();
+  const { faqs, updates, isLoading, refreshData, forceSync } = useData();
   
   // Enhanced state for better functionality
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,6 +21,10 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     console.log('🔍 UserDashboard - Updates from DataContext:', updates);
     console.log('🔍 UserDashboard - FAQ count:', faqs?.length || 0);
     console.log('🔍 UserDashboard - Updates count:', updates?.length || 0);
+    console.log('🔍 UserDashboard - FAQ type:', typeof faqs);
+    console.log('🔍 UserDashboard - Updates type:', typeof updates);
+    console.log('🔍 UserDashboard - FAQ is array:', Array.isArray(faqs));
+    console.log('🔍 UserDashboard - Updates is array:', Array.isArray(updates));
   }, [user, faqs, updates]);
 
   // Load demo readings data (this is user-specific, not shared)
@@ -230,6 +234,28 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
       <div className="welcome-section">
         <h2>Welcome back, {user.name}!</h2>
         <p>Ready to contribute to coastal monitoring?</p>
+        <div style={{ marginTop: '10px' }}>
+          <button 
+            onClick={() => {
+              console.log('🔄 Manual refresh triggered');
+              forceSync();
+            }} 
+            style={{
+              background: '#00d4aa',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginRight: '10px'
+            }}
+          >
+            🔄 Refresh Data
+          </button>
+          <span style={{ fontSize: '12px', color: '#ccc' }}>
+            FAQs: {faqs?.length || 0} | Updates: {updates?.length || 0}
+          </span>
+        </div>
       </div>
 
       <div className="stats-grid">
