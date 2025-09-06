@@ -32,6 +32,7 @@ export const DataProvider = ({ children }) => {
 
   // Load initial data from live database
   useEffect(() => {
+    console.log('🔄 DataContext useEffect triggered - loading initial data');
     loadInitialData();
   }, []);
 
@@ -568,6 +569,15 @@ export const DataProvider = ({ children }) => {
     exportData,
     importData
   };
+
+  // Debug logging
+  console.log('🔍 DataContext providing data:', {
+    faqsCount: faqs?.length || 0,
+    updatesCount: updates?.length || 0,
+    usersCount: users?.length || 0,
+    isLoading,
+    lastSync
+  });
 
   return (
     <DataContext.Provider value={value}>
