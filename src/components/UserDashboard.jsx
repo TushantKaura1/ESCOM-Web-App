@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import Profile from './Profile';
+import ProfileEnhanced from './ProfileEnhanced';
 import './UserDashboard.css';
 
 function UserDashboard({ user, onLogout, onSectionChange }) {
@@ -115,7 +116,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         <button onClick={() => setActiveTab('dashboard')} className="back-btn">← Back</button>
         <h3>❓ FAQ</h3>
       </div>
-      
+
       <div className="faq-controls">
         <div className="search-container">
           <input
@@ -125,8 +126,8 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-        </div>
-        
+      </div>
+
         <div className="category-tabs">
           <button 
             className={`category-tab ${filterCategory === 'all' ? 'active' : ''}`}
@@ -169,15 +170,15 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
                   <span className="faq-category">{faq.category}</span>
                   <span className="faq-priority">{faq.priority}</span>
                 </div>
-              </div>
+          </div>
               <div className="faq-answer">
                 <p>{faq.answer}</p>
                 {faq.tags && faq.tags.length > 0 && (
                   <div className="faq-tags">
                     {faq.tags.map((tag, index) => (
                       <span key={index} className="faq-tag">{tag}</span>
-                    ))}
-                  </div>
+          ))}
+        </div>
                 )}
               </div>
             </div>
@@ -219,58 +220,127 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         ) : (
           <div className="no-updates">
             <p>No updates available at the moment.</p>
-          </div>
+        </div>
         )}
       </div>
     </div>
   );
 
   const renderProfile = () => (
-    <Profile user={user} onLogout={onLogout} />
+    <ProfileEnhanced user={user} onLogout={onLogout} />
   );
 
   const renderDashboard = () => (
     <div className="user-dashboard">
-      <div className="welcome-section">
-        <h2>Welcome back, {user.name}!</h2>
-        <p>Ready to contribute to coastal monitoring?</p>
-        <div style={{ marginTop: '10px' }}>
-          <button 
-            onClick={() => {
-              console.log('🔄 Manual refresh triggered');
-              forceSync();
-            }} 
-            style={{
-              background: '#00d4aa',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginRight: '10px'
-            }}
-          >
-            🔄 Refresh Data
-          </button>
-          <span style={{ fontSize: '12px', color: '#ccc' }}>
-            FAQs: {faqs?.length || 0} | Updates: {updates?.length || 0}
-          </span>
+      {/* Enhanced Welcome Section */}
+      <div className="welcome-section-enhanced">
+        <div className="welcome-content">
+          <div className="welcome-text">
+            <h1>Welcome back, {user.name}! 👋</h1>
+            <p className="welcome-subtitle">Ready to make a difference in coastal monitoring?</p>
+          </div>
+          <div className="welcome-actions">
+            <button 
+              onClick={() => {
+                console.log('🔄 Manual refresh triggered');
+                forceSync();
+              }} 
+              className="refresh-btn"
+            >
+              <span className="refresh-icon">🔄</span>
+              <span>Sync Data</span>
+            </button>
+          </div>
+      </div>
+      
+        {/* Quick Stats Bar */}
+        <div className="quick-stats-bar">
+          <div className="stat-item">
+            <span className="stat-number">{faqs?.length || 0}</span>
+            <span className="stat-label">FAQs Available</span>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat-item">
+            <span className="stat-number">{updates?.length || 0}</span>
+            <span className="stat-label">Latest Updates</span>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat-item">
+            <span className="stat-number">Live</span>
+            <span className="stat-label">Database Status</span>
+          </div>
         </div>
       </div>
 
-      <div className="action-grid">
-        <button onClick={() => setActiveTab('faqs')} className="action-card primary">
-          <div className="action-icon">❓</div>
-          <div className="action-text">View FAQ</div>
-        </button>
-        <button onClick={() => setActiveTab('updates')} className="action-card">
-          <div className="action-icon">📢</div>
-          <div className="action-text">Check Updates</div>
-        </button>
-        <button onClick={() => setActiveTab('profile')} className="action-card">
-          <div className="action-icon">👤</div>
-          <div className="action-text">Profile</div>
-        </button>
+      {/* Enhanced Action Grid */}
+      <div className="action-grid-enhanced">
+        <div className="action-section">
+          <h3 className="section-title">Quick Access</h3>
+          <div className="action-cards">
+            <button onClick={() => setActiveTab('faqs')} className="action-card-enhanced primary">
+              <div className="action-icon-enhanced">❓</div>
+              <div className="action-content">
+                <h4>FAQ Center</h4>
+                <p>Find answers to common questions</p>
+                <span className="action-count">{faqs?.length || 0} FAQs</span>
+            </div>
+              <div className="action-arrow">→</div>
+            </button>
+            
+            <button onClick={() => setActiveTab('updates')} className="action-card-enhanced">
+              <div className="action-icon-enhanced">📢</div>
+              <div className="action-content">
+                <h4>Latest Updates</h4>
+                <p>Stay informed with announcements</p>
+                <span className="action-count">{updates?.length || 0} Updates</span>
+            </div>
+              <div className="action-arrow">→</div>
+            </button>
+          </div>
+      </div>
+
+        <div className="action-section">
+          <h3 className="section-title">Account</h3>
+          <div className="action-cards">
+            <button onClick={() => setActiveTab('profile')} className="action-card-enhanced profile">
+              <div className="action-icon-enhanced">👤</div>
+              <div className="action-content">
+                <h4>My Profile</h4>
+                <p>Manage your account settings</p>
+                <span className="action-count">Personal</span>
+              </div>
+              <div className="action-arrow">→</div>
+            </button>
+          </div>
+    </div>
+      </div>
+      
+      {/* Quick Tips Section */}
+      <div className="quick-tips">
+        <h3 className="tips-title">💡 Quick Tips</h3>
+        <div className="tips-grid">
+          <div className="tip-card">
+            <div className="tip-icon">🔍</div>
+            <div className="tip-content">
+              <h4>Search FAQs</h4>
+              <p>Use keywords to quickly find answers</p>
+            </div>
+          </div>
+          <div className="tip-card">
+            <div className="tip-icon">📱</div>
+            <div className="tip-content">
+              <h4>Mobile Friendly</h4>
+              <p>Access from any device, anywhere</p>
+            </div>
+          </div>
+          <div className="tip-card">
+            <div className="tip-icon">🔄</div>
+            <div className="tip-content">
+              <h4>Real-time Sync</h4>
+              <p>Data updates automatically</p>
+            </div>
+      </div>
+        </div>
       </div>
 
     </div>
@@ -281,7 +351,7 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
     const matchesSearch = searchTerm === '' || 
       faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesCategory = filterCategory === 'all' || 
       faq.category.toLowerCase().includes(filterCategory.toLowerCase());
     

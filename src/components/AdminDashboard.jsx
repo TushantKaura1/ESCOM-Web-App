@@ -766,26 +766,6 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         </div>
       </div>
 
-      <div className="recent-activity">
-        <h3>Recent Activity</h3>
-        <div className="activity-list">
-          <div className="activity-item">
-            <span className="activity-icon">👤</span>
-            <span className="activity-text">New user registration: Ana Oliveira</span>
-            <span className="activity-time">2 hours ago</span>
-          </div>
-          <div className="activity-item">
-            <span className="activity-icon">📊</span>
-            <span className="activity-text">Data submission: 15 new readings</span>
-            <span className="activity-time">4 hours ago</span>
-          </div>
-          <div className="activity-item">
-            <span className="activity-icon">❓</span>
-            <span className="activity-text">FAQ updated: Equipment calibration</span>
-            <span className="activity-time">1 day ago</span>
-          </div>
-        </div>
-      </div>
 
       <div className="data-summary">
         <h3>Data Summary</h3>

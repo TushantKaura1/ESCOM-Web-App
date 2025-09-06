@@ -326,48 +326,6 @@
   box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
 }
 
-.recent-activity {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  padding: 25px;
-}
-
-.recent-activity h3 {
-  margin: 0 0 20px 0;
-  color: #ffffff;
-}
-
-.activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.activity-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.activity-icon {
-  font-size: 1.5rem;
-}
-
-.activity-text {
-  flex: 1;
-  color: #ffffff;
-}
-
-.activity-time {
-  color: #a0a0a0;
-  font-size: 0.9rem;
-}
 
 /* User Management */
 .user-management h3 {
