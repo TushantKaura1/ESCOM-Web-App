@@ -321,10 +321,98 @@ export const notificationOperations = {
   }
 };
 
+// Reading operations
+export const readingOperations = {
+  // Get all readings
+  getAll: async () => {
+    try {
+      return await apiCall('database', 'POST', {
+        operation: 'getAll',
+        table: 'readings'
+      });
+    } catch (error) {
+      console.error('❌ Error fetching readings:', error);
+      return [];
+    }
+  },
+
+  // Get reading by ID
+  getById: async (id) => {
+    try {
+      return await apiCall('database', 'POST', {
+        operation: 'getById',
+        table: 'readings',
+        id: id
+      });
+    } catch (error) {
+      console.error('❌ Error fetching reading:', error);
+      return null;
+    }
+  },
+
+  // Get readings by user ID
+  getByUserId: async (userId) => {
+    try {
+      return await apiCall('database', 'POST', {
+        operation: 'getByUserId',
+        table: 'readings',
+        userId: userId
+      });
+    } catch (error) {
+      console.error('❌ Error fetching user readings:', error);
+      return [];
+    }
+  },
+
+  // Create reading
+  create: async (readingData) => {
+    try {
+      return await apiCall('database', 'POST', {
+        operation: 'create',
+        table: 'readings',
+        data: readingData
+      });
+    } catch (error) {
+      console.error('❌ Error creating reading:', error);
+      throw error;
+    }
+  },
+
+  // Update reading
+  update: async (id, readingData) => {
+    try {
+      return await apiCall('database', 'POST', {
+        operation: 'update',
+        table: 'readings',
+        id: id,
+        data: readingData
+      });
+    } catch (error) {
+      console.error('❌ Error updating reading:', error);
+      throw error;
+    }
+  },
+
+  // Delete reading
+  delete: async (id) => {
+    try {
+      return await apiCall('database', 'POST', {
+        operation: 'delete',
+        table: 'readings',
+        id: id
+      });
+    } catch (error) {
+      console.error('❌ Error deleting reading:', error);
+      throw error;
+    }
+  }
+};
+
 export default {
   initializeDatabase,
   userOperations,
   faqOperations,
   updateOperations,
-  notificationOperations
+  notificationOperations,
+  readingOperations
 };

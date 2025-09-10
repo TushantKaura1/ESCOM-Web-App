@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import Profile from './Profile';
 import ProfileEnhanced from './ProfileEnhanced';
+import MonitoringDashboard from './MonitoringDashboard';
 import './UserDashboard.css';
 
 function UserDashboard({ user, onLogout, onSectionChange }) {
@@ -354,6 +355,8 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         return renderFAQs();
       case 'updates':
         return renderUpdates();
+      case 'monitoring':
+        return <MonitoringDashboard user={user} onLogout={onLogout} onSectionChange={onSectionChange} />;
       case 'profile':
         return renderProfile();
       default:
@@ -414,6 +417,13 @@ function UserDashboard({ user, onLogout, onSectionChange }) {
         >
           <span className="nav-icon">📢</span>
           <span className="nav-text">Updates</span>
+        </button>
+        <button 
+          className={`nav-btn ${activeTab === 'monitoring' ? 'active' : ''}`}
+          onClick={() => setActiveTab('monitoring')}
+        >
+          <span className="nav-icon">📊</span>
+          <span className="nav-text">Monitoring</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`}

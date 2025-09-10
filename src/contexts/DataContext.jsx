@@ -4,7 +4,8 @@ import {
   userOperations, 
   faqOperations, 
   updateOperations, 
-  notificationOperations 
+  notificationOperations,
+  readingOperations 
 } from '../services/database';
 
 const DataContext = createContext();
@@ -22,6 +23,7 @@ export const DataProvider = ({ children }) => {
   const [faqs, setFaqs] = useState([]);
   const [updates, setUpdates] = useState([]);
   const [users, setUsers] = useState([]);
+  const [readings, setReadings] = useState([]);
   const [systemStats, setSystemStats] = useState({});
   const [notifications, setNotifications] = useState([]);
   
@@ -67,6 +69,13 @@ export const DataProvider = ({ children }) => {
       console.log('🔍 DataContext: Live users loaded:', liveUsers);
       console.log('🔍 DataContext: Users count:', liveUsers ? liveUsers.length : 'undefined');
       setUsers(liveUsers || []);
+
+      // Load Readings from live database
+      console.log('🔍 DataContext: Loading readings from live database...');
+      const liveReadings = await readingOperations.getAll();
+      console.log('🔍 DataContext: Live readings loaded:', liveReadings);
+      console.log('🔍 DataContext: Readings count:', liveReadings ? liveReadings.length : 'undefined');
+      setReadings(liveReadings || []);
 
       // Load Notifications from live database
       console.log('🔍 DataContext: Loading notifications from live database...');
@@ -486,6 +495,11 @@ export const DataProvider = ({ children }) => {
           console.log('🔄 Fresh users loaded:', freshUsers);
           setUsers(freshUsers || []);
           break;
+        case 'readings':
+          const freshReadings = await readingOperations.getAll();
+          console.log('🔄 Fresh readings loaded:', freshReadings);
+          setReadings(freshReadings || []);
+          break;
         case 'notifications':
           const freshNotifications = await notificationOperations.getByUserId(null);
           console.log('🔄 Fresh notifications loaded:', freshNotifications);
@@ -498,6 +512,63 @@ export const DataProvider = ({ children }) => {
       console.log(`✅ ${dataType} refreshed successfully`);
     } catch (error) {
       console.error(`❌ Error refreshing ${dataType}:`, error);
+    }
+  };
+
+  // Reading operations
+  const addReading = async (readingData) => {
+    try {
+      console.log('📊 Adding reading:', readingData);
+      const newReading = await readingOperations.create(readingData);
+      console.log('✅ Reading added successfully:', newReading);
+      
+      // Refresh readings data
+      await refreshData('readings');
+      
+      // Add notification
+      await addNotification({
+        userId: readingData.userId,
+        type: 'reading_submitted',
+        title: 'Reading Submitted',
+        message: `Your ${readingData.parameter} reading of ${readingData.value} ${readingData.unit} has been recorded.`
+      });
+      
+      return newReading;
+    } catch (error) {
+      console.error('❌ Error adding reading:', error);
+      throw error;
+    }
+  };
+
+  const updateReading = async (readingId, readingData) => {
+    try {
+      console.log('📊 Updating reading:', readingId, readingData);
+      const updatedReading = await readingOperations.update(readingId, readingData);
+      console.log('✅ Reading updated successfully:', updatedReading);
+      
+      // Refresh readings data
+      await refreshData('readings');
+      
+      return updatedReading;
+    } catch (error) {
+      console.error('❌ Error updating reading:', error);
+      throw error;
+    }
+  };
+
+  const deleteReading = async (readingId) => {
+    try {
+      console.log('📊 Deleting reading:', readingId);
+      await readingOperations.delete(readingId);
+      console.log('✅ Reading deleted successfully');
+      
+      // Refresh readings data
+      await refreshData('readings');
+      
+      return true;
+    } catch (error) {
+      console.error('❌ Error deleting reading:', error);
+      throw error;
     }
   };
 
@@ -533,6 +604,7 @@ export const DataProvider = ({ children }) => {
     faqs,
     updates,
     users,
+    readings,
     systemStats,
     notifications,
     
@@ -555,6 +627,11 @@ export const DataProvider = ({ children }) => {
     updateUser,
     addUser,
     deleteUser,
+    
+    // Reading operations
+    addReading,
+    updateReading,
+    deleteReading,
     
     // Notification operations
     addNotification,

@@ -1950,7 +1950,7 @@ function AdminDashboard({ user, onLogout, onSectionChange }) {
         <div className="header-left">
           <div className="dashboard-logo">
             <img src="/escom-logo.png" alt="ESCOM Logo" className="logo-image" />
-            <h2>Admin Panel</h2>
+            <h2>Admin Dashboard</h2>
           </div>
           <button onClick={() => onLogout()} className="logout-btn">
             <span className="logout-icon">🚪</span>

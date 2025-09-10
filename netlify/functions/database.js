@@ -97,6 +97,22 @@ export const handler = async (event, context) => {
         )
       `;
 
+      await sql`
+        CREATE TABLE IF NOT EXISTS readings (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id),
+          parameter VARCHAR(100) NOT NULL,
+          value DECIMAL(10,3) NOT NULL,
+          unit VARCHAR(20) DEFAULT 'mg/L',
+          location JSONB DEFAULT '{}',
+          timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          accuracy DECIMAL(5,2) DEFAULT 0,
+          notes TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
       result = { success: true, message: 'Database schema initialized' };
     } else {
       switch (operation) {
@@ -124,6 +140,12 @@ export const handler = async (event, context) => {
             }));
           } else if (table === 'notifications') {
             result = await sql`SELECT * FROM notifications ORDER BY created_at DESC`;
+          } else if (table === 'readings') {
+            result = await sql`SELECT * FROM readings ORDER BY timestamp DESC`;
+            result = result.map(reading => ({
+              ...reading,
+              location: reading.location || {}
+            }));
           }
           break;
         
@@ -158,6 +180,12 @@ export const handler = async (event, context) => {
         case 'getByUserId':
           if (table === 'notifications') {
             result = await sql`SELECT * FROM notifications WHERE user_id = ${userId} ORDER BY created_at DESC`;
+          } else if (table === 'readings') {
+            result = await sql`SELECT * FROM readings WHERE user_id = ${userId} ORDER BY timestamp DESC`;
+            result = result.map(reading => ({
+              ...reading,
+              location: reading.location || {}
+            }));
           }
           break;
         
@@ -202,6 +230,16 @@ export const handler = async (event, context) => {
               RETURNING *
             `;
             result = notification;
+          } else if (table === 'readings') {
+            const [reading] = await sql`
+              INSERT INTO readings (user_id, parameter, value, unit, location, timestamp, accuracy, notes)
+              VALUES (${data.userId}, ${data.parameter}, ${data.value}, ${data.unit || 'mg/L'}, ${JSON.stringify(data.location || {})}, ${data.timestamp || new Date().toISOString()}, ${data.accuracy || 0}, ${data.notes || null})
+              RETURNING *
+            `;
+            result = {
+              ...reading,
+              location: reading.location || {}
+            };
           }
           break;
         
@@ -259,6 +297,21 @@ export const handler = async (event, context) => {
               tags: update.tags || [],
               media: update.media || []
             };
+          } else if (table === 'readings') {
+            const [reading] = await sql`
+              UPDATE readings 
+              SET parameter = ${data.parameter}, value = ${data.value}, 
+                  unit = ${data.unit || 'mg/L'}, location = ${JSON.stringify(data.location || {})}, 
+                  timestamp = ${data.timestamp || new Date().toISOString()}, 
+                  accuracy = ${data.accuracy || 0}, notes = ${data.notes || null}, 
+                  updated_at = CURRENT_TIMESTAMP
+              WHERE id = ${id}
+              RETURNING *
+            `;
+            result = {
+              ...reading,
+              location: reading.location || {}
+            };
           }
           break;
         
@@ -278,6 +331,8 @@ export const handler = async (event, context) => {
             await sql`DELETE FROM daily_updates WHERE id = ${id}`;
           } else if (table === 'notifications') {
             await sql`DELETE FROM notifications WHERE id = ${id}`;
+          } else if (table === 'readings') {
+            await sql`DELETE FROM readings WHERE id = ${id}`;
           }
           result = { success: true };
           break;
